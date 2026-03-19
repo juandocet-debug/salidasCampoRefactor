@@ -1,0 +1,66 @@
+/* nsal-stepper.css — Stepper superior de pasos */
+
+.nsal-stepper-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 24px;
+    position: relative;
+}
+
+.nsal-stepper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 60%;
+    justify-content: space-between;
+}
+
+.nsal-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+}
+
+.nsal-step__circulo {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    border: 2px solid #cbd5e1;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.nsal-step__titulo {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.nsal-step--activo .nsal-step__circulo  { background: #0f172a; border-color: #0f172a; color: white; }
+.nsal-step--activo .nsal-step__titulo   { color: #0f172a; }
+.nsal-step--completado .nsal-step__circulo { background: #10b981; border-color: #10b981; color: white; }
+
+.nsal-step__linea {
+    flex: 1;
+    height: 2px;
+    background: #e2e8f0;
+    position: relative;
+    top: -12px;
+    z-index: 1;
+}
+.nsal-step__linea--llena { background: #10b981; }

@@ -1,0 +1,4 @@
+/* WidgetCosto.css — punto de entrada */
+@import './wc-selector.css';
+@import './wc-cards.css';
+@import './wc-timeline.css';

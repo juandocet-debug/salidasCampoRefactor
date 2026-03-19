@@ -1,0 +1,291 @@
+/* BarraLateral.css — Sidebar flotante con paleta cyan */
+
+/* ─ Sidebar ──────────────────────────────────────────────────────── */
+.sb {
+    width: 200px;
+    height: calc(100vh - 20px);
+    margin: 10px 0 10px 10px;
+    flex-shrink: 0;
+
+    background: linear-gradient(175deg, #002535 0%, #004d63 50%, #006578 100%);
+    border-radius: 26px 0 0 26px;
+    /* solo izquierdo → derecha plana = sin gap con la página */
+    box-shadow: -6px 4px 20px rgba(0, 40, 60, 0.35);
+
+    display: flex;
+    flex-direction: column;
+    padding: 14px 0 14px 10px;
+    gap: 2px;
+    overflow: visible;
+    position: relative;
+    z-index: 10;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sb.sb--mini {
+    width: 60px;
+    padding: 14px 0 14px 8px;
+}
+
+/* ─ Header: logo + toggle ────────────────────────────────────────── */
+.sb__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 10px 12px 2px;
+    /* Increased top padding to lower logo */
+    margin-bottom: 2px;
+}
+
+.sb__brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sb__logo-texto {
+    color: #ffffff;
+    font-size: 1.45rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    font-family: 'Inter', system-ui, sans-serif;
+    margin-right: 8px;
+    /* Extra space before toggle */
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.sb__logo-ico {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.sb__logo-ico img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.sb__toggle {
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.80);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s;
+}
+
+.sb__toggle:hover {
+    background: rgba(255, 255, 255, 0.28);
+}
+
+.sb--mini .sb__header {
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sb--mini .sb__toggle {
+    margin: 0 auto;
+}
+
+/* ─ Navegación ───────────────────────────────────────────────────── */
+.sb__nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow: visible;
+    padding-top: 32px;
+}
+
+/* Item base */
+.sb__item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 10px;
+    border-radius: 14px;
+    color: rgba(255, 255, 255, 0.58);
+    text-decoration: none;
+    font-size: 0.855rem;
+    font-weight: 500;
+    white-space: nowrap;
+    position: relative;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
+    margin-right: 0px;
+}
+
+.sb__item:hover {
+    background: rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 1);
+    transform: translateX(2px);
+}
+
+/* Item ACTIVO */
+.sb__item--on {
+    background: #f4f7f9;
+    color: #002535 !important;
+    font-weight: 600;
+    border-radius: 14px 0 0 14px;
+    margin-right: -10px;
+    padding-right: 10px;
+    z-index: 2;
+    overflow: visible;
+}
+
+.sb__item--on:hover {
+    background: #edf1f4;
+}
+
+.sb__item--on .sb__ico svg {
+    stroke: #002535;
+}
+
+/* Curvitas — existen en el DOM solo cuando el item es activo */
+.sb__curva-top,
+.sb__curva-bot {
+    position: absolute;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    background: transparent;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.sb__curva-top {
+    top: -20px;
+    border-bottom-right-radius: 20px;
+    box-shadow: 10px 10px 0 10px #f4f7f9;
+}
+
+.sb__curva-bot {
+    bottom: -20px;
+    border-top-right-radius: 20px;
+    box-shadow: 10px -10px 0 10px #f4f7f9;
+}
+
+/* Ícono */
+.sb__ico {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sb__ico svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Label */
+.sb__label {
+    opacity: 1;
+    transition: opacity 0.15s;
+    flex: 1;
+}
+
+.sb--mini .sb__label {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+}
+
+.sb--mini .sb__item {
+    justify-content: flex-start;
+    padding: 10px 0 10px 16px;
+    /* Asegura anclaje absoluto a la izquierda sin importar el width */
+}
+
+.sb--mini .sb__label {
+    display: none;
+    /* Elimina la caja para no afectar flex */
+}
+
+/* Tooltip en mini */
+.sb--mini .sb__item {
+    position: relative;
+}
+
+.sb--mini .sb__item[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    left: calc(60px + 10px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: #002535;
+    color: #fff;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 7px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 999;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* ─ Responsividad Mobile ─────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .sb {
+        position: fixed;
+        left: -300px;
+        top: 0;
+        bottom: 0;
+        height: 100vh;
+        width: 260px;
+        margin: 0;
+        border-radius: 0 26px 26px 0;
+        z-index: 100;
+        transition: left 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+        box-shadow: none;
+    }
+
+    .sb.sb--mobile-open {
+        left: 0;
+        box-shadow: 10px 0 30px rgba(0, 37, 53, 0.4);
+    }
+
+    .sb__toggle {
+        display: none;
+    }
+
+    .sb__curva-top,
+    .sb__curva-bot {
+        display: none !important;
+    }
+
+    .sb.sb--mobile-open .sb__label,
+    .sb.sb--mobile-open .sb__user-info {
+        opacity: 1;
+        width: auto;
+        display: block;
+    }
+
+    .sb.sb--mobile-open .sb__item {
+        justify-content: flex-start;
+        padding: 9px 10px;
+    }
+
+    .sb.sb--mobile-open .sb__item--on {
+        margin-right: 10px !important;
+        border-radius: 14px !important;
+    }
+
+    .sb.sb--mobile-open .sb__header {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}

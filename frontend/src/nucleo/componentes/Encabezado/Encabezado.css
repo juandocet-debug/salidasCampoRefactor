@@ -1,0 +1,222 @@
+/* src/nucleo/componentes/Encabezado/Encabezado.css */
+
+.nc-encabezado {
+    height: 72px;
+    /* Taller, modern look */
+    min-height: 72px;
+    background: #ffffff;
+    /* Clean white */
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    transition: padding 0.3s;
+}
+
+/* ── IZQUIERDA ─────────────────────────────────────────── */
+.nc-encabezado__izq {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nc-encabezado__btn-mobile {
+    display: none;
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 8px;
+    margin-left: -8px;
+    transition: color 0.15s;
+}
+
+.nc-encabezado__btn-mobile:hover {
+    color: #0f172a;
+}
+
+.nc-encabezado__titulos {
+    display: flex;
+    flex-direction: column;
+}
+
+.nc-encabezado__titulo {
+    font-size: 1.35rem;
+    /* Larger, bolder as referencing image */
+    font-weight: 800;
+    color: #1e293b;
+    letter-spacing: -0.5px;
+}
+
+.nc-encabezado__ruta {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+/* ── DERECHA ─────────────────────────────────────────── */
+.nc-encabezado__der {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.nc-encabezado__btn-texto {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    border-radius: 8px;
+    transition: background 0.15s;
+}
+
+.nc-encabezado__btn-texto:hover {
+    background: #f1f5f9;
+}
+
+.nc-encabezado__btn-icono {
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.2s ease;
+    font-size: 1.15rem;
+    position: relative;
+}
+
+.nc-encabezado__btn-icono:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+.nc-encabezado__btn-icono .notif-punto {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 8px;
+    height: 8px;
+    background: #ef4444;
+    /* Alert red */
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+}
+
+.nc-encabezado__separador {
+    width: 1px;
+    height: 28px;
+    background: #e2e8f0;
+    margin: 0 4px;
+}
+
+/* ── PERFIL FLOTANTE ─────────────────────────────────── */
+.nc-encabezado__perfil {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.nc-encabezado__perfil:hover {
+    background: #f1f5f9;
+}
+
+.nc-encabezado__avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    color: #475569;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 0 2px #ffffff;
+}
+
+.nc-encabezado__avatar img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+    /* Renders above initials if available */
+}
+
+.nc-encabezado__user-textos {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.nc-encabezado__nombre {
+    font-size: 0.90rem;
+    font-weight: 700;
+    color: #0f172a;
+    /* Darker modern color */
+    line-height: 1.1;
+    margin-bottom: 2px;
+}
+
+.nc-encabezado__rol {
+    font-size: 0.75rem;
+    color: #00bcd4;
+    /* Accent color similar to screenshot's blue text */
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.nc-encabezado__chevron {
+    color: #94a3b8;
+    margin-top: 1px;
+    transition: color 0.15s;
+}
+
+.nc-encabezado__perfil:hover .nc-encabezado__chevron {
+    color: #475569;
+}
+
+/* ── MÓVIL ─────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .nc-encabezado {
+        padding: 0 16px;
+    }
+
+    .nc-encabezado__btn-mobile {
+        display: flex;
+    }
+
+    .nc-encabezado__user-textos,
+    .nc-encabezado__btn-texto,
+    .nc-encabezado__separador {
+        display: none;
+    }
+
+    .nc-encabezado__perfil {
+        padding: 4px;
+    }
+}

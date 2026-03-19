@@ -1,0 +1,122 @@
+/* src/funcionalidades/abordaje/paginas/PaginaVerificacionAbordaje.css */
+/* Usa tokens del design system (variables.css) — sin duplicar */
+
+.verif-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 24px;
+    padding: 32px;
+    height: 100%;
+    align-items: start;
+}
+
+/* ── Panel izquierdo: Stats ─────────────────────────────────────────── */
+
+.verif-stats {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: var(--glass-blur);
+    border-radius: var(--radio-base);
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: sticky;
+    top: 24px;
+}
+
+.verif-stats__titulo {
+    font-size: var(--texto-base);
+    font-weight: 600;
+    color: var(--text-secundario);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.verif-stat-bloque {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    border-radius: calc(var(--radio-base) - 2px);
+}
+
+.verif-stat-bloque--ok   { background: rgba(34, 197, 94, 0.10); }
+.verif-stat-bloque--pend { background: rgba(251, 191, 36, 0.08); }
+
+.verif-stat__num {
+    font-size: var(--texto-2xl);
+    font-weight: 700;
+    color: var(--text-primario);
+}
+
+.verif-stat__lbl {
+    font-size: var(--texto-sm);
+    color: var(--text-secundario);
+}
+
+.verif-stat-bloque--ok   .verif-stat__num { color: #4ade80; }
+.verif-stat-bloque--pend .verif-stat__num { color: #fbbf24; }
+
+/* Barra de progreso */
+.verif-progreso {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.verif-progreso__barra {
+    flex: 1;
+    height: 6px;
+    background: var(--borde-suave);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.verif-progreso__fill {
+    height: 100%;
+    background: var(--gradiente-acento);
+    border-radius: 10px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.verif-progreso__pct {
+    font-size: var(--texto-sm);
+    font-weight: 600;
+    color: var(--cyan-400);
+    min-width: 38px;
+    text-align: right;
+}
+
+.verif-stat-total {
+    font-size: var(--texto-xs);
+    color: var(--text-inactivo);
+    text-align: center;
+}
+
+.verif-cargando {
+    color: var(--text-inactivo);
+    font-size: var(--texto-sm);
+    text-align: center;
+    padding: 16px 0;
+}
+
+/* ── Panel derecho: Lector ─────────────────────────────────────────── */
+
+.verif-main {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 48px;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+    .verif-layout {
+        grid-template-columns: 1fr;
+        padding: 16px;
+    }
+    .verif-stats { position: static; }
+    .verif-main  { padding-top: 0; }
+}

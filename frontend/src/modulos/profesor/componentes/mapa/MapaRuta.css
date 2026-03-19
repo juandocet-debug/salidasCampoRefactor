@@ -1,0 +1,92 @@
+/* MapaRuta.css */
+
+.mapa-ruta {
+    width: 100%;
+    height: 340px;
+    border-radius: 16px;
+    border: none;
+    overflow: hidden;
+    z-index: 0;
+    margin-bottom: 12px;
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.07),
+        0 10px 24px -2px rgba(52, 91, 141, 0.12);
+}
+
+/* Controles de zoom */
+.mapa-ruta .leaflet-control-zoom {
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+}
+
+.mapa-ruta .leaflet-control-zoom a {
+    background: #fff !important;
+    color: #1e293b !important;
+    border: none !important;
+    border-radius: 10px !important;
+    width: 32px !important;
+    height: 32px !important;
+    line-height: 32px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    margin-bottom: 2px !important;
+    transition: background 0.15s;
+}
+
+.mapa-ruta .leaflet-control-zoom a:hover {
+    background: #f1f5f9 !important;
+}
+
+/* Attribution pequeño y discreto */
+.mapa-ruta .leaflet-control-attribution {
+    font-size: 0.6rem !important;
+    opacity: 0.5;
+    background: rgba(255,255,255,0.7) !important;
+    border-radius: 4px 0 0 0 !important;
+}
+
+/* Popup moderno */
+.mapa-ruta .leaflet-popup-content-wrapper {
+    border-radius: 10px !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+    border: none !important;
+    padding: 0 !important;
+}
+
+.mapa-ruta .leaflet-popup-content {
+    margin: 10px 14px !important;
+    font-size: 0.82rem !important;
+}
+
+.mapa-ruta .leaflet-popup-tip-container {
+    display: none !important;
+}
+
+/* Marcadores */
+.mapa-marker-custom {
+    background: none !important;
+    border: none !important;
+}
+
+.mapa-marker-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #4A8DAC;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 800;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #fff;
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.2),
+        0 0 0 1px rgba(0,0,0,0.06);
+    transition: transform 0.15s;
+}
+
+.mapa-marker-dot:hover {
+    transform: scale(1.15);
+}

@@ -1,0 +1,147 @@
+/* InputDireccion.css — Diseño limpio tipo Uber/Maps */
+
+.idir {
+    position: relative;
+    width: 100%;
+}
+
+.idir__label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748b;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.idir__input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Círculo negro con letra — fuera del input */
+.idir__circulo {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #1e293b;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.idir__input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 36px 12px 14px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    background: #fff;
+    color: #0f172a;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.idir__input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.idir__input::placeholder {
+    color: #94a3b8;
+}
+
+.idir__spinner {
+    position: absolute;
+    right: 14px;
+    width: 13px;
+    height: 13px;
+    border: 2px solid #e2e8f0;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: idirSpin 0.5s linear infinite;
+}
+
+@keyframes idirSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ── Dropdown ───────────────────────────────────────────────────── */
+.idir__lista {
+    position: absolute;
+    top: calc(100% + 3px);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    margin: 0;
+    padding: 4px;
+    z-index: 9999;
+    max-height: 260px;
+    overflow-y: auto;
+    animation: idirFade 0.12s ease-out;
+}
+
+@keyframes idirFade {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.idir__item {
+    padding: 9px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.idir__item:hover,
+.idir__item--on {
+    background: #f1f5f9;
+}
+
+.idir__item-nombre {
+    display: block;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.idir__item-detalle {
+    display: block;
+    font-size: 0.68rem;
+    color: #94a3b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 1px;
+}
+
+.idir__atribucion {
+    text-align: center;
+    font-size: 0.6rem;
+    color: #cbd5e1;
+    padding: 3px 0 1px;
+}

@@ -1,0 +1,267 @@
+/* src/modulos/profesor/componentes/ModalNuevaSalida.css */
+.mns-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.mns-modal {
+    background: #ffffff;
+    width: 550px;
+    max-width: 90%;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modalScale 0.2s ease-out;
+}
+
+@keyframes modalScale {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.mns-header {
+    background: #f8fafc;
+    padding: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.mns-header h2 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+}
+
+.mns-btn-cerrar {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #94a3b8;
+    transition: color 0.2s;
+}
+
+.mns-btn-cerrar:hover {
+    color: #ef4444;
+}
+
+.mns-form {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+    max-height: 70vh;
+}
+
+.mns-row {
+    display: flex;
+    gap: 16px;
+}
+
+.mns-row>.mns-seccion {
+    flex: 1;
+}
+
+.mns-seccion {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.mns-seccion label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #475569;
+}
+
+.mns-seccion input,
+.mns-seccion textarea {
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #1e293b;
+    outline: none;
+    transition: border-color 0.2s;
+    background: #fdfdfd;
+}
+
+.mns-seccion input:focus,
+.mns-seccion textarea:focus {
+    border-color: #4A8DAC;
+    box-shadow: 0 0 0 2px rgba(74, 141, 172, 0.1);
+}
+
+.mns-design-panel {
+    background: #f4f7fb;
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.mns-design-panel h4 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #334155;
+    margin: 0 0 12px 0;
+    border-bottom: 1px solid #d1d5db;
+    padding-bottom: 8px;
+}
+
+.mns-design-row {
+    display: flex;
+    gap: 24px;
+}
+
+.mns-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mns-selector label {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.mns-opciones {
+    display: flex;
+    gap: 8px;
+}
+
+.mns-opcion {
+    background: white;
+    border: 1px solid #cbd5e1;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mns-opcion--activa {
+    background: #4A8DAC;
+    color: white;
+    border-color: #4A8DAC;
+}
+
+.mns-opciones-color {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.mns-color-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 0 1px #cbd5e1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    transition: transform 0.2s;
+}
+
+.mns-color-btn:hover {
+    transform: scale(1.1);
+}
+
+.mns-color-btn--activa {
+    box-shadow: 0 0 0 2px #4A8DAC;
+    transform: scale(1.1);
+}
+
+.mns-error {
+    color: #ef4444;
+    background: #fef2f2;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    text-align: center;
+    font-weight: 500;
+}
+
+.mns-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 12px;
+    padding-top: 16px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.mns-btn-cancelar {
+    background: white;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.mns-btn-cancelar:hover {
+    background: #f1f5f9;
+}
+
+.mns-btn-guardar {
+    background: #000000;
+    border: none;
+    color: white;
+    padding: 8px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.mns-btn-guardar:hover:not(:disabled) {
+    opacity: 0.8;
+}
+
+.mns-btn-guardar:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+    .mns-row {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .mns-design-row {
+        flex-direction: column;
+    }
+}

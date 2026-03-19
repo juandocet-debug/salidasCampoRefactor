@@ -1,0 +1,137 @@
+/* src/nucleo/sistema-diseno/variables.css */
+/* ─────────────────────────────────────────────────────────────────
+   SISTEMA DE DISEÑO — OTIUM
+   Paleta Teal/Cyan + fondo oscuro + glassmorphism
+   ─────────────────────────────────────────────────────────────────
+
+   ESTRATEGIA DE ESTILOS:
+   · @tailwind → clases utilitarias para layouts y estilos estándar
+   · variables CSS (:root) → design tokens del sistema
+   · CSS personalizado → animaciones, efectos especiales, SVG, :has()
+   ───────────────────────────────────────────────────────────────── */
+
+/* @tailwind utilities; — desactivado: conflictúa con estilos personalizados del proyecto */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* ── Paleta principal Teal/Cyan ───────────────────────────────── */
+  --cyan-50: #e0f7fa;
+  --cyan-100: #b2ebf2;
+  --cyan-200: #80deea;
+  --cyan-300: #4dd0e1;
+  --cyan-400: #26c6da;
+  --cyan-500: #00bcd4;
+  /* primario principal */
+  --cyan-600: #00acc1;
+  --cyan-700: #0097a7;
+  --cyan-800: #00838f;
+  --cyan-900: #006064;
+
+  /* ── Fondos ───────────────────────────────────────────────────── */
+  --bg-base: #050e1a;
+  /* negro azulado — fondo principal */
+  --bg-sidebar: #081422;
+  /* sidebar más oscuro */
+  --bg-card: rgba(0, 188, 212, 0.05);
+  --bg-card-hover: rgba(0, 188, 212, 0.10);
+  --bg-active: rgba(0, 188, 212, 0.18);
+
+  /* ── Glassmorphism ────────────────────────────────────────────── */
+  --glass-bg: rgba(8, 20, 34, 0.75);
+  --glass-border: rgba(0, 188, 212, 0.20);
+  --glass-blur: blur(16px);
+
+  /* ── Texto ────────────────────────────────────────────────────── */
+  --text-primario: #e8f4f8;
+  --text-secundario: #8bb8c8;
+  --text-inactivo: #4a7080;
+  --text-acento: var(--cyan-400);
+
+  /* ── Bordes y divisores ───────────────────────────────────────── */
+  --borde-suave: rgba(0, 188, 212, 0.12);
+  --borde-activo: var(--cyan-500);
+
+  /* ── Gradientes ───────────────────────────────────────────────── */
+  --gradiente-sidebar: linear-gradient(180deg, #081422 0%, #050e1a 100%);
+  --gradiente-acento: linear-gradient(135deg, var(--cyan-500), var(--cyan-700));
+  --gradiente-card: linear-gradient(135deg, rgba(0, 188, 212, 0.08), rgba(0, 96, 100, 0.04));
+
+  /* ── Sombras ──────────────────────────────────────────────────── */
+  --sombra-sidebar: 4px 0 24px rgba(0, 0, 0, 0.5);
+  --sombra-card: 0 4px 24px rgba(0, 0, 0, 0.3);
+  --sombra-acento: 0 0 20px rgba(0, 188, 212, 0.25);
+
+  /* ── Dimensiones ──────────────────────────────────────────────── */
+  --sidebar-ancho: 240px;
+  --sidebar-ancho-mini: 68px;
+  --encabezado-alto: 60px;
+  --radio-base: 12px;
+  --radio-pill: 50px;
+
+  /* ── Transiciones ─────────────────────────────────────────────── */
+  --transicion-base: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  --transicion-sidebar: width 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ── Tipografía ───────────────────────────────────────────────── */
+  --fuente: 'Inter', system-ui, sans-serif;
+  --texto-xs: 0.72rem;
+  --texto-sm: 0.85rem;
+  --texto-base: 1rem;
+  --texto-lg: 1.15rem;
+  --texto-xl: 1.35rem;
+  --texto-2xl: 1.6rem;
+}
+
+/* ── Reset y base global ─────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  font-family: var(--fuente);
+  background: var(--bg-base);
+  color: var(--text-primario);
+  overflow: hidden;
+}
+
+/* ── Scrollbar personalizado ─────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--cyan-800);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cyan-600);
+}
+
+/* ── Utilidades ──────────────────────────────────────────────────── */
+.oculto {
+  display: none !important;
+}
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+}
+
+.truncar {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

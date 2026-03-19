@@ -1,0 +1,29 @@
+# requirements.txt
+# ─────────────────────────────────────────────────────────────────────────────
+# DEPENDENCIAS DEL BACKEND — OTIUM
+# Instalar con: pip install -r requirements.txt
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Framework principal
+Django==5.0.3
+
+# API REST
+djangorestframework==3.15.1
+
+# Autenticación JWT
+djangorestframework-simplejwt==5.3.1
+
+# CORS (permite que React se comunique con Django)
+django-cors-headers==4.3.1
+
+# Leer variables de entorno desde .env
+python-decouple==3.8
+
+# Cargar .env automáticamente en manage.py
+python-dotenv==1.0.1
+
+# Imágenes (requerido por ImageField en el modelo Vehiculo)
+Pillow==12.1.1
+
+# Para PostgreSQL en producción (opcional ahora, necesario en el futuro)
+# psycopg2-binary==2.9.9

@@ -1,0 +1,164 @@
+/* PaginaLoginAnimaciones.css — Keyframes y variantes responsive */
+
+/* ─ Keyframes ───────────────────────────────────────────────────── */
+@keyframes entradaArriba {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes brillo {
+    from {
+        left: -80%;
+    }
+
+    to {
+        left: 130%;
+    }
+}
+
+@keyframes girar {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes parpadeo {
+    50% {
+        opacity: 0;
+    }
+}
+
+@keyframes paisajeVivo {
+
+    0%,
+    100% {
+        transform: scale(1.08) translate(0%, 0%);
+    }
+
+    25% {
+        transform: scale(1.12) translate(-1.5%, -0.8%);
+    }
+
+    50% {
+        transform: scale(1.10) translate(-2.5%, 0.5%);
+    }
+
+    75% {
+        transform: scale(1.13) translate(-1%, 1.2%);
+    }
+}
+
+.anim-entrada {
+    opacity: 0;
+    animation: entradaArriba .55s cubic-bezier(.22, 1, .36, 1) forwards;
+}
+
+/* ─ Spinner cargando ─────────────────────────────────────────────── */
+.login__btn-cargando {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.login__spinner {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, .3);
+    border-top-color: #fff;
+    animation: girar .7s linear infinite;
+}
+
+/* ─ Footer logo ─────────────────────────────────────────────────── */
+.login__footer-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding-top: 20px;
+    border-top: 1px solid var(--sep);
+    width: 100%;
+    max-width: 440px;
+}
+
+.login__logo-img {
+    height: 54px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, .90)) drop-shadow(0 0 10px rgba(0, 188, 212, .50));
+}
+
+.login__tagline {
+    font-family: 'Nunito', sans-serif;
+    font-size: .88rem;
+    font-weight: 300;
+    letter-spacing: .06em;
+    color: rgba(255, 255, 255, .70);
+    white-space: nowrap;
+    min-height: 1.4em;
+}
+
+.login__cursor {
+    display: inline-block;
+    width: 1.5px;
+    height: .9em;
+    background: var(--cyan);
+    margin-left: 1px;
+    vertical-align: middle;
+    animation: parpadeo .75s step-end infinite;
+}
+
+/* ─ Responsive ───────────────────────────────────────────────────── */
+@media (max-width:1024px) {
+    .login {
+        grid-template-columns: 55fr 45fr;
+    }
+}
+
+@media (max-width:768px) {
+    .login {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+
+    .login__ilustracion {
+        display: none;
+    }
+
+    .login__formulario-panel {
+        padding: 24px;
+    }
+
+    .login__titulo {
+        font-size: 1.2rem;
+    }
+
+    .login__card,
+    .login__upn-header,
+    .login__footer-logo {
+        max-width: 100%;
+    }
+}
+
+@media (max-width:480px) {
+    .login__formulario-panel {
+        padding: 20px 16px;
+    }
+
+    .login__titulo {
+        font-size: 1.1rem;
+    }
+
+    .login__input {
+        padding: 10px 14px 10px 40px;
+    }
+}

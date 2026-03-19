@@ -1,0 +1,18 @@
+/* p3l-layout.css — layout mapa, columnas, grid resumen+costo */
+
+.p3l-mapa-full { width: 100%; margin-bottom: 20px; }
+
+.p3l-cols-2 {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 14px; margin-bottom: 16px; align-items: stretch;
+}
+@media (max-width: 640px) { .p3l-cols-2 { grid-template-columns: 1fr; } }
+
+.p3l-resumen-full {
+    display: grid; grid-template-columns: 1fr 1.4fr;
+    gap: 14px; margin-bottom: 24px; align-items: stretch;
+}
+@media (max-width: 760px) { .p3l-resumen-full { grid-template-columns: 1fr; } }
+
+.p3l-footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px; }
+@media (max-width: 700px) { .p3l-footer-grid { grid-template-columns: 1fr; } }

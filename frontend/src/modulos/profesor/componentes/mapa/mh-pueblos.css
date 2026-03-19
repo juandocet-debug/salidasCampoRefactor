@@ -1,0 +1,29 @@
+/* mh-pueblos.css — cards de pueblos en ruta dentro del ModalHospedaje */
+
+.mh-pueblos-list { display: flex; flex-direction: column; gap: 14px; }
+
+.mh-pueblo-card {
+    display: flex; gap: 14px; border: 1.5px solid #e2e8f0;
+    border-radius: 14px; overflow: hidden; background: #fafbfc;
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+.mh-pueblo-card:hover { box-shadow: 0 4px 18px rgba(0, 0, 0, .09); border-color: #cbd5e1; }
+
+.mh-pueblo-card__left { flex-shrink: 0; width: 110px; }
+.mh-pueblo-card__img  { width: 110px; height: 100%; min-height: 100px; object-fit: cover; display: block; }
+.mh-pueblo-card__img--placeholder { display: flex; align-items: center; justify-content: center; font-size: 2.5rem; background: #f1f5f9; height: 100%; min-height: 100px; }
+
+.mh-pueblo-card__body   { flex: 1; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+.mh-pueblo-card__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.mh-pueblo-card__nombre { font-size: 1rem; font-weight: 700; color: #1e293b; margin: 0; }
+.mh-pueblo-card__badges { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.mh-badge      { font-size: 0.72rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+.mh-badge--km  { background: #dbeafe; color: #1d4ed8; }
+.mh-badge--depto { background: #f0fdf4; color: #15803d; }
+
+.mh-pueblo-card__desc { font-size: 0.8rem; color: #475569; line-height: 1.55; margin: 0; }
+
+.mh-pueblo-card__footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 6px; }
+.mh-wiki-link       { font-size: 0.75rem; color: #3b82f6; text-decoration: none; font-weight: 500; }
+.mh-wiki-link:hover { text-decoration: underline; }

@@ -1,0 +1,207 @@
+/* BarraLateralFooter.css — Footer del sidebar: usuario, menú de roles, logout */
+
+/* ─ Footer & User Menu ────────────────────────────────────────────── */
+.sb__footer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    margin-top: 8px;
+    padding-right: 10px;
+    position: relative;
+}
+
+.sb__menu-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+}
+
+.sb__user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+    border-radius: 10px;
+    padding: 4px;
+    transition: background 0.18s;
+    position: relative;
+    z-index: 1001;
+}
+
+.sb__user:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* Menu Dropdown Roles */
+.sb__menu-roles {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 4px;
+    width: 220px;
+    background: #002535;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    z-index: 1010;
+    animation: menuSubida 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    transform-origin: bottom left;
+}
+
+@keyframes menuSubida {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.sb__menu-roles-titulo {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 4px 8px 6px;
+    font-weight: 600;
+}
+
+.sb__menu-rol-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: left;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+}
+
+.sb__menu-rol-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.sb__menu-rol-btn.activo {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    font-weight: 600;
+}
+
+.sb__menu-divisor {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 4px 0;
+}
+
+.sb__avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.20);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.sb__user-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    transition: opacity 0.2s;
+}
+
+.sb--mini .sb__user-info {
+    opacity: 0;
+    width: 0;
+}
+
+.sb__user-name {
+    font-size: 0.80rem;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.15;
+    margin-bottom: 2px;
+}
+
+.sb__user-role {
+    font-size: 0.68rem;
+    color: rgba(255, 255, 255, 0.55);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.15s;
+}
+
+.sb__user:hover .sb__user-role {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.sb__user-chevron {
+    opacity: 0.6;
+    margin-top: 1px;
+}
+
+.sb__salir {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.45);
+    padding: 6px;
+    border-radius: 8px;
+    display: flex;
+    flex-shrink: 0;
+    transition: color 0.18s, background 0.18s;
+}
+
+.sb__salir:hover {
+    color: #ff8a80;
+    background: rgba(255, 100, 80, 0.12);
+}
+
+.sb--mini .sb__salir {
+    display: none;
+}
+
+.sb--mini .sb__footer {
+    justify-content: center;
+    padding-right: 0;
+}
+
+.sb--mini .sb__user {
+    flex: none;
+}
+
+/* ─ Responsividad Mobile (footer) ────────────────────────────────── */
+@media (max-width: 900px) {
+    .sb.sb--mobile-open .sb__footer {
+        padding-right: 10px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .sb.sb--mobile-open .sb__salir {
+        justify-content: center;
+    }
+}

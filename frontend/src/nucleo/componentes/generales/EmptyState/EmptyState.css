@@ -1,0 +1,47 @@
+/* EmptyState.css — estado vacío compartido OTIUM */
+
+.otm-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 32px 24px;
+    border-radius: 14px;
+    text-align: center;
+    font-family: inherit;
+}
+
+/* Tema claro (default) */
+.otm-empty--light {
+    background: #f8fafc;
+    border: 1.5px dashed #cbd5e1;
+    color: #64748b;
+}
+
+/* Tema oscuro (para paneles con fondo oscuro) */
+.otm-empty--dark {
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px dashed rgba(255, 255, 255, 0.25);
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.otm-empty__ico {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.otm-empty__titulo {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin: 0;
+}
+.otm-empty--dark .otm-empty__titulo { color: rgba(255,255,255,0.9); }
+
+.otm-empty__sub {
+    font-size: 0.78rem;
+    margin: 0;
+    line-height: 1.5;
+}
+.otm-empty--dark .otm-empty__sub { color: rgba(255,255,255,0.5); }
+
+.otm-empty__accion { margin-top: 8px; }

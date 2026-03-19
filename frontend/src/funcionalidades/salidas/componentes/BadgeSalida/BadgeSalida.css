@@ -1,0 +1,89 @@
+/* src/funcionalidades/salidas/componentes/BadgeSalida/BadgeSalida.css */
+/* ──────────────────────────────────────────────────────────────────────────
+   Badge de estado para salidas de campo.
+   Usa las variables del design system (variables.css). No duplica ningún token.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.badge-salida {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: var(--radio-pill);
+  font-size: var(--texto-xs);
+  font-weight: 600;
+  font-family: var(--fuente);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  transition: var(--transicion-base);
+}
+
+/* ── Variantes por estado ──────────────────────────────────────────────── */
+
+.badge-salida--borrador {
+  background: rgba(74, 112, 128, 0.18);
+  color: var(--text-secundario);
+  border-color: var(--borde-suave);
+}
+
+.badge-salida--enviada {
+  background: rgba(0, 188, 212, 0.15);
+  color: var(--cyan-300);
+  border-color: rgba(0, 188, 212, 0.30);
+}
+
+.badge-salida--revision {
+  background: rgba(251, 191, 36, 0.12);
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.25);
+}
+
+.badge-salida--favorable {
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ade80;
+  border-color: rgba(34, 197, 94, 0.25);
+}
+
+.badge-salida--ajuste {
+  background: rgba(251, 146, 60, 0.12);
+  color: #fb923c;
+  border-color: rgba(251, 146, 60, 0.25);
+}
+
+.badge-salida--aprobada {
+  background: rgba(34, 197, 94, 0.20);
+  color: #22c55e;
+  border-color: rgba(34, 197, 94, 0.40);
+}
+
+.badge-salida--rechazada {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.badge-salida--ejecucion {
+  background: rgba(0, 188, 212, 0.22);
+  color: var(--cyan-400);
+  border-color: var(--borde-activo);
+  box-shadow: 0 0 8px rgba(0, 188, 212, 0.20);
+}
+
+.badge-salida--finalizada {
+  background: rgba(139, 92, 246, 0.12);
+  color: #a78bfa;
+  border-color: rgba(139, 92, 246, 0.25);
+}
+
+.badge-salida--cerrada {
+  background: rgba(74, 112, 128, 0.12);
+  color: var(--text-inactivo);
+  border-color: var(--borde-suave);
+}
+
+.badge-salida--cancelada {
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--text-inactivo);
+  border-color: rgba(239, 68, 68, 0.15);
+  text-decoration: line-through;
+}

@@ -1,0 +1,82 @@
+/* src/modulos/profesor/componentes/KpisProfesor.css */
+.tp-kpis {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.tp-kpi {
+    background: #ffffff;
+    border: none;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tp-kpi:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+}
+
+.tp-kpi__icono {
+    background: #f5f3ff;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #5c4dfa;
+    flex-shrink: 0;
+}
+
+.tp-kpi__text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+}
+
+.tp-kpi__lbl {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-bottom: 2px;
+}
+
+.tp-kpi__main {
+    display: flex;
+    align-items: baseline;
+     gap: 8px;
+}
+
+.tp-kpi__val {
+    font-size: 1.55rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: #1e1b4b;
+}
+
+.tp-kpi__trend {
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.tp-kpi__trend--up {
+    color: #10b981;
+}
+
+.tp-kpi__trend--down {
+    color: #ef4444;
+}
+
+@media (max-width: 768px) {
+    .tp-kpis {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,5 @@
+/* PantallaParada.css — punto de entrada */
+@import './pp-layout.css';
+@import './pp-form.css';
+@import './pp-municipios.css';
+@import './pp-modal-lugar.css';

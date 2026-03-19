@@ -1,0 +1,72 @@
+/* mp-base.css — overlay, modal, campos, acciones del ModalAgregarParada */
+
+@keyframes mpFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes mpSlide {
+    from { opacity: 0; transform: translateY(16px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes mpSpin { to { transform: rotate(360deg); } }
+
+.mp-overlay {
+    position: fixed; inset: 0;
+    background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(4px);
+    z-index: 1000; display: flex; align-items: center; justify-content: center;
+    animation: mpFadeIn 0.18s ease-out;
+}
+
+.mp-modal {
+    background: #fff; border-radius: 18px; padding: 32px;
+    width: 90%; max-width: 680px; max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+    display: flex; flex-direction: column; gap: 16px;
+    animation: mpSlide 0.2s ease-out;
+}
+
+.mp-titulo { font-size: 1.2rem; font-weight: 700; color: #0f172a; margin: 0; }
+
+.mp-campo  { display: flex; flex-direction: column; gap: 5px; }
+.mp-label  { font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.mp-input,
+.mp-select,
+.mp-textarea {
+    padding: 11px 14px; font-size: 0.88rem; font-family: inherit;
+    border: 1.5px solid #e2e8f0; border-radius: 10px;
+    background: #fff; color: #0f172a; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.mp-input:focus, .mp-select:focus, .mp-textarea:focus {
+    border-color: #1e293b; box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.08);
+}
+.mp-input::placeholder, .mp-textarea::placeholder { color: #94a3b8; }
+.mp-select   { cursor: pointer; appearance: auto; }
+.mp-textarea { resize: vertical; min-height: 70px; }
+
+.mp-fila-2     { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.mp-tiempo-row { display: flex; gap: 8px; }
+.mp-input--num      { flex: 1; min-width: 0; }
+.mp-select--unidad  { width: 120px; flex-shrink: 0; }
+
+.mp-acciones { display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px; }
+
+.mp-btn { padding: 10px 22px; font-size: 0.85rem; font-weight: 600; font-family: inherit; border-radius: 10px; cursor: pointer; transition: all 0.15s; }
+.mp-btn--cancelar { background: #fff; color: #334155; border: 1.5px solid #d1d5db; }
+.mp-btn--cancelar:hover { background: #f8fafc; border-color: #94a3b8; }
+.mp-btn--agregar { background: #1e293b; color: #fff; border: 1.5px solid #1e293b; }
+.mp-btn--agregar:hover:not(:disabled) { background: #334155; }
+.mp-btn--disabled { opacity: 0.4; cursor: not-allowed; }
+
+.mp-label--section {
+    font-size: 0.82rem !important; font-weight: 700;
+    color: #0f172a !important; text-transform: none !important; letter-spacing: 0 !important;
+}
+
+.mp-itinerario-section {
+    display: flex; flex-direction: column; gap: 10px;
+    padding-top: 14px; border-top: 1.5px dashed #e2e8f0; margin-top: 4px;
+}
+
+@media (max-width: 560px) {
+    .mp-modal  { padding: 20px; }
+    .mp-fila-2 { grid-template-columns: 1fr; }
+}

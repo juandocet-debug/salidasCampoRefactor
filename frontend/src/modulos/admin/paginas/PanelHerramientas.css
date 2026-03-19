@@ -1,0 +1,819 @@
+/* modulos/admin/paginas/PanelHerramientas.css */
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Panel de Herramientas — Administrador del Sistema                          */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+.herr-layout {
+    display: flex;
+    flex-direction: column;
+    margin: -24px; /* Anula el padding: 24px de .layout__contenido para que el sticky funcioe bien */
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    min-height: calc(100vh - 40px);
+    background: #f8fafc;
+}
+
+/* ── Menú de Navegación Horizontal (Top Nav) ──────────────────────────────── */
+.herr-top-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0.75rem 2.5rem;
+    gap: 2rem;
+    position: sticky;
+    top: -24px;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* Sombra más fuerte para asegurar profundidad */
+}
+
+.herr-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 auto; /* Centrar los links como en la foto */
+}
+
+.herr-nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    padding: 0.5rem 0.85rem;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.herr-nav-link:hover {
+    color: #1e293b;
+    background: #f1f5f9;
+}
+
+.herr-nav-link.active {
+    color: #a855f7; /* Violeta/morado brillante de la referencia */
+    font-weight: 700;
+}
+
+.herr-nav-arrow {
+    transition: transform 0.2s;
+    opacity: 0.6;
+}
+
+.herr-nav-link.active .herr-nav-arrow {
+    transform: rotate(180deg);
+    opacity: 1;
+}
+
+.herr-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    position: absolute;
+    right: 2.5rem; /* Anclado a la derecha como en la referencia */
+}
+
+.herr-nav-actions .herr-btn-icon {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: #64748b;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+}
+
+.herr-nav-actions .herr-btn-icon:hover {
+    color: #0f172a;
+    background: rgba(0,0,0,0.04);
+}
+
+.herr-btn-demo {
+    padding: 0.65rem 1.1rem;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    background: transparent;
+    color: #334155;
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.herr-btn-demo:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+    color: #0f172a;
+}
+
+
+/* ── Contenido Principal (Abajo del nav) ───────────────────────────────────── */
+.herr-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2.5rem;
+}
+
+.herr-main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2.5rem;
+}
+
+.herr-header-text h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.5px;
+}
+
+.herr-header-text p {
+    font-size: 1rem;
+    color: #64748b;
+    margin: 0;
+}
+
+.herr-content-area {
+    /* Agrupa los contenidos, dejando que sean renderizados fluídamente */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+    .herr-top-nav {
+        padding: 0.75rem 1rem;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .herr-nav-actions {
+        position: relative;
+        right: 0;
+    }
+}
+
+/* ── Cards de formulario (Nuevo Estilo Premium) ──────────────────────────────── */
+.herr-card {
+    background: #ffffff;
+    border-radius: 24px;
+    border: none;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 16px 40px rgba(20, 30, 45, 0.04), 0 4px 12px rgba(20, 30, 45, 0.02);
+    position: relative;
+    overflow: hidden;
+}
+/* Premium Headers */
+.herr-card-header--premium {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+.herr-premium-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    flex-shrink: 0;
+}
+.herr-premium-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+.herr-premium-title-group h3 {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #1e293b;
+    letter-spacing: -0.5px;
+}
+.herr-premium-title-group p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* ── Grid de inputs ────────────────────────────────────────────────────────── */
+.herr-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+}
+.herr-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+.herr-campo label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.herr-campo input,
+.herr-campo select {
+    padding: 0.6rem 0.85rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.92rem;
+    color: #1e293b;
+    background: #f8fafc;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.herr-campo input:focus,
+.herr-campo select:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+    background: #fff;
+}
+
+/* ── Tabla ──────────────────────────────────────────────────────────────────── */
+.herr-tabla-wrapper {
+    overflow-x: auto;
+    margin-top: 1rem;
+    border-radius: 16px;
+    border: 1px solid rgba(0,0,0,0.04);
+}
+.herr-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+.herr-tabla th {
+    text-align: left;
+    padding: 1rem 1.25rem;
+    font-weight: 700;
+    color: #64748b;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+.herr-tabla td {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+    vertical-align: middle;
+}
+.herr-tabla tr:last-child td {
+    border-bottom: none;
+}
+.herr-tabla tr:hover td {
+    background: #f8fafc;
+}
+
+/* ── Botones ───────────────────────────────────────────────────────────────── */
+.herr-btn {
+    padding: 0.55rem 1.1rem;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.herr-btn--primario {
+    background: linear-gradient(135deg, #6366f1, #818cf8);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(99,102,241,0.25);
+}
+.herr-btn--primario:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99,102,241,0.35);
+}
+
+.herr-btn--dark {
+    background: #0f172a;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.herr-btn--dark:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    background: #1e293b;
+}
+
+.herr-btn--danger {
+    background: #fee2e2;
+    color: #dc2626;
+}
+.herr-btn--danger:hover { background: #fecaca; }
+.herr-btn--ghost {
+    background: #f1f5f9;
+    color: #475569;
+}
+.herr-btn--ghost:hover { background: #e2e8f0; }
+.herr-btn--sm {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.78rem;
+}
+
+/* ── Botones circulares de acción ────────────────────────────────────────── */
+.herr-action-circle {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s, opacity 0.2s;
+    padding: 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+.herr-action-circle:hover {
+    transform: scale(1.05);
+}
+.herr-action-circle--edit {
+    background: #e6f4ea; /* verde suave de la refe */
+    color: #3f4e4f;
+}
+.herr-action-circle--edit:hover { background: #ceebd6; }
+
+.herr-action-circle--toggle {
+    background: #e2e8f0;
+    color: #475569;
+}
+.herr-action-circle--toggle:hover { background: #cbd5e1; }
+
+.herr-action-circle--eye {
+    background: #dbeafe;
+    color: #2563eb;
+}
+.herr-action-circle--eye:hover { background: #bfdbfe; }
+
+.herr-action-circle--eye-off {
+    background: #fef3c7;
+    color: #d97706;
+}
+.herr-action-circle--eye-off:hover { background: #fde68a; }
+
+.herr-action-circle--delete {
+    background: #dc2626;
+    color: #ffffff;
+}
+.herr-action-circle--delete:hover { background: #b91c1c; }
+
+/* ── Badge estado ──────────────────────────────────────────────────────────── */
+.herr-badge {
+    padding: 0.2rem 0.55rem;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+.herr-badge--activo {
+    background: #dcfce7;
+    color: #16a34a;
+}
+.herr-badge--inactivo {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+/* ── Mensaje vacío ─────────────────────────────────────────────────────────── */
+.herr-vacio {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+/* ── Acciones tabla ────────────────────────────────────────────────────────── */
+.herr-acciones {
+    display: flex;
+    gap: 0.35rem;
+}
+
+/* ── Toast/feedback ────────────────────────────────────────────────────────── */
+.herr-toast {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 10px;
+    background: #1e293b;
+    color: #fff;
+    font-size: 0.85rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    animation: herrToastIn 0.3s ease;
+    z-index: 999;
+}
+@keyframes herrToastIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Form inline (agregar) ─────────────────────────────────────────────────── */
+.herr-form-inline {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    padding: 1.25rem 1.5rem;
+    background: #f8fafc;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(0,0,0,0.03);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
+}
+.herr-form-inline .herr-campo {
+    flex: 1;
+    min-width: 160px;
+}
+
+/* ── Tarjetas de Rendimiento por Vehículo (Premium Dark) ───────────────────── */
+.herr-vehiculos-premium-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding-top: 2rem; /* Espacio para que sobresalgan las imágenes */
+}
+
+@media (max-width: 1100px) {
+    .herr-vehiculos-premium-grid {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+}
+
+.herr-vehiculo-card-premium {
+    position: relative;
+    border-radius: 16px;
+    padding: 1.25rem 1rem 1.25rem 140px; /* Margen izq para la imagen horizontal */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 120px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    background: #1e293b;
+    z-index: 1;
+}
+
+.herr-vehiculo-card-premium:hover {
+    transform: translateY(-4px) scale(1.02);
+    z-index: 5;
+}
+
+/* Backgrounds degradados oscuros elegantes */
+.herr-vehiculo-card-premium::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border-radius: 16px;
+    z-index: 0;
+}
+.herr-vehiculo-premium--bus {
+    box-shadow: 0 10px 25px -5px rgba(217, 119, 6, 0.2);
+}
+.herr-vehiculo-premium--bus::before {
+    background: linear-gradient(135deg, #451a03 0%, #0f172a 70%);
+    border: 1px solid rgba(217, 119, 6, 0.3);
+}
+.herr-vehiculo-premium--buseta {
+    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.2);
+}
+.herr-vehiculo-premium--buseta::before {
+    background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 70%);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+.herr-vehiculo-premium--camioneta {
+    box-shadow: 0 10px 25px -5px rgba(22, 163, 74, 0.2);
+}
+.herr-vehiculo-premium--camioneta::before {
+    background: linear-gradient(135deg, #14532d 0%, #0f172a 70%);
+    border: 1px solid rgba(22, 163, 74, 0.3);
+}
+
+/* La Imagen que sobresale */
+.herr-vehiculo-premium-img {
+    position: absolute;
+    left: -25px;
+    top: 50%;
+    transform: translateY(-50%) scale(1);
+    width: 160px; /* Ancho fijo para imágenes de proporción horizontal */
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(5px 15px 10px rgba(0, 0, 0, 0.5));
+    z-index: 2;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.herr-vehiculo-card-premium:hover .herr-vehiculo-premium-img {
+    transform: translateY(-50%) translate(5px, -5px) scale(1.08);
+}
+
+/* Contenido de texto */
+.herr-vehiculo-premium-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.herr-vehiculo-premium-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.herr-vehiculo-premium-tipo {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #f8fafc;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+}
+
+.herr-vehiculo-premium-pax {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Input oscuro */
+.herr-vehiculo-premium-input {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(15, 23, 42, 0.6);
+    padding: 0.3rem 0.5rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    width: fit-content;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.herr-vehiculo-premium-input input {
+    width: 55px;
+    padding: 0.25rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #ffffff;
+    text-align: center;
+    background: transparent;
+    transition: all 0.2s;
+    border-bottom: 2px solid rgba(255,255,255,0.1);
+}
+
+.herr-vehiculo-premium-input input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom-color: #818cf8;
+}
+
+.herr-vehiculo-premium-unit {
+    font-size: 0.75rem;
+    color: #cbd5e1;
+    font-weight: 600;
+    padding-right: 0.25rem;
+}
+
+.herr-vehiculo-legend {
+    display: flex;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    padding: 0.65rem 0.85rem;
+    background: #f1f5f9;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    color: #64748b;
+}
+
+/* ── IA: Aplicar a tipo selector ─────────────────────────────────────────── */
+.herr-ia-aplicar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+.herr-ia-aplicar-row label {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #64748b;
+    white-space: nowrap;
+}
+.herr-ia-aplicar-row select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    color: #334155;
+    background: #fff;
+}
+.herr-ia-aplicar-row .herr-btn--aplicar {
+    flex: 1;
+}
+
+/* ── Buscador IA ───────────────────────────────────────────────────────────── */
+.herr-card--ia {
+    border: 1px solid transparent;
+    background:
+        linear-gradient(#fff, #fff) padding-box,
+        linear-gradient(135deg, #6366f1 0%, #3b82f6 50%, #06b6d4 100%) border-box;
+    position: relative;
+    overflow: hidden;
+}
+.herr-card--ia::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #6366f1, #3b82f6, #06b6d4, #6366f1);
+    background-size: 200% auto;
+    animation: herrIaShimmer 3s linear infinite;
+}
+@keyframes herrIaShimmer {
+    0%   { background-position: 0%   center; }
+    100% { background-position: 200% center; }
+}
+
+.herr-ia-search {
+    display: flex;
+    gap: 0.65rem;
+    margin-bottom: 1rem;
+}
+.herr-ia-search input {
+    flex: 1;
+    padding: 0.7rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    color: #1e293b;
+    background: #f8fafc;
+    transition: all 0.2s;
+}
+.herr-ia-search input:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+    background: #fff;
+}
+.herr-ia-search input::placeholder {
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+
+.herr-btn--ia {
+    background: linear-gradient(135deg, #6366f1, #3b82f6);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(99,102,241,0.25);
+    white-space: nowrap;
+    min-width: 120px;
+    justify-content: center;
+}
+.herr-btn--ia:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99,102,241,0.35);
+}
+.herr-btn--ia:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ── Spinner IA ──────────────────────────────────────────────────────────── */
+.herr-ia-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: herrSpin 0.6s linear infinite;
+}
+.herr-ia-loading .herr-ia-spinner {
+    border-color: rgba(99,102,241,0.2);
+    border-top-color: #6366f1;
+}
+@keyframes herrSpin {
+    to { transform: rotate(360deg); }
+}
+
+.herr-ia-loading {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 1rem;
+    color: #6366f1;
+    font-size: 0.88rem;
+    font-weight: 500;
+}
+
+/* ── Resultado IA ────────────────────────────────────────────────────────── */
+.herr-ia-result {
+    background: linear-gradient(135deg, #f0f0ff 0%, #eef2ff 100%);
+    border-radius: 10px;
+    padding: 1.25rem;
+    border: 1px solid #c7d2fe;
+    animation: herrFadeIn 0.3s ease;
+}
+@keyframes herrFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.herr-ia-result-header {
+    margin-bottom: 0.85rem;
+}
+.herr-ia-result-badge {
+    background: linear-gradient(135deg, #6366f1, #3b82f6);
+    color: #fff;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.herr-ia-result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 0.85rem;
+}
+.herr-ia-stat {
+    background: #fff;
+    border-radius: 8px;
+    padding: 0.85rem;
+    text-align: center;
+    border: 1px solid #e0e7ff;
+}
+.herr-ia-stat--highlight {
+    background: linear-gradient(135deg, #6366f1, #818cf8);
+    border: none;
+}
+.herr-ia-stat--highlight .herr-ia-stat-val {
+    color: #fff;
+    font-size: 1.6rem;
+}
+.herr-ia-stat--highlight .herr-ia-stat-label {
+    color: rgba(255,255,255,0.8);
+}
+.herr-ia-stat-val {
+    display: block;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #334155;
+    line-height: 1.2;
+}
+.herr-ia-stat-val--sm {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+.herr-ia-stat-label {
+    display: block;
+    font-size: 0.72rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 0.2rem;
+}
+
+.herr-ia-nota {
+    font-size: 0.82rem;
+    color: #64748b;
+    margin: 0 0 0.85rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(255,255,255,0.7);
+    border-radius: 6px;
+    border-left: 3px solid #6366f1;
+}
+
+.herr-btn--aplicar {
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    color: #fff;
+    width: 100%;
+    justify-content: center;
+    padding: 0.65rem 1rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(22,163,74,0.25);
+}
+.herr-btn--aplicar:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(22,163,74,0.35);
+}

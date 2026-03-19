@@ -1,0 +1,28 @@
+/* BadgeMunicipio.css — badges de distancia y departamento compartidos OTIUM */
+
+.otm-municipio-badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.otm-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    line-height: 1.4;
+}
+
+/* Azul — kilómetros */
+.otm-badge--km {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+/* Verde — departamento */
+.otm-badge--dep {
+    background: #f0fdf4;
+    color: #15803d;
+}

@@ -1,0 +1,415 @@
+/* src/modulos/profesor/componentes/ListaTarjetasProfesor.css */
+
+.tp-lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+}
+
+.tp-empty-state {
+    padding: 60px 20px;
+    text-align: center;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px dashed #cbd5e1;
+}
+
+.tp-empty-state h3 {
+    color: #0f172a;
+    margin-bottom: 8px;
+}
+
+.tp-empty-state p {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.tp-empty-state button {
+    margin-top: 20px;
+    padding: 10px 24px;
+    background: #0f172a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+/* ── NUEVA TARJETA ─────────────────────────────────── */
+.card-new {
+    position: relative;
+    border-radius: 20px;
+    min-height: 175px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-new:hover {
+    transform: translateY(-4px);
+}
+
+.card-new--dark {
+    color: #ffffff;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.15);
+}
+
+.card-new--light {
+    color: #0f172a;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+}
+
+/* Fondo decorativo (Icono gigante) */
+.card-new__bg-icon {
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%) rotate(-10deg);
+    width: 160px;
+    height: 160px;
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.card-new--light .card-new__bg-icon {
+    opacity: 0.05;
+    color: #0f172a;
+}
+
+/* Contenido Principal */
+.card-new__content {
+    position: relative;
+    z-index: 1;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: space-between;
+}
+
+.card-new__header {
+    max-width: 80%;
+}
+
+.card-new__title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin: 0 0 4px 0;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+}
+
+.card-new__subtitle {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0;
+    opacity: 0.8;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+}
+
+/* ── Botones de acción Top Right y Footer ────────────────────────── */
+.card-new__actions-top {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    z-index: 10;
+}
+
+.card-new__footer {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    margin-top: auto;
+    padding-top: 24px;
+    padding-bottom: 20px;
+    /* Espacio extra abajo porque las labels de los pasos son absolutas y podrían cortarse */
+    width: 60%;
+    padding-right: 15px;
+    /* Empujar a la fuerza todo lejos de la derecha */
+}
+
+.c-btn-action {
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    opacity: 0.85;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.c-btn-action:hover {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.c-btn-action--borrar {
+    color: #ffcccc;
+}
+
+.card-new--light .c-btn-action--borrar {
+    color: #ef4444;
+}
+
+.action-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #000000;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.action-circle._del {
+    background: #dc2626;
+    color: #ffffff;
+}
+
+.card-new--light .action-circle:not(._del) {
+    background: #0f172a;
+}
+
+.card-new--dark .action-circle:not(._del) {
+    background: #ffffff;
+    color: #0f172a;
+}
+
+/* ── Stepper Modificado (Estilo Premium) ────────────────── */
+.card-new__stepper-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    /* Alineado a la izquierda */
+    gap: 4px;
+    width: 100%;
+    /* Toma todo el 85% del footer asignado */
+}
+
+
+.c-stepper-full {
+    display: flex;
+    align-items: flex-start;
+    /* alinear textos arriba-abajo */
+    gap: 0;
+    margin-top: 4px;
+    /* espacio arriba */
+    width: 100%;
+}
+
+.c-step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    /* El label se alinea al inicio del círculo */
+    position: relative;
+    flex: 1;
+    /* Estirarse equitativamente para dar espacio a los textos */
+}
+
+/* El último item no se estira porque no tiene línea hacia adelante */
+.c-step-item:last-child {
+    flex: 0;
+}
+
+.c-step-indicator {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    /* Ocupa el espacio reservado del flex: 1 */
+}
+
+.c-stepper-circle {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s;
+}
+
+.c-stepper-circle.active {
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+    transform: scale(1.15);
+}
+
+.c-stepper-circle.past {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.card-new--light .c-stepper-circle {
+    background: rgba(0, 0, 0, 0.1);
+    border-color: rgba(0, 0, 0, 0.05);
+}
+
+.card-new--light .c-stepper-circle.active {
+    background: #0f172a;
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
+}
+
+.card-new--light .c-stepper-circle.past {
+    background: #475569;
+}
+
+.c-stepper-line {
+    flex: 1;
+    /* Estirado dinámico en lugar de width fijo */
+    height: 2px;
+    background: rgba(255, 255, 255, 0.25);
+    margin: 0 4px;
+    /* Separación con los círculos */
+    position: relative;
+    z-index: 1;
+}
+
+.c-stepper-line.line-past {
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.card-new--light .c-stepper-line {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.card-new--light .c-stepper-line.line-past {
+    background: #475569;
+}
+
+.c-step-label {
+    position: absolute;
+    top: 100%;
+    margin-top: 8px;
+    font-size: 0.48rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.65;
+    white-space: nowrap;
+}
+
+.c-step-label.text-start {
+    left: 0;
+    text-align: left;
+}
+
+.c-step-label.text-center {
+    left: 5px;
+    /* Mitad exacta del ancho del círculo (10px) */
+    transform: translateX(-50%);
+    /* Centrado absoluto bajo el círculo */
+    text-align: center;
+}
+
+.c-step-label.text-end {
+    right: -2px;
+    text-align: right;
+}
+
+.c-step-label.label-active {
+    opacity: 1;
+    font-weight: 800;
+}
+
+/* ── Mini-ticket Salida → Llegada en tarjeta ────────────────────── */
+.card-ticket {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.18);
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin: 10px 0 4px 0;
+    border: 1px solid rgba(255,255,255,0.1);
+    width: fit-content;
+    max-width: 80%;
+    backdrop-filter: blur(4px);
+}
+
+.card-new--light .card-ticket {
+    background: rgba(15, 23, 42, 0.06);
+    border-color: rgba(15, 23, 42, 0.1);
+}
+
+.card-ticket__col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    min-width: 70px;
+}
+
+.card-ticket__col--llegada {
+    align-items: flex-end;
+}
+
+.card-ticket__label {
+    font-size: 0.55rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    opacity: 0.65;
+}
+
+/* Fecha en grande (siempre visible) */
+.card-ticket__fecha-main {
+    font-size: 1.1rem;
+    font-weight: 800;
+    line-height: 1;
+    color: rgba(255,255,255,0.95);
+    letter-spacing: 0px;
+}
+
+.card-new--light .card-ticket__fecha-main {
+    color: #0f172a;
+}
+
+/* Hora debajo, más pequeña */
+.card-ticket__hora-sub {
+    font-size: 0.75rem;
+    font-weight: 700;
+    opacity: 0.85;
+    color: rgba(255,255,255,0.85);
+    margin-top: 1px;
+}
+
+.card-new--light .card-ticket__hora-sub {
+    color: #334155;
+}
+
+.card-ticket__hora-sub--llegada {
+    color: #34d399 !important;
+    opacity: 1;
+}
+
+.card-ticket__sep {
+    font-size: 0.85rem;
+    opacity: 0.4;
+    padding: 0 10px;
+    align-self: center;
+}
+

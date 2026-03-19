@@ -1,0 +1,312 @@
+/* src/modulos/profesor/componentes/BuscadorProfesores.css */
+
+/* ── Toggle "¿Salida grupal?" ─────────────────────────────────────────────── */
+.bp-toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.bp-toggle-row:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.bp-toggle-row.activo {
+    background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+    border-color: #93c5fd;
+}
+
+/* Custom toggle switch */
+.bp-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.bp-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.bp-switch__track {
+    position: absolute;
+    inset: 0;
+    background: #cbd5e1;
+    border-radius: 12px;
+    transition: background 0.3s ease;
+    cursor: pointer;
+}
+
+.bp-switch__track::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.bp-switch input:checked+.bp-switch__track {
+    background: #3b82f6;
+}
+
+.bp-switch input:checked+.bp-switch__track::after {
+    transform: translateX(20px);
+}
+
+.bp-toggle-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.bp-toggle-desc {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    font-weight: 400;
+}
+
+/* ── Panel de búsqueda (expandible) ───────────────────────────────────────── */
+.bp-panel {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
+    margin-top: 0;
+}
+
+.bp-panel.abierto {
+    max-height: 500px;
+    opacity: 1;
+    margin-top: 16px;
+}
+
+.bp-panel-inner {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.bp-panel-titulo {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #0f172a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bp-panel-titulo svg {
+    width: 16px;
+    height: 16px;
+    color: #3b82f6;
+}
+
+/* ── Input de búsqueda ────────────────────────────────────────────────────── */
+.bp-busqueda-wrap {
+    position: relative;
+}
+
+.bp-busqueda-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: #94a3b8;
+    pointer-events: none;
+}
+
+.bp-busqueda-input {
+    width: 100%;
+    padding: 11px 14px 11px 40px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    color: #1e293b;
+    background: #f8fafc;
+    outline: none;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.bp-busqueda-input:focus {
+    border-color: #3b82f6;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.bp-busqueda-input::placeholder {
+    color: #94a3b8;
+}
+
+/* ── Resultados de búsqueda ───────────────────────────────────────────────── */
+.bp-resultados {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.bp-resultado-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.bp-resultado-item:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    transform: translateX(2px);
+}
+
+.bp-resultado-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.bp-resultado-nombre {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.bp-resultado-email {
+    font-size: 0.72rem;
+    color: #64748b;
+}
+
+.bp-resultado-agregar {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #3b82f6;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    padding: 4px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.bp-resultado-agregar:hover {
+    background: #3b82f6;
+    color: white;
+}
+
+.bp-sin-resultados {
+    text-align: center;
+    padding: 16px;
+    color: #94a3b8;
+    font-size: 0.82rem;
+    font-style: italic;
+}
+
+.bp-cargando {
+    text-align: center;
+    padding: 12px;
+    color: #64748b;
+    font-size: 0.82rem;
+}
+
+/* ── Profesores seleccionados (chips) ─────────────────────────────────────── */
+.bp-seleccionados {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.bp-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #eff6ff 0%, #e0f2fe 100%);
+    border: 1px solid #93c5fd;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #1e40af;
+    animation: chipIn 0.3s ease;
+}
+
+.bp-chip__avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #3b82f6;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 800;
+}
+
+.bp-chip__quitar {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    border: none;
+    color: #64748b;
+    font-size: 0.7rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    padding: 0;
+    line-height: 1;
+}
+
+.bp-chip__quitar:hover {
+    background: #ef4444;
+    color: white;
+}
+
+.bp-vacio {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    font-style: italic;
+    padding: 4px 0;
+}
+
+@keyframes chipIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

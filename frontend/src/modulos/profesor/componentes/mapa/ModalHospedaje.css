@@ -1,0 +1,4 @@
+/* ModalHospedaje.css — punto de entrada */
+@import './mh-base.css';
+@import './mh-cards.css';
+@import './mh-pueblos.css';

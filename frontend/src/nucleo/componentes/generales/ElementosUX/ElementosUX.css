@@ -1,0 +1,162 @@
+/* src/nucleo/componentes/generales/ElementosUX/ElementosUX.css */
+
+/* ── BOTONES DE ACCIÓN (Extraídos de Tablero Profesor) ── */
+.c-btn-action {
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.c-btn-action .action-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #0ea5e9;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+}
+
+.c-btn-action .action-circle._del {
+  color: #ef4444;
+}
+
+.c-btn-action--editar:hover .action-circle {
+  background: #0ea5e9;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(14, 165, 233, 0.3);
+}
+
+.c-btn-action--borrar:hover .action-circle {
+  background: #ef4444;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(239, 68, 68, 0.3);
+}
+
+.c-btn-action--ver:hover .action-circle {
+  background: #10b981;
+  color: white;
+  transform: translateY(-2px);
+}
+
+
+/* ── PILLS DE ETIQUETA (Basados en CardMatcha config) ── */
+.ux-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #334155;
+  background: #f1f5f9;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  border: 1px solid rgba(255,255,255,0.7);
+  white-space: nowrap;
+}
+
+.ux-pill--blue {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.ux-pill--green {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.ux-pill--orange {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+.ux-pill--red {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.ux-pill__icon {
+  font-size: 1em;
+  line-height: 1;
+}
+
+
+/* ── ÍTEM DE USUARIO (Extraído de WidgetUsuarios) ── */
+.ux-user-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+  position: relative;
+}
+
+.ux-user-item:last-child {
+  border-bottom: none;
+}
+
+.ux-user-item__avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 12px;
+  background: #e2e8f0;
+  flex-shrink: 0;
+}
+
+.ux-user-item__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ux-user-item__avatar-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.ux-user-item__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ux-user-item__nombre {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ux-user-item__id {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.ux-user-item__estado {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #3b82f6; 
+  flex-shrink: 0;
+  margin-left: 10px;
+}

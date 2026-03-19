@@ -1,0 +1,11 @@
+/* Spinner.css — spinner de carga compartido OTIUM */
+@keyframes otm-spin { to { transform: rotate(360deg); } }
+
+.otm-spinner {
+    display: inline-block;
+    border: 2.5px solid rgba(0, 0, 0, 0.1);
+    border-top-color: #0d9488; /* sobreescrito via style inline */
+    border-radius: 50%;
+    animation: otm-spin 0.65s linear infinite;
+    flex-shrink: 0;
+}

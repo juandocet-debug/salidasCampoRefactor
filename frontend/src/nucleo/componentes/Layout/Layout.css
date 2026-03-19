@@ -1,0 +1,90 @@
+/* src/nucleo/componentes/Layout/Layout.css */
+/* ─────────────────────────────────────────────────────────────────
+   LAYOUT PRINCIPAL — Encabezado + Sidebar + Área de contenido
+   ───────────────────────────────────────────────────────────────── */
+
+.layout {
+    display: flex;
+    height: 100vh;
+    background: #002535;
+    /* Same as sidebar to blend */
+    overflow: hidden;
+    animation: layoutEntrada 0.45s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+@keyframes layoutEntrada {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── Área principal (todo lo que no es sidebar) ──────────────────── */
+.layout__principal {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #f4f7f9;
+    border-top-left-radius: 28px;
+    border-bottom-left-radius: 28px;
+    margin: 8px 8px 8px 0;
+    /* Creates the floating card gap */
+    overflow: hidden;
+    min-width: 0;
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+    /* Shadow falling left over the sidebar */
+}
+
+
+/* ── Área de contenido ───────────────────────────────────────────── */
+.layout__contenido {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* ── Elementos Mobile (Ocultos por defecto) ─────────────────────── */
+.layout__btn-mobile {
+    display: none;
+}
+
+.layout__backdrop {
+    display: none;
+}
+
+/* ── Responsividad Global ────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .layout__principal {
+        margin: 0;
+        /* Full bleed on mobile */
+        border-radius: 0;
+    }
+
+    .layout__backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 37, 53, 0.5);
+        backdrop-filter: blur(3px);
+        z-index: 40;
+        /* Justo debajo del sidebar que tiene 50 */
+        cursor: pointer;
+    }
+
+    .layout__encabezado {
+        padding: 0 16px;
+    }
+
+    .layout__contenido {
+        padding: 16px;
+    }
+}

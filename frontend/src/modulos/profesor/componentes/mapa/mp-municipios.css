@@ -1,0 +1,42 @@
+/* mp-municipios.css — cards de municipios en ruta con paginación */
+
+.mp-pueblos-list { display: flex; flex-direction: column; gap: 10px; max-height: 280px; overflow-y: auto; }
+
+.mp-pueblo-card {
+    display: flex; gap: 10px; border: 1.5px solid #e2e8f0;
+    border-radius: 12px; overflow: hidden; background: #fafbfc;
+    cursor: pointer; text-align: left; width: 100%; padding: 0;
+    transition: box-shadow 0.18s, border-color 0.18s, background 0.18s;
+}
+.mp-pueblo-card:hover { background: #f0f9ff; border-color: #7dd3fc; box-shadow: 0 4px 14px rgba(14, 165, 233, .12); }
+
+.mp-pueblo-img        { width: 90px; height: 90px; object-fit: cover; flex-shrink: 0; }
+.mp-pueblo-img--ph    { width: 90px; height: 90px; display: flex; align-items: center; justify-content: center; font-size: 2rem; background: #f1f5f9; flex-shrink: 0; }
+.mp-pueblo-body       { flex: 1; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.mp-pueblo-nombre     { font-size: 0.95rem; font-weight: 700; color: #1e293b; }
+.mp-pueblo-badges     { display: flex; gap: 6px; flex-wrap: wrap; }
+.mp-badge-km          { font-size: 0.7rem; font-weight: 600; background: #dbeafe; color: #1d4ed8; padding: 2px 7px; border-radius: 20px; }
+.mp-badge-dep         { font-size: 0.7rem; font-weight: 600; background: #f0fdf4; color: #15803d; padding: 2px 7px; border-radius: 20px; }
+.mp-pueblo-desc {
+    font-size: 0.75rem; color: #64748b; line-height: 1.45; margin: 0;
+    display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3;
+    -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* Paginado */
+.mp-pueblos-paginado { display: flex; flex-direction: column; gap: 8px; }
+.mp-pueblos-list     { max-height: none; overflow: visible; }
+
+.mp-paginado-ctrl {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 2px; border-top: 1px solid #e2e8f0; margin-top: 4px;
+}
+.mp-pag-btn {
+    padding: 5px 14px; border-radius: 8px; border: 1.5px solid #e2e8f0;
+    background: #fff; color: #334155; font-size: 0.8rem; font-weight: 600;
+    cursor: pointer; transition: all 0.15s;
+}
+.mp-pag-btn:hover:not(:disabled) { background: #f0f9ff; border-color: #7dd3fc; color: #0369a1; }
+.mp-pag-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.mp-pag-info       { font-size: 0.82rem; color: #64748b; font-weight: 600; }
+.mp-pag-info small { font-weight: 400; color: #94a3b8; }

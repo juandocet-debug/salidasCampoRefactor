@@ -1,0 +1,917 @@
+================================================================================
+  SISTEMA SIGDEP — SISTEMA DE GESTIÓN DE SALIDAS DE CAMPO
+  HISTORIAS DE USUARIO Y REQUERIMIENTOS FUNCIONALES
+  Fecha: 2026-02-24
+================================================================================
+
+TABLA DE CONTENIDO
+──────────────────
+  1. DESCRIPCIÓN GENERAL DEL SISTEMA
+  2. ROLES DEL SISTEMA
+  3. HISTORIAS DE USUARIO
+     3.1  Módulo Profesor
+     3.2  Módulo Coordinador Académico
+     3.3  Módulo Consejo de Facultad
+     3.4  Módulo Coordinador de Salidas (Operativo)
+     3.5  Módulo Conductor
+     3.6  Módulo Estudiante
+  4. REQUERIMIENTOS FUNCIONALES
+  5. REQUERIMIENTOS NO FUNCIONALES
+  6. FLUJOS DE NEGOCIO PRINCIPALES
+  7. MATRIZ DE TRAZABILIDAD
+
+================================================================================
+1. DESCRIPCIÓN GENERAL DEL SISTEMA
+================================================================================
+
+SIGDEP (Sistema de Gestión de Salidas de Campo) es una plataforma web para la
+gestión integral del ciclo de vida de las salidas académicas de campo en una
+institución universitaria (UPN). El sistema cubre desde la solicitud pedagógica
+por parte del profesor, pasando por la revisión del coordinador académico, la
+aprobación del consejo de facultad, la gestión operativa y logística, hasta el
+monitoreo en tiempo real de la ejecución y el cierre operativo final.
+
+================================================================================
+2. ROLES DEL SISTEMA
+================================================================================
+
+ROL-01  Profesor (Docente)
+        Solicita salidas de campo, gestiona el formulario FOR-DOC-008,
+        da seguimiento al estado de sus solicitudes, verifica estudiantes
+        durante la ejecución y monitorea el viaje en tiempo real.
+
+ROL-02  Coordinador Académico (Coordinador de Programa)
+        Revisa pedagógicamente las solicitudes de salida, evalúa criterios
+        de calidad, emite concepto favorable/no favorable y gestiona
+        el historial de revisiones.
+
+ROL-03  Consejo de Facultad (Autoridad)
+        Toma la decisión final de aprobar, solicitar cambios o rechazar
+        las solicitudes de salida. Puede asignar tiempos de ajuste.
+
+ROL-04  Coordinador de Salidas (Coordinador Operativo / Logístico)
+        Gestiona la operación de las salidas aprobadas: asigna transporte,
+        gestiona presupuesto, monitorea la ejecución en tiempo real,
+        registra novedades y realiza el cierre operativo.
+
+ROL-05  Conductor
+        Recibe asignaciones de viaje, completa checklists del vehículo,
+        registra novedades durante el trayecto, confirma hitos del
+        itinerario y verifica el abordaje de estudiantes.
+
+ROL-06  Estudiante
+        Se registra a salidas mediante QR, sube documentos requeridos,
+        genera código de verificación de abordaje, consulta el detalle
+        de sus salidas y revisa su historial académico de campo.
+
+================================================================================
+3. HISTORIAS DE USUARIO
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+3.1 MÓDULO PROFESOR
+────────────────────────────────────────────────────────────────────────────────
+
+HU-PROF-001  Dashboard de Salidas
+  COMO profesor
+  QUIERO ver un panel con todas mis solicitudes de salida de campo
+  PARA tener una visión general del estado de cada una.
+  CRITERIOS DE ACEPTACIÓN:
+    - Muestra tarjetas con cada salida: nombre, asignatura, fecha, estado.
+    - Los estados posibles son: Borrador, Enviada, En Revisión, Aprobada,
+      Rechazada, En Ejecución.
+    - Permite filtrar por estado, distancia, precio y cantidad de estudiantes.
+    - Incluye barra de búsqueda por texto libre.
+    - Botón "Nueva Solicitud" visible y accesible.
+    - Estadísticas de resumen: total salidas, aprobadas, en revisión, rechazadas.
+
+HU-PROF-002  Crear Solicitud - Paso 1: Información General
+  COMO profesor
+  QUIERO completar la información básica de una nueva salida de campo
+  PARA iniciar el proceso formal de solicitud (FOR-DOC-008).
+  CRITERIOS DE ACEPTACIÓN:
+    - Campos: nombre de la salida, asignatura, semestre/periodo, programa
+      académico, número de estudiantes, justificación pedagógica.
+    - Validación de campos obligatorios.
+    - Stepper horizontal visible mostrando el paso actual (1 de 4).
+    - Botones: Cancelar (vuelve al dashboard), Guardar Borrador, Siguiente.
+
+HU-PROF-003  Crear Solicitud - Paso 2: Planeación Pedagógica
+  COMO profesor
+  QUIERO definir los objetivos, competencias y metodología de la salida
+  PARA justificar pedagógicamente la actividad de campo.
+  CRITERIOS DE ACEPTACIÓN:
+    - Campos: objetivos generales, objetivos específicos, competencias a
+      desarrollar, metodología de trabajo en campo.
+    - Permite agregar múltiples objetivos y competencias.
+    - Botones: Anterior, Guardar Borrador, Siguiente.
+
+HU-PROF-004  Crear Solicitud - Paso 3: Logística
+  COMO profesor
+  QUIERO definir la ruta, itinerario y requerimientos logísticos
+  PARA planificar la ejecución operativa de la salida.
+  CRITERIOS DE ACEPTACIÓN:
+    - Constructor visual de ruta con puntos: origen, paradas intermedias,
+      destino final.
+    - Campos por punto de ruta: lugar, hora estimada de llegada, actividad.
+    - Botón para agregar paradas intermedias.
+    - Campos: fecha de salida, hora de salida, fecha de retorno, hora de
+      retorno estimada.
+    - Modal para agregar actividades al itinerario.
+    - Tipo de transporte requerido (bus, van, especial).
+
+HU-PROF-005  Crear Solicitud - Paso 4: Evaluación
+  COMO profesor
+  QUIERO definir los criterios y métodos de evaluación de la salida
+  PARA establecer cómo se medirá el aprendizaje de los estudiantes.
+  CRITERIOS DE ACEPTACIÓN:
+    - Sección de criterios de evaluación con porcentajes.
+    - Tipo de evaluación: informe, presentación, diario de campo,
+      evaluación práctica, otro.
+    - Resumen completo de la solicitud antes de enviar.
+    - Badges de resumen: vehículo, ruta, conductor.
+    - Botones: Anterior, Guardar Borrador, Enviar Solicitud.
+    - Al enviar, el estado cambia a "Enviada" y se notifica al coordinador.
+
+HU-PROF-006  Ver Historial de Solicitudes
+  COMO profesor
+  QUIERO acceder al historial completo de mis solicitudes
+  PARA consultar el estado y detalles de solicitudes pasadas.
+
+HU-PROF-007  Gestión de Plantillas
+  COMO profesor
+  QUIERO guardar y reutilizar formularios de solicitud como plantillas
+  PARA agilizar la creación de nuevas solicitudes recurrentes.
+
+HU-PROF-008  Dashboard de Viaje en Ejecución
+  COMO profesor
+  QUIERO ver el estado en tiempo real de una salida en ejecución
+  PARA monitorear el progreso del viaje y la seguridad de los estudiantes.
+  CRITERIOS DE ACEPTACIÓN:
+    - Muestra el estado actual del viaje: En Punto de Encuentro, En Ruta,
+      En Destino, Retorno, Finalizado.
+    - Tracker visual de estados con indicadores de progreso.
+    - Acciones rápidas: QR Estudiantes, Verificar Código.
+
+HU-PROF-009  Lista de Control de Abordaje (Profesor)
+  COMO profesor
+  QUIERO ver la lista completa de estudiantes y su estado de abordaje
+  PARA saber quiénes ya abordaron y quiénes están pendientes.
+  CRITERIOS DE ACEPTACIÓN:
+    - Tabla con: foto, nombre, ID, programa, estado (Abordado/Pendiente).
+    - Barra de progreso visual (ej: 28/30 a bordo).
+    - Filtros: Todos, Abordados, Pendientes.
+    - Búsqueda por nombre o ID.
+    - Estudiantes pendientes resaltados en amarillo.
+    - Función JavaScript filtrarListaProf() operativa.
+
+HU-PROF-010  Verificar Código de Estudiante
+  COMO profesor
+  QUIERO ingresar el código de verificación de un estudiante
+  PARA confirmar su identidad y registrar su abordaje.
+  CRITERIOS DE ACEPTACIÓN:
+    - Modal con campo de entrada para código de 6 caracteres.
+    - Al verificar, muestra foto, nombre e ID del estudiante.
+    - Botón de confirmar abordaje.
+
+────────────────────────────────────────────────────────────────────────────────
+3.2 MÓDULO COORDINADOR ACADÉMICO
+────────────────────────────────────────────────────────────────────────────────
+
+HU-COORD-001  Dashboard de Revisiones Pendientes
+  COMO coordinador académico
+  QUIERO ver todas las solicitudes de salida pendientes de revisión
+  PARA priorizar y gestionar mi carga de trabajo.
+  CRITERIOS DE ACEPTACIÓN:
+    - Tabla con: código, nombre salida, profesor, facultad, fecha,
+      estado, acciones.
+    - Filtros avanzados: distancia, precio, cantidad de estudiantes.
+    - Barra de búsqueda.
+    - Stats: total pendientes, revisadas este mes, promedio de tiempo.
+    - Acciones por fila: Revisar, Ver detalle.
+
+HU-COORD-002  Revisión Pedagógica de Solicitud
+  COMO coordinador académico
+  QUIERO evaluar cada criterio pedagógico de una solicitud
+  PARA emitir un concepto formal sobre la viabilidad de la salida.
+  CRITERIOS DE ACEPTACIÓN:
+    - Vista de dos columnas: contenido de la solicitud (izq) y panel
+      de validación (der).
+    - Pestañas: Información, Planeación, Logística, Evaluación, Presupuesto.
+    - Por cada criterio: botones CUMPLE / NO CUMPLE.
+    - Campo de observaciones por criterio.
+    - Timeline de historial de revisiones.
+    - Decisión final: CONCEPTUAR FAVORABLE, FAVORABLE CON AJUSTES,
+      CONCEPTUAR NO FAVORABLE.
+    - Al emitir concepto, se notifica al Consejo de Facultad.
+
+HU-COORD-003  Historial de Revisiones
+  COMO coordinador académico
+  QUIERO consultar el historial de todas mis revisiones anteriores
+  PARA tener trazabilidad de mis decisiones.
+
+HU-COORD-004  Ver Salidas Aprobadas (vista Coordinador)
+  COMO coordinador académico
+  QUIERO ver las salidas que ya fueron aprobadas por consejo
+  PARA dar seguimiento a las que pasaron mi revisión.
+  CRITERIOS DE ACEPTACIÓN:
+    - Tabla con salidas aprobadas, filtros y acciones.
+    - Estados visibles: Lista, En Ejecución, Finalizada.
+
+────────────────────────────────────────────────────────────────────────────────
+3.3 MÓDULO CONSEJO DE FACULTAD
+────────────────────────────────────────────────────────────────────────────────
+
+HU-CONS-001  Dashboard de Decisiones Pendientes
+  COMO miembro del Consejo de Facultad
+  QUIERO ver todas las solicitudes que requieren decisión del consejo
+  PARA gestionar la agenda de aprobaciones.
+  CRITERIOS DE ACEPTACIÓN:
+    - Tabla con: código, salida, profesor, concepto coordinador, fecha,
+      estado, acciones.
+    - Stats: pendientes, aprobadas, con observaciones, rechazadas.
+    - Filtros por estado y fecha.
+    - Acciones: Ver Detalle, Decidir.
+
+HU-CONS-002  Detalle y Decisión de Solicitud
+  COMO miembro del Consejo de Facultad
+  QUIERO revisar el detalle completo de una solicitud con el concepto
+  del coordinador y tomar una decisión formal
+  PARA aprobar, solicitar cambios o rechazar la salida.
+  CRITERIOS DE ACEPTACIÓN:
+    - Vista con pestañas: Información, Planeación, Logística, Evaluación.
+    - Panel lateral de decisión con semáforo (verde/amarillo/rojo).
+    - Concepto del coordinador visible.
+    - Timeline del proceso de revisión.
+    - Opciones de decisión: APROBAR, SOLICITAR CAMBIOS, RECHAZAR.
+    - Si selecciona SOLICITAR CAMBIOS: campo de Tiempo de Ajuste
+      (días para que el profesor corrija).
+    - Campo de observaciones/acta.
+    - Acordeón expandible con secciones detalladas.
+    - Al decidir se actualiza el estado y se notifica al profesor.
+
+HU-CONS-003  Actas y Reportes
+  COMO miembro del Consejo de Facultad
+  QUIERO acceder a actas y reportes de decisiones pasadas
+  PARA mantener registro institucional.
+
+────────────────────────────────────────────────────────────────────────────────
+3.4 MÓDULO COORDINADOR DE SALIDAS (OPERATIVO)
+────────────────────────────────────────────────────────────────────────────────
+
+HU-CSAL-001  Dashboard Operativo
+  COMO coordinador de salidas
+  QUIERO ver un panel general con estadísticas operativas
+  PARA tener visión global de la carga operativa.
+  CRITERIOS DE ACEPTACIÓN:
+    - Cards de resumen: salidas aprobadas, en preparación, en ejecución,
+      finalizadas.
+    - Módulos de acceso rápido con iconos: Salidas Aprobadas, Asignar
+      Transporte, Monitoreo en Ejecución, Presupuesto, Cancelar/Reprogramar,
+      Cierre Operativo, Reportes Logísticos.
+
+HU-CSAL-002  Gestión de Salidas Aprobadas
+  COMO coordinador de salidas
+  QUIERO ver la lista de todas las salidas aprobadas por el consejo
+  PARA planificar la logística de cada una.
+  CRITERIOS DE ACEPTACIÓN:
+    - Tabla con: código, destino, facultad, profesor, fecha, estudiantes,
+      estado logístico, acciones.
+    - Filtro multi-select por facultad.
+    - Estados: Sin asignar, Transporte asignado, Lista, En ejecución,
+      Finalizada, Cancelada/Reprogramada.
+    - Badges de categoría de viaje (Local, Regional, Larga, etc.).
+    - Panel de alertas con salidas próximas sin transporte.
+    - Alertas de cupo bajo.
+    - Acciones por fila: dropdown con opciones (Asignar transporte,
+      Ver presupuesto, Notificar cambio, Ver detalle).
+
+HU-CSAL-003  Asignar Transporte
+  COMO coordinador de salidas
+  QUIERO asignar vehículos y conductores a una salida aprobada
+  PARA garantizar la logística de transporte.
+  CRITERIOS DE ACEPTACIÓN:
+    - Wizard de 3 pasos: Selección de Tipo → Vehículo → Conductor.
+    - Paso 1: Selección entre transporte propio (flota institucional) o
+      transporte externo (empresa tercerizada).
+    - Paso 2: Grid de vehículos disponibles con datos: placa, tipo,
+      capacidad, estado técnico, disponibilidad.
+    - Cards de vehículo seleccionables con badges de estado.
+    - Paso 3: Grid de conductores disponibles con: nombre, licencia,
+      experiencia, calificación.
+    - Formulario de datos adicionales si es transporte externo.
+    - Resumen de asignación antes de confirmar.
+    - Alertas de capacidad (estudiantes vs. asientos).
+
+HU-CSAL-004  Presupuesto Operativo
+  COMO coordinador de salidas
+  QUIERO gestionar el presupuesto asignado a las salidas
+  PARA controlar los costos operativos.
+  CRITERIOS DE ACEPTACIÓN:
+    - Dashboard con cards de presupuesto: total asignado, ejecutado,
+      disponible, comprometido.
+    - Barras de progreso con colores: normal (negro), advertencia
+      (amarillo), peligro (rojo).
+    - Tabla de desglose por categoría: transporte, alimentación, hospedaje,
+      seguros, materiales.
+    - Formulario para registrar gastos.
+    - Historial de movimientos presupuestales.
+
+HU-CSAL-005  Monitoreo en Ejecución
+  COMO coordinador de salidas
+  QUIERO monitorear en tiempo real las salidas que están en curso
+  PARA intervenir ante cualquier novedad.
+  CRITERIOS DE ACEPTACIÓN:
+    - Vista de monitoreo con estado actual de la salida.
+    - Timeline del itinerario con hitos: Salida, En Ruta, Llegada,
+      Actividades, Retorno, Llegada Final.
+    - Itinerario detallado con paradas y horarios actualizados.
+    - Sección de novedades con registro de incidentes.
+    - Modal para agregar novedades con: tipo, descripción, urgencia.
+    - Botón para escalar novedades a nivel superior.
+
+HU-CSAL-006  Lista de Control de Abordaje (Coordinador)
+  COMO coordinador de salidas
+  QUIERO ver el estado de abordaje de todos los estudiantes
+  PARA supervisar que todos estén a bordo antes de partir.
+  CRITERIOS DE ACEPTACIÓN:
+    - Tabla con: foto, nombre, ID, programa, estado, verificado por.
+    - Columna "Verificado por" con badge: Conductor (negro) o
+      Profesor (azul).
+    - Barra de progreso (ej: 28/30 a bordo).
+    - Filtros: Todos, Abordados, Pendientes (con IDs filtro-coord-*).
+    - Búsqueda por nombre o ID.
+    - Estudiantes pendientes resaltados en amarillo.
+    - Botones de acción: Notificar Conductor, Notificar Profesor.
+    - Función JavaScript filtrarListaCoord() operativa.
+
+HU-CSAL-007  Cancelar / Reprogramar Salida
+  COMO coordinador de salidas
+  QUIERO registrar la cancelación o reprogramación de una salida
+  PARA notificar a todos los involucrados.
+  CRITERIOS DE ACEPTACIÓN:
+    - Información de la salida al inicio (card resumen).
+    - Selección de tipo de acción: Reprogramar fecha, Cambio de ruta,
+      Cancelación total.
+    - Motivo detallado (textarea).
+    - Si es reprogramación: calendario de disponibilidad con vista de
+      conductores y vehículos. Días bloqueados visibles. Selección de
+      nuevas fechas.
+    - Panel de conductores disponibles para las nuevas fechas.
+    - Destinatarios de la notificación (profesor, estudiantes, conductor).
+    - Previsualización de la notificación.
+    - Botones: Cancelar, Enviar Notificación.
+
+HU-CSAL-008  Cierre Operativo
+  COMO coordinador de salidas
+  QUIERO realizar el cierre formal de una salida finalizada
+  PARA documentar los resultados y cerrar el proceso.
+  CRITERIOS DE ACEPTACIÓN:
+    - Información general de la salida (datos de partida y llegada).
+    - Checklist de verificación de cierre.
+    - Registro de novedades resueltas y pendientes.
+    - Resumen de costos ejecutados vs. presupuestados.
+    - Campo de observaciones finales.
+    - Botón de "Cerrar Salida Definitivamente".
+    - Una vez cerrada, la salida pasa a estado histórico.
+
+HU-CSAL-009  Reportes Logísticos
+  COMO coordinador de salidas
+  QUIERO generar reportes logísticos consolidados
+  PARA rendir cuentas y mejorar procesos.
+  CRITERIOS DE ACEPTACIÓN:
+    - Catálogo de reportes disponibles: Ejecución Presupuestal,
+      Uso de Flota Vehicular, Indicadores por Facultad, Novedades.
+    - Filtros por fecha, facultad, tipo de salida.
+    - Estadísticas de resumen: total salidas, estudiantes movilizados,
+      km recorridos, promedio costo por estudiante.
+    - Tabla de datos detallados.
+    - Vista previa de reportes en modal.
+    - Opciones de exportación (PDF, Excel).
+
+────────────────────────────────────────────────────────────────────────────────
+3.5 MÓDULO CONDUCTOR
+────────────────────────────────────────────────────────────────────────────────
+
+HU-COND-001  Dashboard de Mis Viajes
+  COMO conductor
+  QUIERO ver la lista de viajes asignados a mi nombre
+  PARA planificar mis actividades.
+  CRITERIOS DE ACEPTACIÓN:
+    - Cards de viaje con: código, destino, fecha, profesor, pasajeros,
+      estado, vehículo asignado.
+    - Estados visuales: Pendiente (borde punteado), Confirmado, Lista
+      (borde doble), En ejecución (borde sólido izq), Finalizado (negro).
+    - Acciones por viaje: Ver detalle, Confirmar, Iniciar Checklist.
+
+HU-COND-002  Detalle del Viaje
+  COMO conductor
+  QUIERO ver el detalle completo de un viaje asignado
+  PARA conocer toda la información necesaria.
+  CRITERIOS DE ACEPTACIÓN:
+    - Información del viaje: origen, destino, fechas, pasajeros, vehículo.
+    - Itinerario con timeline de hitos.
+    - Acciones de progreso: Confirmar salida, Registrar llegada a punto,
+      Confirmar retorno.
+    - Botón de verificar código de estudiante con modal.
+
+HU-COND-003  Checklist del Vehículo
+  COMO conductor
+  QUIERO completar la inspección pre-viaje del vehículo
+  PARA garantizar condiciones seguras de operación.
+  CRITERIOS DE ACEPTACIÓN:
+    - Pestañas por categoría: Mecánica, Seguridad, Documentos, Confort.
+    - Items de checklist con opciones: OK / NO OK / N/A.
+    - Barra de progreso del checklist.
+    - Observaciones por ítem con campo de texto.
+    - Carga de evidencia fotográfica por ítem.
+    - Firma digital del conductor.
+    - Sección de evidencia fotográfica general del vehículo.
+    - No permite iniciar viaje sin checklist completo al 100%.
+
+HU-COND-004  Registrar Novedad
+  COMO conductor
+  QUIERO reportar incidentes o novedades durante el viaje
+  PARA dejar registro formal de cualquier eventualidad.
+  CRITERIOS DE ACEPTACIÓN:
+    - Selección de tipo: Mecánica, Accidente, Clima, Vial, Salud, Otro.
+    - Selección de urgencia: Baja, Media, Alta, Crítica (con colores).
+    - Descripción detallada (textarea).
+    - Carga de evidencia fotográfica.
+    - Captura automática de ubicación GPS.
+    - Lista de novedades previas del viaje actual.
+    - Botón de envío con confirmación.
+
+HU-COND-005  Lista de Control de Abordaje (Conductor)
+  COMO conductor
+  QUIERO ver y gestionar la lista de estudiantes que deben abordar
+  PARA controlar quién sube al vehículo.
+  CRITERIOS DE ACEPTACIÓN:
+    - Tabla con: foto, nombre, ID, programa, estado (Abordado/Pendiente).
+    - Barra de progreso (ej: 28/30 a bordo).
+    - Filtros: Todos, Abordados, Pendientes.
+    - Búsqueda por nombre o ID.
+    - Verificación de código de estudiante via modal.
+    - Confirmación visual al verificar (foto + nombre + ID).
+    - Estudiantes pendientes resaltados en amarillo.
+    - Función JavaScript filtrarLista() operativa.
+
+HU-COND-006  Historial de Viajes
+  COMO conductor
+  QUIERO consultar el historial de todos mis viajes ejecutados
+  PARA revisar mi desempeño y trayectoria.
+  CRITERIOS DE ACEPTACIÓN:
+    - Stats de resumen: total viajes, km recorridos, este mes.
+    - Filtros: mes, estado, tipo de ruta.
+    - Tabla con: fecha, código, destino, pasajeros, km, duración, estado.
+
+────────────────────────────────────────────────────────────────────────────────
+3.6 MÓDULO ESTUDIANTE
+────────────────────────────────────────────────────────────────────────────────
+
+HU-EST-001  Dashboard del Estudiante
+  COMO estudiante
+  QUIERO ver mis salidas de campo activas y próximas
+  PARA estar informado de mis actividades académicas.
+  CRITERIOS DE ACEPTACIÓN:
+    - Card de escaneo QR prominente para unirse a salidas.
+    - Lista de salidas activas con: nombre, fecha, estado, profesor.
+    - Estados con colores: Activa (verde), Pendiente docs (amarillo),
+      Docs incompletos (rojo).
+    - Barra de progreso de documentos por salida.
+    - Links a detalle de cada salida.
+
+HU-EST-002  Registro QR a Salida
+  COMO estudiante
+  QUIERO escanear un código QR para unirme a una salida
+  PARA inscribirme de forma rápida y digital.
+  CRITERIOS DE ACEPTACIÓN:
+    - Pantalla de resultado post-escaneo con: ícono de éxito, código
+      de salida, nombre, descripción, profesor.
+    - Grid de detalles: profesor, fecha, destino, cupos disponibles.
+    - Botón "Unirme a esta salida" con estado de procesamiento.
+    - Aviso de tratamiento de datos personales.
+    - Redirección al detalle de salida tras unirse.
+
+HU-EST-003  Detalle de Salida (Vista Estudiante)
+  COMO estudiante
+  QUIERO ver el detalle completo de una salida a la que estoy inscrito
+  PARA conocer la información y subir mis documentos.
+  CRITERIOS DE ACEPTACIÓN:
+    - Pestañas: Información, Documentos, Estado.
+    - Pestaña Información: datos generales, itinerario, profesor.
+    - Pestaña Documentos: lista de documentos requeridos con estado
+      (subido/pendiente). Upload de archivos.
+    - Timeline del proceso de la salida.
+    - Botón de confirmación de asistencia (fijo en la parte inferior).
+
+HU-EST-004  Mis Documentos
+  COMO estudiante
+  QUIERO gestionar un repositorio de documentos personales reutilizables
+  PARA no tener que subirlos en cada salida.
+  CRITERIOS DE ACEPTACIÓN:
+    - Grid de documentos: Documento de Identidad, EPS/ARL,
+      Consentimiento, Póliza de Seguro.
+    - Estado por documento: Vigente (verde), Vencido (rojo), No cargado.
+    - Fecha de última actualización.
+    - Botones: Actualizar, Subir Nuevo.
+    - Los documentos se adjuntan automáticamente a nuevas salidas.
+
+HU-EST-005  Historial de Salidas (Estudiante)
+  COMO estudiante
+  QUIERO consultar el historial de todas mis salidas de campo
+  PARA tener registro de mi experiencia académica.
+  CRITERIOS DE ACEPTACIÓN:
+    - Agrupado por semestre (ej: 2024 - Semestre II).
+    - Por cada salida: nombre, destino, fecha, profesor, concepto/nota.
+    - Indicador visual de completada.
+
+HU-EST-006  Código de Verificación de Abordaje
+  COMO estudiante
+  QUIERO generar un código único de verificación para el día de la salida
+  PARA que el conductor o profesor confirme mi identidad al abordar.
+  CRITERIOS DE ACEPTACIÓN:
+    - Requiere subir foto actualizada antes de generar el código.
+    - Código alfanumérico de 6 caracteres (ej: A7X3K2).
+    - El código solo está activo el día y hora de la salida.
+    - Badge de estado: ACTIVO (pulsante) o INACTIVO.
+    - Muestra foto del estudiante, nombre completo e ID.
+    - Información de la salida: destino, fecha, hora, profesor.
+    - Barra de estado de verificados (ej: 28/30 verificados).
+    - Contador de cupos verificados.
+    - Footer con código de referencia y validez temporal.
+    - Sección de carga de foto obligatoria con área drag-and-drop.
+    - Alerta de que la foto es obligatoria antes de generar código.
+
+================================================================================
+4. REQUERIMIENTOS FUNCIONALES
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+RF-001  AUTENTICACIÓN Y AUTORIZACIÓN
+────────────────────────────────────────────────────────────────────────────────
+RF-001.1  El sistema debe permitir el inicio de sesión con credenciales
+          (usuario y contraseña).
+RF-001.2  El sistema debe soportar 6 roles diferenciados con permisos
+          específicos: Profesor, Coordinador Académico, Consejo,
+          Coordinador de Salidas, Conductor, Estudiante.
+RF-001.3  El sistema debe mostrar el sidebar de navegación correspondiente
+          al rol del usuario autenticado.
+RF-001.4  El sidebar debe mostrar: logo, perfil del usuario (nombre y rol),
+          menú de navegación contextual, y opción de cerrar sesión.
+RF-001.5  El sistema debe tener un mecanismo de cambio de roles para
+          usuarios con múltiples perfiles (desarrollo/demo).
+
+────────────────────────────────────────────────────────────────────────────────
+RF-002  SOLICITUD DE SALIDA (FOR-DOC-008)
+────────────────────────────────────────────────────────────────────────────────
+RF-002.1  El formulario de solicitud debe seguir un wizard de 4 pasos
+          secuenciales con stepper visual horizontal.
+RF-002.2  Paso 1 - Información: nombre, asignatura, semestre, programa,
+          número de estudiantes, rango de fechas, justificación.
+RF-002.3  Paso 2 - Planeación: objetivos (general, específicos),
+          competencias, metodología de campo.
+RF-002.4  Paso 3 - Logística: constructor de ruta visual con marcadores,
+          itinerario con horarios, tipo de transporte, actividades por
+          parada, modal para agregar actividades.
+RF-002.5  Paso 4 - Evaluación: criterios con porcentajes, tipo de
+          evaluación, resumen pre-envío con badges.
+RF-002.6  Debe permitir guardar como borrador en cualquier paso.
+RF-002.7  Debe permitir navegación bidireccional entre pasos.
+RF-002.8  Al enviar, el estado debe cambiar a "Enviada" y generar
+          notificación al coordinador académico correspondiente.
+RF-002.9  Debe soportar modo edición para solicitudes en borrador o
+          devueltas con observaciones.
+
+────────────────────────────────────────────────────────────────────────────────
+RF-003  REVISIÓN PEDAGÓGICA
+────────────────────────────────────────────────────────────────────────────────
+RF-003.1  El coordinador debe poder evaluar cada criterio con CUMPLE o
+          NO CUMPLE.
+RF-003.2  Cada criterio debe tener campo de observaciones asociado.
+RF-003.3  El concepto final debe ser: CONCEPTUAR FAVORABLE,
+          FAVORABLE CON AJUSTES, o CONCEPTUAR NO FAVORABLE.
+RF-003.4  El sistema debe registrar timeline de todas las acciones de
+          revisión con fecha, hora y usuario.
+RF-003.5  La vista de revisión debe presentar el contenido de la
+          solicitud por pestañas.
+
+────────────────────────────────────────────────────────────────────────────────
+RF-004  DECISIÓN DEL CONSEJO
+────────────────────────────────────────────────────────────────────────────────
+RF-004.1  El consejo debe poder: APROBAR, SOLICITAR CAMBIOS, o RECHAZAR.
+RF-004.2  Si selecciona SOLICITAR CAMBIOS, debe especificar un "Tiempo
+          de Ajuste" en días para que el profesor corrija.
+RF-004.3  El estado de la solicitud se actualiza a "pendiente por ajuste"
+          y posteriormente a "ajustado" cuando el profesor responde.
+RF-004.4  Sistema de semáforo visual para indicar la decisión.
+RF-004.5  Acordeones expandibles para revisar secciones detalladas.
+
+────────────────────────────────────────────────────────────────────────────────
+RF-005  GESTIÓN DE TRANSPORTE
+────────────────────────────────────────────────────────────────────────────────
+RF-005.1  Wizard de 3 pasos para asignación: Tipo → Vehículo → Conductor.
+RF-005.2  Selección entre transporte propio (flota) y externo (tercero).
+RF-005.3  Grid de vehículos con filtro por capacidad, tipo y estado.
+RF-005.4  Cards de vehículo con: placa, tipo, capacidad, estado técnico,
+          disponibilidad, foto.
+RF-005.5  Grid de conductores con: nombre, licencia, experiencia,
+          calificación, disponibilidad.
+RF-005.6  Validación de capacidad: alertar si estudiantes > asientos.
+RF-005.7  Formulario para datos de empresa externa si aplica.
+RF-005.8  Resumen completo antes de confirmar asignación.
+
+────────────────────────────────────────────────────────────────────────────────
+RF-006  GESTIÓN DE PRESUPUESTO
+────────────────────────────────────────────────────────────────────────────────
+RF-006.1  Dashboard con total asignado, ejecutado, disponible, comprometido.
+RF-006.2  Barras de progreso con indicadores de advertencia y peligro.
+RF-006.3  Desglose por categoría de gasto.
+RF-006.4  Registro de gastos individuales.
+RF-006.5  Historial de movimientos presupuestales.
+
+────────────────────────────────────────────────────────────────────────────────
+RF-007  MONITOREO EN EJECUCIÓN
+────────────────────────────────────────────────────────────────────────────────
+RF-007.1  Timeline de progreso del viaje con hitos actualizados.
+RF-007.2  Itinerario detallado con horarios reales vs. planificados.
+RF-007.3  Registro y visualización de novedades durante el viaje.
+RF-007.4  Modal para agregar novedades con tipo y descripción.
+RF-007.5  Capacidad de escalar novedades a nivel superior (rectoría,
+          bienestar).
+RF-007.6  Lista de control de abordaje integrada.
+
+────────────────────────────────────────────────────────────────────────────────
+RF-008  LISTA DE CONTROL DE ABORDAJE
+────────────────────────────────────────────────────────────────────────────────
+RF-008.1  Tabla de estudiantes con: foto, nombre, ID, programa, estado.
+RF-008.2  Barra de progreso de abordados/total.
+RF-008.3  Filtros dinámicos: Todos, Abordados, Pendientes.
+RF-008.4  Búsqueda por nombre o documento.
+RF-008.5  Resaltado visual (amarillo) de estudiantes pendientes.
+RF-008.6  Vista Conductor: verificación directa con modal de código.
+RF-008.7  Vista Profesor: verificación directa con modal de código.
+RF-008.8  Vista Coordinador: columna adicional "Verificado por" con
+          badge de rol (Conductor=negro, Profesor=azul).
+RF-008.9  Vista Coordinador: botones para notificar conductor/profesor.
+RF-008.10 Funciones JS independientes por rol: filtrarLista(),
+          filtrarListaProf(), filtrarListaCoord().
+
+────────────────────────────────────────────────────────────────────────────────
+RF-009  VERIFICACIÓN DE ABORDAJE
+────────────────────────────────────────────────────────────────────────────────
+RF-009.1  Estudiante sube foto obligatoria para generar código.
+RF-009.2  Código alfanumérico de 6 caracteres, único por estudiante-salida.
+RF-009.3  Código solo activo en la fecha y horario de la salida.
+RF-009.4  Conductor/Profesor ingresan código en modal de verificación.
+RF-009.5  Sistema muestra foto, nombre e ID para confirmación visual.
+RF-009.6  Al confirmar, el estudiante pasa a estado "Abordado".
+RF-009.7  Contador de abordados se actualiza en tiempo real.
+
+────────────────────────────────────────────────────────────────────────────────
+RF-010  CHECKLIST DE VEHÍCULO
+────────────────────────────────────────────────────────────────────────────────
+RF-010.1  Categorías: Mecánica, Seguridad, Documentos, Confort.
+RF-010.2  Items con estados: OK, NO OK, N/A.
+RF-010.3  Campo de observaciones por ítem.
+RF-010.4  Carga de evidencia fotográfica por ítem y general.
+RF-010.5  Barra de progreso del completamiento.
+RF-010.6  Firma digital del conductor.
+RF-010.7  No se puede iniciar viaje sin 100% del checklist aprobado.
+
+────────────────────────────────────────────────────────────────────────────────
+RF-011  REGISTRO DE NOVEDADES
+────────────────────────────────────────────────────────────────────────────────
+RF-011.1  Tipos: Mecánica, Accidente, Clima, Vial, Salud, Otro.
+RF-011.2  Niveles de urgencia: Baja, Media, Alta, Crítica.
+RF-011.3  Descripción en texto libre.
+RF-011.4  Adjuntar evidencia fotográfica.
+RF-011.5  Captura de ubicación GPS automática.
+RF-011.6  Historial de novedades previas del viaje.
+RF-011.7  Estados de novedad: Abierta, Resuelta.
+
+────────────────────────────────────────────────────────────────────────────────
+RF-012  CANCELACIÓN Y REPROGRAMACIÓN
+────────────────────────────────────────────────────────────────────────────────
+RF-012.1  Tipos de acción: Reprogramar fecha, Cambio de ruta, Cancelación.
+RF-012.2  Calendario de disponibilidad de vehículos y conductores.
+RF-012.3  Días bloqueados visibles en el calendario.
+RF-012.4  Selección de nuevo rango de fechas con vista de inicio/fin.
+RF-012.5  Panel de conductores disponibles para nuevas fechas.
+RF-012.6  Selección de destinatarios de notificación.
+RF-012.7  Previsualización del mensaje de notificación.
+RF-012.8  Motivo obligatorio documentado.
+
+────────────────────────────────────────────────────────────────────────────────
+RF-013  CIERRE OPERATIVO
+────────────────────────────────────────────────────────────────────────────────
+RF-013.1  Verificación de checklist de cierre.
+RF-013.2  Registro de novedades resueltas vs. pendientes.
+RF-013.3  Comparativo costos ejecutados vs. presupuestados.
+RF-013.4  Campo de observaciones finales.
+RF-013.5  Cierre definitivo que cambia el estado a "Cerrada/Histórico".
+
+────────────────────────────────────────────────────────────────────────────────
+RF-014  REPORTES LOGÍSTICOS
+────────────────────────────────────────────────────────────────────────────────
+RF-014.1  Catálogo de reportes: Presupuestal, Flota, Indicadores, Novedades.
+RF-014.2  Filtros por rango de fechas, facultad, tipo de salida.
+RF-014.3  Estadísticas de resumen con indicadores clave.
+RF-014.4  Tabla de detalle con datos operativos.
+RF-014.5  Vista previa en modal.
+RF-014.6  Exportación a PDF y/o Excel.
+
+────────────────────────────────────────────────────────────────────────────────
+RF-015  GESTIÓN DOCUMENTAL DEL ESTUDIANTE
+────────────────────────────────────────────────────────────────────────────────
+RF-015.1  Repositorio personal de documentos reutilizables.
+RF-015.2  Tipos: Documento de identidad, EPS/ARL, Consentimiento, Póliza.
+RF-015.3  Estados: Vigente, Vencido, No cargado.
+RF-015.4  Adjunción automática a nuevas solicitudes.
+RF-015.5  Funcionalidad de actualizar documentos vigentes.
+
+────────────────────────────────────────────────────────────────────────────────
+RF-016  REGISTRO QR DEL ESTUDIANTE
+────────────────────────────────────────────────────────────────────────────────
+RF-016.1  Escaneo de código QR desde la app del estudiante.
+RF-016.2  Pantalla de resultado con datos de la salida.
+RF-016.3  Verificación de cupos disponibles antes de inscribir.
+RF-016.4  Consentimiento de tratamiento de datos.
+RF-016.5  Redirección a detalle para completar documentación.
+
+────────────────────────────────────────────────────────────────────────────────
+RF-017  NAVEGACIÓN Y LAYOUT
+────────────────────────────────────────────────────────────────────────────────
+RF-017.1  Sidebar responsivo con menú de hamburguesa en móvil.
+RF-017.2  Sidebar con: logo, tarjeta de perfil (avatar, nombre, rol),
+          menú de navegación, footer con configuración/cerrar sesión.
+RF-017.3  Header superior con: botón menú, título de sección, badge
+          de contexto (programa/facultad), perfil de usuario.
+RF-017.4  Layout de dos columnas: sidebar fijo + contenido principal.
+RF-017.5  Diseño responsive que colapsa a una columna en móvil.
+
+================================================================================
+5. REQUERIMIENTOS NO FUNCIONALES
+================================================================================
+
+RNF-001  El sistema debe ser responsive y funcional en dispositivos
+         móviles, tablets y escritorio (breakpoint: 768px y 1024px).
+
+RNF-002  El diseño debe seguir un esquema monocromático (blanco y negro)
+         con acentos mínimos de color solo para estados y alertas.
+
+RNF-003  La interfaz debe usar la fuente del design system
+         (font-primary) definida en design-system.css.
+
+RNF-004  Los tiempos de carga de cada vista no deben superar 3 segundos.
+
+RNF-005  El sistema debe funcionar correctamente en Chrome, Firefox,
+         Safari y Edge (últimas 2 versiones).
+
+RNF-006  Las acciones críticas (enviar solicitud, aprobar, rechazar,
+         cerrar operativamente) deben tener diálogo de confirmación.
+
+RNF-007  La información sensible (documentos, fotos de estudiantes)
+         debe transmitirse de forma segura (HTTPS).
+
+RNF-008  El sistema debe utilizar CSS custom properties (variables)
+         siguiendo el design system centralizado (design-system.css,
+         sidebar.css, sidebar-modern.css).
+
+RNF-009  Las funciones JavaScript deben ser independientes por módulo
+         para evitar conflictos entre vistas.
+
+RNF-010  El sistema debe mantener consistencia visual en todos los
+         módulos: mismo estilo de cards, tablas, botones, badges y modales.
+
+================================================================================
+6. FLUJOS DE NEGOCIO PRINCIPALES
+================================================================================
+
+FLUJO 1: CICLO DE VIDA COMPLETO DE UNA SALIDA
+──────────────────────────────────────────────
+
+  Profesor                     Coordinador              Consejo
+  ────────                     ───────────              ───────
+  Crea solicitud (4 pasos)
+  Estado: BORRADOR
+         ↓
+  Envía solicitud
+  Estado: ENVIADA
+         ↓
+                               Recibe notificación
+                               Revisa pedagógicamente
+                               Evalúa criterios
+                               Emite concepto
+                               Estado: EN REVISIÓN
+                                        ↓
+                                                        Recibe solicitud
+                                                        + concepto
+                                                        Revisa detalle
+                                                        Decide:
+                                                        ├── APROBAR → Estado: APROBADA
+                                                        ├── SOLICITAR CAMBIOS → PEND. AJUSTE
+                                                        └── RECHAZAR → RECHAZADA
+
+  Si SOLICITAR CAMBIOS:
+  ─────────────────────
+  Profesor recibe notificación con plazo
+  Profesor ajusta solicitud
+  Estado: AJUSTADA
+  Vuelve al coordinador para revisión
+
+  Coordinador de Salidas       Conductor                Estudiante
+  ─────────────────────       ─────────                ──────────
+  Recibe salida APROBADA
+  Asigna transporte (wizard)
+  Asigna presupuesto
+  Estado: LISTA
+         ↓
+                               Recibe asignación
+                               Confirma viaje
+                               Completa checklist
+                                        ↓
+                                                        Escanea QR
+                                                        Sube documentos
+                                                        Genera código verif.
+                                        ↓
+  Día de la salida:
+  ─────────────────
+  Coordinador monitorea
+         ↓
+                               Verifica abordaje
+                               Confirma hitos
+                               Registra novedades
+         ↓                              ↓
+  Ve lista de abordaje         Lista actualizada
+  Notifica si hay pendientes
+         ↓
+  Viaje finaliza
+  Cierre operativo
+  Estado: CERRADA
+
+
+FLUJO 2: VERIFICACIÓN DE ABORDAJE
+──────────────────────────────────
+
+  Estudiante ──→ Sube foto ──→ Genera código (6 chars)
+                    ↓
+  Día de salida:
+  Estudiante muestra código al conductor/profesor
+                    ↓
+  Conductor/Profesor ──→ Ingresa código en modal
+                    ↓
+  Sistema muestra foto + nombre + ID del estudiante
+                    ↓
+  Conductor/Profesor confirma ──→ Estado: ABORDADO
+                    ↓
+  Coordinador ve actualización en su lista de control
+  con indicación de quién verificó (Conductor/Profesor)
+
+
+================================================================================
+7. MATRIZ DE TRAZABILIDAD
+================================================================================
+
+  HISTORIA DE USUARIO    → REQUERIMIENTO FUNCIONAL    → ARCHIVO(S)
+  ──────────────────────────────────────────────────────────────────
+  HU-PROF-001            → RF-002, RF-017             → index.html
+  HU-PROF-002            → RF-002.1, RF-002.2         → profesor/solicitud/paso-1-informacion.html
+  HU-PROF-003            → RF-002.3                   → profesor/solicitud/paso-2-planeacion.html
+  HU-PROF-004            → RF-002.4                   → profesor/solicitud/paso-3-logistica.html
+  HU-PROF-005            → RF-002.5, RF-002.6-002.9   → profesor/solicitud/paso-4-evaluacion.html
+  HU-PROF-008            → RF-007                     → profesor/dashboard.html
+  HU-PROF-009            → RF-008.1-008.5, RF-008.7   → profesor/dashboard.html
+  HU-PROF-010            → RF-009.4, RF-009.5         → profesor/dashboard.html
+  HU-COORD-001           → RF-003, RF-017             → coordinador/index.html
+  HU-COORD-002           → RF-003.1-003.5             → coordinador/revision.html
+  HU-COORD-004           → RF-003                     → coordinador/salidas-aprobadas.html
+  HU-CONS-001            → RF-004, RF-017             → consejo/index.html
+  HU-CONS-002            → RF-004.1-004.5             → consejo/detalle-salida.html
+  HU-CSAL-001            → RF-017                     → coordinador-salidas/index.html
+  HU-CSAL-002            → RF-005, RF-017             → coordinador-salidas/salidas-aprobadas.html
+  HU-CSAL-003            → RF-005.1-005.8             → coordinador-salidas/asignar-transporte.html
+  HU-CSAL-004            → RF-006.1-006.5             → coordinador-salidas/presupuesto-operativo.html
+  HU-CSAL-005            → RF-007.1-007.5             → coordinador-salidas/monitoreo-ejecucion.html
+  HU-CSAL-006            → RF-008.1-008.10            → coordinador-salidas/monitoreo-ejecucion.html
+  HU-CSAL-007            → RF-012.1-012.8             → coordinador-salidas/cancelar-salida.html
+  HU-CSAL-008            → RF-013.1-013.5             → coordinador-salidas/cierre-operativo.html
+  HU-CSAL-009            → RF-014.1-014.6             → coordinador-salidas/reportes-logisticos.html
+  HU-COND-001            → RF-017                     → conductor/index.html
+  HU-COND-002            → RF-007, RF-008, RF-009     → conductor/detalle-viaje.html
+  HU-COND-003            → RF-010.1-010.7             → conductor/checklist.html
+  HU-COND-004            → RF-011.1-011.7             → conductor/registrar-novedad.html
+  HU-COND-005            → RF-008.1-008.6             → conductor/detalle-viaje.html
+  HU-COND-006            → RF-014                     → conductor/historial.html
+  HU-EST-001             → RF-017                     → estudiante/index.html
+  HU-EST-002             → RF-016.1-016.5             → estudiante/registro-qr.html
+  HU-EST-003             → RF-015                     → estudiante/detalle-salida.html
+  HU-EST-004             → RF-015.1-015.5             → estudiante/mis-documentos.html
+  HU-EST-005             → RF-014                     → estudiante/historial.html
+  HU-EST-006             → RF-009.1-009.7             → estudiante/codigo-verificacion.html
+
+================================================================================
+  FIN DEL DOCUMENTO
+  Total: 35 Historias de Usuario | 17 Grupos de Requerimientos Funcionales
+         10 Requerimientos No Funcionales | 2 Flujos de Negocio
+================================================================================

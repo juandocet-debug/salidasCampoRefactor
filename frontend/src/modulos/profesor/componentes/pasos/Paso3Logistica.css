@@ -1,0 +1,5 @@
+/* Paso3Logistica.css — punto de entrada */
+@import './p3l-layout.css';
+@import './p3l-km-strip.css';
+@import './p3l-cards.css';
+@import './p3l-tabs-kanban.css';

@@ -1,0 +1,6 @@
+/* PaginaNuevaSalida.css — punto de entrada, importa secciones */
+@import './nsal-base.css';
+@import './nsal-stepper.css';
+@import './nsal-form.css';
+@import './nsal-paradas.css';
+@import './nsal-ticket.css';

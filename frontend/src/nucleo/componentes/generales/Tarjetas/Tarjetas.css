@@ -1,0 +1,226 @@
+/* src/nucleo/componentes/generales/Tarjetas/Tarjetas.css */
+
+/* ── Card Ice Matcha (Flota/Vehículos) ────────────────────────── */
+.ui-card-matcha {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.03);
+    cursor: default;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+}
+
+.ui-card-matcha:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.06);
+}
+
+.ui-matcha-top {
+    position: relative;
+    width: 100%;
+    height: 190px;
+    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Base pastel variants */
+.ui-matcha-top.bg-blue   { background: #e0f2fe; } .ui-matcha-top.bg-blue   .ui-matcha-banner { background: #bae6fd; color: #0369a1; }
+.ui-matcha-top.bg-green  { background: #dcfce7; } .ui-matcha-top.bg-green  .ui-matcha-banner { background: #bbf7d0; color: #166534; }
+.ui-matcha-top.bg-yellow { background: #fef08a; } .ui-matcha-top.bg-yellow .ui-matcha-banner { background: #fde047; color: #854d0e; }
+.ui-matcha-top.bg-orange { background: #ffedd5; } .ui-matcha-top.bg-orange .ui-matcha-banner { background: #fed7aa; color: #9a3412; }
+.ui-matcha-top.bg-slate  { background: #f1f5f9; } .ui-matcha-top.bg-slate  .ui-matcha-banner { background: #e2e8f0; color: #334155; }
+
+/* Azul rey degradado para las fotos limpias (vehículos png transparentes) */
+.ui-matcha-top.bg-bus,
+.ui-matcha-top.bg-buseta,
+.ui-matcha-top.bg-camioneta {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+}
+.ui-matcha-top.bg-bus .ui-matcha-banner,
+.ui-matcha-top.bg-buseta .ui-matcha-banner,
+.ui-matcha-top.bg-camioneta .ui-matcha-banner {
+    background: rgba(15, 23, 42, 0.4);
+    color: #ffffff;
+    backdrop-filter: blur(4px);
+}
+
+.ui-matcha-top img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 2;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ui-card-matcha:hover .ui-matcha-top img {
+    transform: scale(1.04);
+}
+
+.ui-matcha-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #ffffff;
+    padding: 8px 14px;
+    border-bottom-left-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 3;
+    pointer-events: none;
+    box-shadow: -2px 2px 10px rgba(0,0,0,0.02);
+}
+
+.ui-matcha-banner {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    padding: 8px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 3;
+}
+
+.ui-matcha-body {
+    padding: 16px 4px 4px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.ui-matcha-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;  /* center instead of baseline for buttons */
+    margin-bottom: 15px;
+}
+
+.ui-matcha-header h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #1e293b;
+    letter-spacing: -0.3px;
+}
+
+.ui-matcha-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ui-matcha-pill {
+    background: #f1f5f9;
+    color: #475569;
+    padding: 5px 10px;
+    border-radius: 10px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+/* ── Botones de Tarjetas (Small Buttons) ────────────────── */
+.ui-card-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.ui-card-btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #f8fafc;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.ui-card-btn:hover { background: #e2e8f0; color: #1e293b; }
+
+.ui-card-btn--edit { background: rgba(14, 165, 233, 0.1); color: #0ea5e9; border: 1px solid transparent; }
+.ui-card-btn--edit:hover { background: #0ea5e9; color: #fff; box-shadow: 0 4px 10px rgba(14,165,233,0.25); }
+
+.ui-card-btn--danger { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid transparent; }
+.ui-card-btn--danger:hover { background: #ef4444; color: #fff; box-shadow: 0 4px 10px rgba(239,68,68,0.25); }
+
+
+/* ── Card KPI (Dashboard Stats) ────────────────────────── */
+.ui-card-kpi {
+    background: #ffffff;
+    border: none;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ui-card-kpi:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+}
+
+.ui-kpi-icono {
+    background: #f5f3ff;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #5c4dfa;
+    flex-shrink: 0;
+    font-size: 1.5rem;
+}
+
+.ui-kpi-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+}
+
+.ui-kpi-lbl {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-bottom: 2px;
+    text-transform: capitalize;
+}
+
+.ui-kpi-main {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.ui-kpi-val {
+    font-size: 1.55rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: #1e1b4b;
+}

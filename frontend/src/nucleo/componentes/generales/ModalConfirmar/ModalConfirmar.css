@@ -1,0 +1,102 @@
+/* ModalConfirmar.css — Estilos del modal de confirmación compartido OTIUM */
+
+@keyframes otm-overlay-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes otm-slide-up {
+    from { transform: translateY(30px) scale(0.95); opacity: 0; }
+    to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.otm-confirmar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: otm-overlay-in 0.2s ease;
+}
+
+.otm-confirmar {
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 36px 32px;
+    width: 90%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+    animation: otm-slide-up 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.otm-confirmar__icono {
+    width: 56px;
+    height: 56px;
+    background: #fee2e2;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #dc2626;
+    margin-bottom: 4px;
+}
+
+.otm-confirmar__titulo {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+    text-align: center;
+}
+
+.otm-confirmar__desc {
+    font-size: 0.88rem;
+    color: #64748b;
+    text-align: center;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.otm-confirmar__acciones {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+    width: 100%;
+}
+
+.otm-confirmar__cancelar,
+.otm-confirmar__borrar {
+    flex: 1;
+    height: 42px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-family: inherit;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.15s, background 0.2s;
+}
+
+.otm-confirmar__cancelar {
+    background: #f1f5f9;
+    color: #475569;
+}
+.otm-confirmar__cancelar:hover { background: #e2e8f0; }
+
+.otm-confirmar__borrar {
+    background: #dc2626;
+    color: #ffffff;
+}
+.otm-confirmar__borrar:hover:not(:disabled) {
+    background: #b91c1c;
+    transform: scale(1.03);
+}
+
+.otm-confirmar__borrar:disabled,
+.otm-confirmar__cancelar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

@@ -1,0 +1,67 @@
+# === Python / Django ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+*.log
+*.pot
+*.pyc
+db.sqlite3
+local_settings.py
+media/
+staticfiles/
+
+# Entornos virtuales
+venv/
+env/
+.env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Variables de entorno
+.env
+*.env
+
+# === Node / React ===
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# Build outputs
+frontend/dist/
+frontend/build/
+frontend/.vite/
+
+# === IDEs ===
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# === OS ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === Misceláneos ===
+*.bak
+*.tmp
+*.swp
+
+# === Logs de depuración (pueden contener credenciales) ===
+error_log.html
+*.log.html

@@ -1,0 +1,115 @@
+/* src/modulos/tablero/paginas/PaginaTablero.css */
+
+.tablero {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    animation: fadeInc 0.5s ease;
+}
+
+@keyframes fadeInc {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Default Tablero (Non-Professor) */
+.tablero__bienvenida {
+    margin-bottom: 24px;
+}
+
+.tablero__saludo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 4px;
+}
+
+.tablero__saludo span {
+    color: #00bcd4;
+}
+
+.tablero__fecha {
+    font-size: 0.9rem;
+    color: #64748b;
+    text-transform: capitalize;
+}
+
+.tablero__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.tablero__tarjeta {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.tablero__tarjeta:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+.tablero__tarjeta::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+}
+
+.tablero__tarjeta--teal::before {
+    background: #00bcd4;
+}
+
+.tablero__tarjeta--ambar::before {
+    background: #f59e0b;
+}
+
+.tablero__tarjeta--verde::before {
+    background: #10b981;
+}
+
+.tablero__tarjeta--cyan::before {
+    background: #0ea5e9;
+}
+
+.tablero__tarjeta--rojo::before {
+    background: #ef4444;
+}
+
+.tablero__tarjeta-valor {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.tablero__tarjeta-titulo {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 4px;
+}
+
+.tablero__tarjeta-desc {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+/* ── TABLERO PROFESOR (Wireframe Neutral) MOVED TO TableroProfesor.css ── */
