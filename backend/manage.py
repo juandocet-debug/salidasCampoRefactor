@@ -12,15 +12,10 @@ try:
     from dotenv import load_dotenv
     load_dotenv(Path(__file__).resolve().parent / '.env')
 except ImportError:
-    pass  # Si no está instalado dotenv, las variables deben estar en el entorno
+    pass
 
 def main():
-    # Lee el entorno para saber qué settings usar
-    entorno = os.environ.get('DJANGO_ENTORNO', 'development')
-    if entorno == 'production':
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'configuracion.settings.produccion')
-    else:
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'configuracion.settings.desarrollo')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
     try:
         from django.core.management import execute_from_command_line

@@ -3,12 +3,12 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import './nucleo/sistema-diseno/variables.css';
+import '@/sistema-diseno/variables.css';
 import App from './App.jsx';
 
 // Inyección de dependencias para el cliente HTTP
-import { configurarAdaptadorHttp } from './nucleo/api/clienteHttp';
-import useAutenticacion from './modulos/autenticacion/estado/useAutenticacion';
+import { configurarAdaptadorHttp } from '@/shared/api/clienteHttp';
+import useAutenticacion from '@/shared/hooks/useAutenticacion';
 
 configurarAdaptadorHttp(
   () => useAutenticacion.getState().token,

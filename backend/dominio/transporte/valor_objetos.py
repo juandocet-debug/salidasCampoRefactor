@@ -1,26 +1,16 @@
-# dominio/transporte/valor_objetos.py  (~60 líneas)
-# ⚠️  Python puro — cero Django.
+# CAPA: Dominio
+# QUÉ HACE: Enums del módulo transporte
+# NO DEBE CONTENER: Django, ORM, lógica de vistas
 
 from enum import Enum
 
 
 class TipoVehiculo(str, Enum):
-    BUS      = 'bus'
-    BUSETA   = 'buseta'
-    MICROBUS = 'microbus'
+    BUS       = 'bus'
+    BUSETA    = 'buseta'
+    MICROBUS  = 'microbus'
     CAMIONETA = 'camioneta'
-    FURGON   = 'furgon'
-
-
-class EstadoVehiculo(str, Enum):
-    DISPONIBLE    = 'disponible'
-    EN_SERVICIO   = 'en_servicio'
-    MANTENIMIENTO = 'mantenimiento'
-
-
-class Propietario(str, Enum):
-    INSTITUCIONAL = 'institucional'   # Flota propia UPN
-    EXTERNO       = 'externo'         # Empresa contratada
+    FURGON    = 'furgon'
 
 
 class TipoCombustible(str, Enum):
@@ -29,7 +19,17 @@ class TipoCombustible(str, Enum):
     GAS      = 'gas'
 
 
+class Propietario(str, Enum):
+    INSTITUCIONAL = 'institucional'
+    EXTERNO       = 'externo'
+
+
+class EstadoVehiculo(str, Enum):
+    DISPONIBLE    = 'disponible'
+    EN_SERVICIO   = 'en_servicio'
+    MANTENIMIENTO = 'mantenimiento'
+
+
 class TipoTransporte(str, Enum):
-    """Cómo se contrata el transporte para la salida."""
-    PROPIO   = 'propio'
-    EXTERNO  = 'externo'
+    PROPIO  = 'propio'
+    EXTERNO = 'externo'

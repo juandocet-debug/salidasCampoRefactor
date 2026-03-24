@@ -4,7 +4,7 @@
 // ─────────────────────────────────────────────────────────────────
 
 import { Navigate, Outlet } from 'react-router-dom';
-import useAutenticacion from '../modulos/autenticacion/estado/useAutenticacion';
+import useAutenticacion from '@/shared/hooks/useAutenticacion';
 
 export default function RutasProtegidas() {
     const token = useAutenticacion(s => s.token);

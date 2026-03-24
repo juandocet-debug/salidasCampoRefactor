@@ -1,0 +1,489 @@
+/* modulos/admin/componentes/TabFlota.css */
+/* ─────────────────────────────────────────────────────────────────────────────
+   Gestión de Flota Vehicular — Estilos
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.flota-tab { 
+    padding: 0; 
+}
+
+/* ── Layout Dashboard (2 Columnas) ────────────────────────────────────────── */
+.layout-dashboard {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 32px;
+    align-items: start;
+}
+
+.flota-main-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.flota-side-column {
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 24px;
+}
+
+@media (max-width: 1280px) {
+    .layout-dashboard {
+        grid-template-columns: 1fr;
+    }
+    .flota-side-column {
+        position: relative;
+        top: 0;
+    }
+}
+
+/* ── Stats ─────────────────────────────────────────────────────────────────── */
+.flota-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+
+/* ── Toolbar ───────────────────────────────────────────────────────────────── */
+.flota-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 12px; }
+.flota-filters { display: flex; gap: 10px; }
+.flota-select {
+    padding: 8px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.06); color: #e2e8f0; font-size: 13px; cursor: pointer;
+}
+.flota-btn-add {
+    display: flex; align-items: center; gap: 8px; padding: 10px 22px; border-radius: 12px;
+    background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none;
+    font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 4px 14px rgba(16,185,129,0.25);
+}
+.flota-btn-add:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16,185,129,0.4); }
+
+/* ── Grid de tarjetas (ICE MATCHA STYLE) ────────────────────────── */
+.flota-grid {
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+    gap: 24px; 
+}
+
+.flota-card-matcha {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.03);
+    cursor: default;
+}
+
+.flota-card-matcha:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.06);
+}
+
+.flota-matcha-top {
+    position: relative;
+    width: 100%;
+    height: 190px;
+    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Colores pastel personalizados por tipo de vehículo, imitando el matcha green */
+.flota-matcha-top.bg-tipo-bus       { background: #e0f2fe; } /* Blue clarete */
+.flota-matcha-top.bg-tipo-bus .flota-matcha-banner { background: #bae6fd; color: #0369a1; }
+
+.flota-matcha-top.bg-tipo-buseta    { background: #dcfce7; } /* Green pastel - Like Matcha! */
+.flota-matcha-top.bg-tipo-buseta .flota-matcha-banner { background: #bbf7d0; color: #166534; }
+
+.flota-matcha-top.bg-tipo-microbus  { background: #fef08a; } /* Yellow */
+.flota-matcha-top.bg-tipo-microbus .flota-matcha-banner { background: #fde047; color: #854d0e; }
+
+.flota-matcha-top.bg-tipo-camioneta { background: #ffedd5; } /* Orange pastel */
+.flota-matcha-top.bg-tipo-camioneta .flota-matcha-banner { background: #fed7aa; color: #9a3412; }
+
+.flota-matcha-top.bg-tipo-furgon    { background: #f1f5f9; } /* Slate */
+.flota-matcha-top.bg-tipo-furgon .flota-matcha-banner { background: #e2e8f0; color: #334155; }
+
+
+.flota-matcha-top img {
+    height: 75%;
+    width: auto;
+    object-fit: contain;
+    z-index: 2;
+    filter: drop-shadow(0 15px 15px rgba(0,0,0,0.15));
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.flota-card-matcha:hover .flota-matcha-top img {
+    transform: scale(1.05) translateY(-5px);
+}
+
+.flota-matcha-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #ffffff;
+    padding: 8px 14px;
+    border-bottom-left-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 3;
+    pointer-events: none;
+    box-shadow: -2px 2px 10px rgba(0,0,0,0.02);
+}
+
+.flota-matcha-banner {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    padding: 8px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 3;
+}
+
+.flota-matcha-body {
+    padding: 16px 4px 4px;
+}
+
+.flota-matcha-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 15px;
+}
+
+.flota-matcha-header h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #1e293b;
+    letter-spacing: -0.3px;
+}
+
+.flota-matcha-link {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #64748b;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    transition: color 0.2s;
+}
+
+.flota-matcha-link:hover {
+    color: #0f172a;
+}
+
+.flota-matcha-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.flota-matcha-pill {
+    background: #f1f5f9;
+    color: #475569;
+    padding: 5px 10px;
+    border-radius: 10px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+
+/* ── Empty / Loading ──────────────────────────────────────────────────────── */
+.flota-empty { text-align: center; padding: 60px 20px; }
+.flota-empty-icon { font-size: 64px; display: block; margin-bottom: 16px; opacity: 0.4; }
+.flota-empty h3 { color: #e2e8f0; margin-bottom: 8px; }
+.flota-empty p  { color: #94a3b8; margin-bottom: 24px; }
+.flota-loading  { text-align: center; padding: 40px; color: #94a3b8; font-size: 15px; }
+
+/* ── Modal Light Soft UI ──────────────────────────────────────────────────── */
+.flota-modal-overlay {
+    position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center; z-index: 9999;
+}
+.flota-modal {
+    width: 1080px; max-height: 95vh; overflow-y: auto; border-radius: 24px;
+    background: #ffffff; border: none;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
+}
+.flota-modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 24px 32px 12px; border-bottom: none;
+}
+.flota-modal-header h2 { font-size: 24px; color: #1e1b4b; margin: 0; font-weight: 800; letter-spacing: -0.5px; }
+.flota-modal-close { background: #f1f5f9; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: none; color: #64748b; font-size: 16px; cursor: pointer; transition: background 0.2s, color 0.2s; }
+.flota-modal-close:hover { background: #e2e8f0; color: #1e293b; }
+.flota-modal-body { padding: 4px 32px 24px; }
+
+.flota-modal-layout {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 32px;
+}
+.flota-col-left { display: flex; flex-direction: column; gap: 24px; }
+.flota-col-right { display: flex; flex-direction: column; gap: 0; }
+
+/* ── Formulario en Modo Premium ──────────────────────────────────────────────── */
+.flota-form-section {
+    margin-bottom: 16px;
+}
+.flota-section-title {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #94a3b8;
+    margin: 0 0 10px 0;
+    font-weight: 700;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 6px;
+}
+
+.flota-form-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); 
+    gap: 20px; 
+}
+
+.flota-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.flota-field label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #475569;
+    text-transform: none;
+    letter-spacing: 0.2px;
+}
+
+.flota-field input,
+.flota-field select,
+.flota-field textarea {
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #1e293b;
+    background: #f8fafc;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.flota-field select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 2.2rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23475569'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1.1em;
+    cursor: pointer;
+    text-overflow: ellipsis;
+}
+
+.flota-field input:focus,
+.flota-field select:focus,
+.flota-field textarea:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99,102,241,0.1);
+    background: #ffffff;
+}
+
+.flota-field--full  { grid-column: 1 / -1; }
+
+.flota-field-ia     { display: flex; gap: 8px; }
+.flota-field-ia input { flex: 1; }
+
+.flota-file-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 24px 16px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.flota-file-wrapper:hover {
+    border-color: #818cf8;
+    background: #eef2ff;
+}
+
+.flota-file-input { display: none !important; }
+.flota-file-name  { font-size: 13px; color: #4f46e5; display: block; font-weight: 600; }
+.flota-preview-img { border-radius: 8px; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+
+/* ── Asistente IA Modo Chat UI ────────────────────────────────────────────────────── */
+.flota-ia-search {
+    background: linear-gradient(135deg, rgba(99,102,241,0.05), rgba(139,92,246,0.03));
+    border: 1px solid rgba(99,102,241,0.15); border-radius: 16px;
+    padding: 16px; margin-bottom: 16px;
+}
+.flota-ia-search-header { display: flex; align-items: center; gap: 12px; margin-bottom: 0px; }
+.flota-ia-icon { font-size: 32px; }
+.flota-ia-search-header h3 { color: #312e81; margin: 0; font-size: 16px; font-weight: 800; }
+.flota-ia-search-header p  { color: #64748b; margin: 2px 0 0; font-size: 13px; font-weight: 500;}
+
+.flota-ia-chat-area {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.flota-ia-user-msg {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    position: relative;
+    width: 100%;
+}
+
+.flota-ia-chat-input {
+    resize: none;
+    line-height: 1.4;
+    border-radius: 16px;
+    background: #ffffff;
+    border: 1px solid rgba(99,102,241,0.2) !important;
+    padding: 12px 48px 12px 16px !important;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 0.95rem;
+    color: #1e293b;
+    font-family: inherit;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+
+.flota-ia-chat-input:focus {
+    outline: none;
+    border-color: #818cf8 !important;
+    box-shadow: 0 0 0 4px rgba(99,102,241,0.1), 0 4px 6px -1px rgba(0,0,0,0.05) !important;
+}
+
+.flota-btn-ia-send {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(99,102,241,0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+    z-index: 10;
+}
+
+.flota-btn-ia-send:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 6px 14px rgba(99,102,241,0.4);
+}
+
+.flota-btn-ia-send:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.flota-ia-bot-msg {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.flota-ia-bot-avatar {
+    background: #eef2ff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 4px;
+}
+
+.flota-ia-bot-bubble {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 12px 16px;
+    border-radius: 0 16px 16px 16px;
+    font-size: 0.85rem;
+    color: #334155;
+    line-height: 1.5;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.flota-file-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none;
+    width: 100%;
+}
+
+/* ── Footer del modal Light Soft UX ───────────────────────────────────────── */
+.flota-modal-footer {
+    padding: 24px 32px; border-top: 1px solid #f1f5f9;
+    display: flex; justify-content: flex-end; gap: 12px;
+}
+.flota-btn-cancel {
+    padding: 12px 24px; border-radius: 14px; border: none;
+    background: #f1f5f9; color: #475569; cursor: pointer; font-size: 14px; font-weight: 700; transition: background 0.2s;
+}
+.flota-btn-cancel:hover { background: #e2e8f0; }
+.flota-btn-save {
+    padding: 12px 32px; border-radius: 14px; border: none;
+    background: #4f46e5; color: #fff; cursor: pointer; font-size: 14px; font-weight: 700;
+    transition: background 0.2s, transform 0.2s; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+}
+.flota-btn-save:hover:not(:disabled) { background: #4338ca; transform: translateY(-1px); }
+.flota-btn-save:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .flota-modal-layout { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+    .flota-stats     { grid-template-columns: repeat(2, 1fr); }
+    .flota-form-grid { grid-template-columns: 1fr; }
+    .flota-modal     { width: 95%; }
+}

@@ -6,19 +6,20 @@
 // ─────────────────────────────────────────────────────────────────
 
 import { Routes, Route, Navigate } from 'react-router-dom';
-import useAutenticacion from './modulos/autenticacion/estado/useAutenticacion';
-import RutasProtegidas from './rutas/RutasProtegidas';
-import Layout from './nucleo/componentes/Layout/Layout';
-import GlobalAlerts from './nucleo/componentes/Alertas/GlobalAlerts';
+import useAutenticacion from '@/shared/hooks/useAutenticacion';
+import RutasProtegidas from '@/rutas/RutasProtegidas';
+import Layout from '@/shared/componentes/Layout/Layout';
+import GlobalAlerts from '@/shared/componentes/Alertas/GlobalAlerts';
 
 // ── Importación directa de módulos ────────────────────
-import PaginaLogin from './modulos/autenticacion/paginas/PaginaLogin';
-import PaginaTablero from './modulos/tablero/paginas/PaginaTablero';
-import PaginaHistorico from './modulos/profesor/paginas/PaginaHistorico';
-import PaginaNuevaSalida from './modulos/profesor/paginas/PaginaNuevaSalida';
-import PanelHerramientas from './modulos/admin/paginas/PanelHerramientas';
-import PaginaVerificacionAbordaje from './funcionalidades/abordaje/paginas/PaginaVerificacionAbordaje';
-import PaginaCodigoEstudiante from './funcionalidades/abordaje/paginas/PaginaCodigoEstudiante';
+import PaginaLogin from '@/features/auth/presentacion/paginas/Login/PaginaLogin';
+import PaginaTablero from '@/features/tablero/presentacion/paginas/PaginaTablero/PaginaTablero';
+import PaginaHistorico from '@/features/salidas/presentacion/paginas/Historico/PaginaHistorico';
+import PaginaNuevaSalida from '@/features/salidas/presentacion/paginas/NuevaSalida/PaginaNuevaSalida';
+import PanelHerramientas from '@/features/admin_sistema/presentacion/paginas/PanelHerramientas/PanelHerramientas';
+import PaginaVerificacionAbordaje from '@/features/abordaje/presentacion/paginas/PaginaVerificacionAbordaje/PaginaVerificacionAbordaje';
+import PaginaCodigoEstudiante from '@/features/abordaje/presentacion/paginas/PaginaCodigoEstudiante/PaginaCodigoEstudiante';
+import PaginaConstruccion from '@/shared/componentes/PaginaConstruccion/PaginaConstruccion';
 
 // ── Fallback de carga ─────────────────────────────────────────────
 function Cargando() {
@@ -53,26 +54,26 @@ export default function App() {
             <Route path="/tablero" element={<PaginaTablero />} />
 
             {/* Rutas Fases */}
-            <Route path="/salidas" element={<PaginaTablero />} />
+            <Route path="/salidas" element={<PaginaConstruccion />} />
             <Route path="/nueva-salida" element={<PaginaNuevaSalida />} />
-            <Route path="/revisiones" element={<PaginaTablero />} />
-            <Route path="/decisiones" element={<PaginaTablero />} />
-            <Route path="/historial" element={<PaginaTablero />} />
+            <Route path="/revisiones" element={<PaginaConstruccion />} />
+            <Route path="/decisiones" element={<PaginaConstruccion />} />
+            <Route path="/historial" element={<PaginaConstruccion />} />
             <Route path="/historico" element={<PaginaHistorico />} />
-            <Route path="/transporte" element={<PaginaTablero />} />
-            <Route path="/presupuesto" element={<PaginaTablero />} />
-            <Route path="/parametros" element={<PaginaTablero />} />
+            <Route path="/transporte" element={<PaginaConstruccion />} />
+            <Route path="/presupuesto" element={<PaginaConstruccion />} />
+            <Route path="/parametros" element={<PaginaConstruccion />} />
             <Route path="/herramientas" element={<PanelHerramientas />} />
-            <Route path="/checklist" element={<PaginaTablero />} />
-            <Route path="/novedades" element={<PaginaTablero />} />
+            <Route path="/checklist" element={<PaginaConstruccion />} />
+            <Route path="/novedades" element={<PaginaConstruccion />} />
             {/* Abordaje: conductor verifica / estudiante ve su código */}
             <Route path="/abordaje/:salidaId" element={<PaginaVerificacionAbordaje />} />
             <Route path="/mi-codigo/:salidaId" element={<PaginaCodigoEstudiante />} />
 
             {/* Otros (placeholders actuales) */}
-            <Route path="/mi-codigo" element={<PaginaTablero />} />
-            <Route path="/documentos" element={<PaginaTablero />} />
-            <Route path="/perfil" element={<PaginaTablero />} />
+            <Route path="/mi-codigo" element={<PaginaConstruccion />} />
+            <Route path="/documentos" element={<PaginaConstruccion />} />
+            <Route path="/perfil" element={<PaginaConstruccion />} />
 
             {/* Redirige raíz → tablero */}
             <Route index element={<Navigate to="/tablero" replace />} />
