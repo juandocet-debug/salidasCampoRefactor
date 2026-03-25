@@ -15,8 +15,8 @@ export async function obtenerCatalogosAcademicos() {
  * (que darán 404). 
  * Se dejan preparados para cuando el backend los exponga.
  */
-const API_FAC = '/api/admin/facultades/';
-const API_PROG = '/api/admin/programas/';
+const API_FAC = '/api/facultades/';
+const API_PROG = '/api/programas/';
 
 export async function crearFacultad(datos) {
     const res = await clienteHttp.post(API_FAC, datos);
