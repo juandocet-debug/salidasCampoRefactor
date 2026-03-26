@@ -60,8 +60,6 @@ export default function App() {
             <Route path="/decisiones" element={<PaginaConstruccion />} />
             <Route path="/historial" element={<PaginaConstruccion />} />
             <Route path="/historico" element={<PaginaHistorico />} />
-            <Route path="/transporte" element={<PaginaConstruccion />} />
-            <Route path="/presupuesto" element={<PaginaConstruccion />} />
             <Route path="/parametros" element={<PaginaConstruccion />} />
             <Route path="/herramientas" element={<PanelHerramientas />} />
             <Route path="/checklist" element={<PaginaConstruccion />} />
@@ -73,7 +71,7 @@ export default function App() {
             {/* Otros (placeholders actuales) */}
             <Route path="/mi-codigo" element={<PaginaConstruccion />} />
             <Route path="/documentos" element={<PaginaConstruccion />} />
-            <Route path="/perfil" element={<PaginaConstruccion />} />
+            <Route path="/usuarios" element={<PaginaConstruccion />} />
 
             {/* Redirige raíz → tablero */}
             <Route index element={<Navigate to="/tablero" replace />} />

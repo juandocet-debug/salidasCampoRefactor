@@ -20,15 +20,13 @@ const TITULOS = {
     '/salidas': 'Mis Salidas',
     '/nueva-salida': 'Nueva Salida',
     '/revisiones': 'Revisiones',
-    '/transporte': 'Transporte',
-    '/presupuesto': 'Presupuesto',
     '/parametros': 'Parámetros',
     '/herramientas': 'Herramientas del Sistema',
     '/checklist': 'Checklist Vehículo',
     '/novedades': 'Novedades',
     '/mi-codigo': 'Mi Código de Abordaje',
     '/documentos': 'Mis Documentos',
-    '/perfil': 'Mi Perfil',
+    '/usuarios': 'Gestión de Usuarios',
 };
 
 // ── Componente Layout ────────────────────────────────────────────

@@ -4,7 +4,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import { useEffect } from 'react';
 import { useParametrosSistema } from '@/features/salidas/presentacion/componentes/mapa/utils/useParametrosSistema';
-import { cop, getOpcionesVehiculo, calcularCostos } from './costoUtils';
+import { useFlotaDisponible } from '@/features/salidas/presentacion/componentes/logistica/hooks/useFlotaDisponible';
+import { cop, calcularCostos } from './costoUtils';
 import './WidgetCosto.css';
 import imgFuel     from '@/assets/portadas/fuel_3d.png';
 import imgLodge    from '@/assets/portadas/lodge_3d.png';
@@ -24,47 +25,68 @@ const TIPOS_VEHICULO = {
 };
 
 // ── Sub-componente: Selector de tipo de vehículo ──────────────────────────────
-function SelectorVehiculo({ pax, tipoVehiculo, onTipoChange }) {
-    const opciones = getOpcionesVehiculo(pax);
+function SelectorFlota({ pax, vehiculosAsignados, onVehiculosChange, vehiculos, cargando, error }) {
+    if (cargando) return <div className="flota-loading" style={{ padding: '1rem', color: '#64748b' }}>Cargando flota...</div>;
+    if (error) return <div style={{ padding: '1rem', color: '#ef4444' }}>Error: {error}</div>;
+    if (!vehiculos || vehiculos.length === 0) return <div style={{ padding: '1rem', color: '#f59e0b' }}>⚠️ No hay vehículos registrados o disponibles en este momento.</div>;
+
+    const handleToggle = (id) => {
+        if (vehiculosAsignados.includes(id)) {
+            onVehiculosChange(vehiculosAsignados.filter(v => v !== id));
+        } else {
+            onVehiculosChange([...vehiculosAsignados, id]);
+        }
+    };
+
     return (
-        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'nowrap', overflowX: 'auto', paddingBottom: '0.5rem' }}>
-            {opciones.map(key => {
-                const val      = TIPOS_VEHICULO[key];
-                const isActive = tipoVehiculo === key;
-                const qty      = Math.ceil(pax / val.capacidad) || 1;
+        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'nowrap', overflowX: 'auto', paddingBottom: '0.5rem', scrollBehavior: 'smooth' }}>
+            {vehiculos.map(v => {
+                const isActive = vehiculosAsignados.includes(v.id);
                 
-                const COLORES_MATCHA = {
-                    bus: 'orange',
-                    buseta: 'blue',
-                    camioneta: 'green'
-                };
+                const esUPN = v.propietario === 'institucional';
+                const imgSrcFallback = v.tipo === 'buseta' || v.tipo === 'microbus' || v.tipo === 'camioneta' 
+                    ? 'https://cdn3d.iconscout.com/3d/premium/thumb/minivan-6780879-5573489.png'
+                    : 'https://cdn3d.iconscout.com/3d/premium/thumb/bus-4993648-4159573.png';
+                
+                const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+                const fotoSrc = v.foto_url
+                    ? (v.foto_url.startsWith('http') ? v.foto_url : `${API_BASE}${v.foto_url}`)
+                    : imgSrcFallback;
+
+                const colorTheme =
+                    v.tipo === 'bus' ? 'blue' : 
+                    v.tipo === 'buseta' ? 'sky' : 
+                    v.tipo === 'microbus' ? 'cyan' : 
+                    v.tipo === 'camioneta' ? 'slate' : 'indigo';
                 
                 return (
                     <div 
-                        key={key} 
-                        onClick={() => onTipoChange?.(key)}
+                        key={v.id} 
+                        onClick={() => handleToggle(v.id)}
                         style={{ 
-                            flex: '1', 
-                            minWidth: '200px', 
-                            maxWidth: '280px',
+                            flex: '0 0 auto', 
+                            width: '240px', /* Tarjeta más compacta */
                             cursor: 'pointer',
                             transform: isActive ? 'scale(1.02)' : 'scale(1)',
-                            opacity: isActive ? 1 : 0.6,
+                            opacity: isActive ? 1 : 0.65,
                             transition: 'all 0.3s ease'
                         }}
                     >
-                        <CardMatcha
-                            title={val.label}
-                            color={COLORES_MATCHA[key] || 'slate'}
-                            badgeText={isActive ? 'ACTIVO' : ''}
-                            badgeColor={isActive ? '#16a34a' : '#64748b'}
-                            imageSrc={val.img}
-                            bannerText={qty > 1 ? `${qty} Vehículos necesarios` : '1 Vehículo necesario'}
-                            tags={[
-                                `${qty * val.capacidad} Cupos Totales`,
-                                `${val.capacidad} PAX/Unidad`
-                            ]}
-                        />
+                        <div style={{ pointerEvents: 'none' }}>
+                            <CardMatcha
+                                title={v.placa}
+                                color={colorTheme}
+                                badgeText={isActive ? 'SELECCIONADO' : 'DISPONIBLE'}
+                                badgeColor={isActive ? '#10b981' : '#3b82f6'}
+                                imageSrc={fotoSrc}
+                                bannerText={esUPN ? 'Institucional — UPN' : 'Flota Externa'}
+                                tags={[
+                                    v.tipo ? (v.tipo.charAt(0).toUpperCase() + v.tipo.slice(1)) : 'Bus',
+                                    `${v.capacidad || 0} PAX`,
+                                    v.tipo_combustible === 'diesel' ? '⛽ Diésel' : '🔋 ' + (v.tipo_combustible || '')
+                                ]}
+                            />
+                        </div>
                     </div>
                 );
             })}
@@ -148,20 +170,23 @@ export default function WidgetCosto({
     numEstudiantes = 0,
     horaInicio = '',
     horaFin = '',
-    tipoVehiculo = 'bus',
+    vehiculosAsignados = [],
     parametros,
     onCostoCalculado,
-    onTipoChange,
+    onVehiculosChange,
 }) {
     const paramsSistema = useParametrosSistema();
+    const { vehiculos, cargando, error } = useFlotaDisponible();
     const p             = { ...paramsSistema, ...parametros };
     const pax           = parseInt(numEstudiantes) || 0;
-    const tipoInfo      = TIPOS_VEHICULO[tipoVehiculo] || TIPOS_VEHICULO.bus;
+
+    // Filtramos los vehículos completos basados en los IDs asignados
+    const flotaElegida = vehiculos.filter(v => vehiculosAsignados.includes(v.id));
 
     const { combustible, costoConductor, costoExtra, total, numVehiculos, viaticos, jornada } =
         calcularCostos({
             distanciaKm, duracionDias, horasTotales, pax,
-            tipoVehiculo, capacidadVehiculo: tipoInfo.capacidad,
+            flotaElegida,
             params: p, horaInicio,
         });
 
@@ -169,7 +194,7 @@ export default function WidgetCosto({
         if (distanciaKm > 0 && onCostoCalculado) {
             onCostoCalculado(Math.round(total));
         }
-    }, [total, distanciaKm, horaFin, duracionDias, numEstudiantes, tipoVehiculo]);
+    }, [total, distanciaKm, horaFin, duracionDias, numEstudiantes, vehiculosAsignados]);
 
     if (distanciaKm === 0) {
         return (
@@ -181,7 +206,14 @@ export default function WidgetCosto({
 
     return (
         <div className="wc-container">
-            <SelectorVehiculo pax={pax} tipoVehiculo={tipoVehiculo} onTipoChange={onTipoChange} />
+            <SelectorFlota 
+                pax={pax} 
+                vehiculosAsignados={vehiculosAsignados} 
+                onVehiculosChange={onVehiculosChange} 
+                vehiculos={vehiculos} 
+                cargando={cargando}
+                error={error}
+            />
 
             <div className="wc-top">
                 <span className="wc-top-label">Costo Estimado Total</span>
@@ -196,7 +228,7 @@ export default function WidgetCosto({
                         <span className="wc-card-lbl">Combustible</span>
                         <div className="wc-card-bar"><div style={{ width: '100%' }} /></div>
                         <span className="wc-card-detail">
-                            {distanciaKm.toFixed(0)}km • {numVehiculos} {tipoInfo.label}{numVehiculos !== 1 ? 's' : ''}
+                            {distanciaKm.toFixed(0)}km • {numVehiculos} Vehículo{numVehiculos !== 1 ? 's' : ''}
                         </span>
                     </div>
                 </div>

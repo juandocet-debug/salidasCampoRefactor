@@ -4,7 +4,7 @@
 // independiente para mantener Paso3Logistica.jsx enfocado en el layout.
 // ──────────────────────────────────────────────────────────────────────────────
 import React from 'react';
-import { tipoVehiculoSugerido } from '@/features/salidas/presentacion/componentes/mapa/WidgetCosto/WidgetCosto';
+import { useFlotaDisponible } from './useFlotaDisponible';
 
 /**
  * Auto-calcula hora_fin basándose en hora_inicio + duración total de la ruta
@@ -62,14 +62,33 @@ export function useSyncCostosForm({ form, setForm, rutaInfoIda, rutaInfoRetorno,
 }
 
 /**
- * Sugiere automáticamente el tipo de vehículo cuando no se ha seleccionado uno
- * y cambia el número de estudiantes.
+ * Sugiere automáticamente la lista de vehículos cuando no se ha seleccionado ninguno
+ * y la cantidad de estudiantes cambia.
  */
-export function useAutoTipoVehiculo({ form, setForm }) {
+export function useAutoFlota({ form, setForm }) {
+    const { vehiculos, cargando } = useFlotaDisponible();
+
     React.useEffect(() => {
-        if (!form.tipo_vehiculo_calculo || form.tipo_vehiculo_calculo === '') {
-            const sugerido = tipoVehiculoSugerido(form.num_estudiantes);
-            setForm(f => ({ ...f, tipo_vehiculo_calculo: sugerido }));
+        if (cargando || vehiculos.length === 0) return;
+        
+        // Si no hay vehículos asignados o el pax cambió mucho, auto sugerimos
+        // Para simplificar: solo auto-asigna si está vacío
+        const pax = parseInt(form.num_estudiantes) || 0;
+        if ((!form.vehiculos_asignados || form.vehiculos_asignados.length === 0) && pax > 0) {
+            
+            // Ordenamos de mayor a menor capacidad para minimizar buses
+            const flotaOrdenada = [...vehiculos].sort((a, b) => b.capacidad_pasajeros - a.capacidad_pasajeros);
+            
+            let capacidadAcumulada = 0;
+            const asignados = [];
+
+            for (const v of flotaOrdenada) {
+                if (capacidadAcumulada >= pax) break;
+                asignados.push(v.id);
+                capacidadAcumulada += v.capacidad_pasajeros;
+            }
+
+            setForm(f => ({ ...f, vehiculos_asignados: asignados }));
         }
-    }, [form.num_estudiantes]);
+    }, [form.num_estudiantes, form.vehiculos_asignados, vehiculos, cargando, setForm]);
 }

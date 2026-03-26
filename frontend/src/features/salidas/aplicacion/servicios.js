@@ -1,22 +1,22 @@
 import { clienteHttp } from '@/shared/api/clienteHttp';
 
 export async function obtenerSalidasServicio() {
-  const res = await clienteHttp.get('/api/profesor/salidas/');
+  const res = await clienteHttp.get('/api/salidas/core/');
   return res.data;
 }
 
 export async function crearSalidaServicio(payload) {
-  const res = await clienteHttp.post('/api/profesor/salidas/', payload);
+  const res = await clienteHttp.post('/api/salidas/core/', payload);
   return res.data;
 }
 
 export async function enviarSalidaServicio(id) {
-  const res = await clienteHttp.post(`/api/profesor/salidas/${id}/enviar/`, {});
+  const res = await clienteHttp.post(`/api/salidas/core/${id}/enviar/`, {});
   return res.data;
 }
 
 export async function eliminarSalidaServicio(id) {
-  const res = await clienteHttp.delete(`/api/profesor/salidas/${id}/`);
+  const res = await clienteHttp.delete(`/api/salidas/core/${id}/`);
   return res.data;
 }
 import * as reglas from '@/features/salidas/dominio/reglas';
@@ -328,7 +328,7 @@ export async function buscarLugaresEnRuta(motivo, puntos, rutaInfo = {}) {
 
 // buscarPueblos.js — Municipios en ruta: Backend Gemini proxy + Diccionario + OSRM fallback
 // PRIORIDAD:
-//  1. Backend Django /api/nucleo/municipios-en-ruta/ → llama Gemini server-side (sin 429)
+//  1. Backend Django /api/salidas/itinerario/ia/municipios/ -> llama Gemini server-side
 //  2. Diccionario interno (rutas conocidas) → instantáneo si el backend falla
 //  3. OSRM + Overpass → último recurso
 
@@ -346,7 +346,7 @@ async function buscarConGemini(oriNombre, dstNombre) {
     if (_pending.has(pKey)) return null;
     _pending.add(pKey);
     try {
-        const res = await clienteHttp.post('/api/nucleo/municipios-en-ruta/', {
+        const res = await clienteHttp.post('/api/salidas/itinerario/ia/municipios/', {
             origen: oriNombre,
             destino: dstNombre
         });
@@ -492,7 +492,7 @@ export async function enriquecerPueblos(pueblos) {
 }
 
 export async function cargarSalidaParaEdicion(editarId, token) {
-    const res = await clienteHttp.get(`/api/profesor/salidas/${editarId}/`);
+    const res = await clienteHttp.get(`/api/salidas/core/${editarId}/`);
     const data = res.data;
 
     const formData = {
@@ -581,10 +581,10 @@ export async function cargarSalidaParaEdicion(editarId, token) {
  */
 export async function enviarSalida(editarId, payload, token) {
     if (editarId) {
-        await clienteHttp.patch(`/api/profesor/salidas/${editarId}/`, payload);
+        await clienteHttp.patch(`/api/salidas/core/${editarId}/`, payload);
         return '¡Salida actualizada con éxito!';
     } else {
-        await clienteHttp.post(`/api/profesor/salidas/`, payload);
+        await clienteHttp.post(`/api/salidas/core/`, payload);
         return '¡Salida creada con éxito!';
     }
 }

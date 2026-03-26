@@ -11,7 +11,7 @@ import ModalHospedaje from '@/features/salidas/presentacion/componentes/mapa/Mod
 import ResumenRuta    from '@/features/salidas/presentacion/componentes/logistica/ResumenRuta/ResumenRuta';
 import usePuntosRuta  from '@/features/salidas/presentacion/componentes/logistica/hooks/usePuntosRuta';
 import KanbanItinerario from '../KanbanItinerario/KanbanItinerario';
-import { useAutoHoraFin, useSyncCostosForm, useAutoTipoVehiculo } from '@/features/salidas/presentacion/componentes/logistica/hooks/LogisticaHooks';
+import { useAutoHoraFin, useSyncCostosForm, useAutoFlota } from '@/features/salidas/presentacion/componentes/logistica/hooks/LogisticaHooks';
 import { IconoIda, IconoRetorno, IconoGlobo, IconoDolar } from '@/features/salidas/presentacion/componentes/logistica/LogisticaIconos/LogisticaIconos';
 import imgBrujula    from '@/assets/portadas/brujula.png';
 import imgMochila    from '@/assets/portadas/mochila.png';
@@ -57,7 +57,7 @@ export default function Paso3Logistica({ form, setForm }) {
     // ── Efectos secundarios (encapsulados en hooks) ───────────────────────────
     useAutoHoraFin({ form, setForm, tiempos, tiemposRetorno, rutaInfoIda, rutaInfoRetorno });
     useSyncCostosForm({ form, setForm, rutaInfoIda, rutaInfoRetorno, calcularDias, calcularHorasTotales, tiempos, tiemposRetorno });
-    useAutoTipoVehiculo({ form, setForm });
+    useAutoFlota({ form, setForm });
 
     // ── Handlers de mapa ─────────────────────────────────────────────────────
     const handleDistanciaCalculada = (data) => {
@@ -207,8 +207,8 @@ export default function Paso3Logistica({ form, setForm }) {
                         numEstudiantes={form.num_estudiantes}
                         horaInicio={form.hora_inicio}
                         horaFin={form.hora_fin}
-                        tipoVehiculo={form.tipo_vehiculo_calculo || 'bus'}
-                        onTipoChange={(tipo) => setForm(f => ({ ...f, tipo_vehiculo_calculo: tipo }))}
+                        vehiculosAsignados={form.vehiculos_asignados || []}
+                        onVehiculosChange={(v) => setForm(f => ({ ...f, vehiculos_asignados: v }))}
                         onCostoCalculado={(costo) => {
                             if (form.costo_estimado !== costo) {
                                 setForm(f => ({ ...f, costo_estimado: costo }));

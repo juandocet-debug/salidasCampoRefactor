@@ -11,7 +11,7 @@ import TabParametros from '../TabParametros/TabParametros';
 import { clienteHttp } from '@/shared/api/clienteHttp';
 
 const API    = '/api/transporte/vehiculos/';
-const API_IA = '/api/nucleo/rendimiento-vehiculo/';
+const API_IA = '/api/transporte/vehiculos/ia/';
 
 const TIPOS = [
     { value: 'bus',       label: 'Bus' },
@@ -47,6 +47,7 @@ const EMPTY_FORM = {
 
 export default function TabFlota({ token, onToast }) {
     const [vehiculos,        setVehiculos]        = useState([]);
+    const [busqueda,         setBusqueda]         = useState('');
     const [cargando,         setCargando]          = useState(true);
     const [filtroTipo,       setFiltroTipo]        = useState('');
     const [filtroPropietario, setFiltroPropietario] = useState('');
@@ -189,9 +190,17 @@ export default function TabFlota({ token, onToast }) {
     };
 
     // ── Stats derivadas ──────────────────────────────────────────────────────
-    const total          = vehiculos.length;
-    const institucionales = vehiculos.filter(v => v.propietario === 'institucional').length;
-    const disponibles    = vehiculos.filter(v => v.estado_tecnico === 'disponible').length;
+    const vehiculosFiltrados = vehiculos.filter(v => {
+        if (!busqueda) return true;
+        const term = busqueda.toLowerCase();
+        return v.placa.toLowerCase().includes(term) ||
+               (v.marca && v.marca.toLowerCase().includes(term)) ||
+               (v.modelo && v.modelo.toLowerCase().includes(term));
+    });
+
+    const total          = vehiculosFiltrados.length;
+    const institucionales = vehiculosFiltrados.filter(v => v.propietario === 'institucional').length;
+    const disponibles    = vehiculosFiltrados.filter(v => v.estado_tecnico === 'disponible').length;
 
     return (
         <div className="flota-tab layout-dashboard">
@@ -230,35 +239,47 @@ export default function TabFlota({ token, onToast }) {
 
             {/* ── Toolbar ───────────────────────────────────────────────── */}
             <div className="flota-toolbar">
-                <div className="flota-filters">
-                    <select value={filtroTipo} onChange={e => setFiltroTipo(e.target.value)} className="flota-select">
-                        <option value="">Todos los tipos</option>
-                        {TIPOS.map(t => <option key={t.value} value={t.value}>{t.icon} {t.label}</option>)}
-                    </select>
-                    <select value={filtroPropietario} onChange={e => setFiltroPropietario(e.target.value)} className="flota-select">
-                        <option value="">Todos</option>
-                        {PROPIETARIOS.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
-                    </select>
+                <div className="flota-search-bar">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input 
+                        type="text" 
+                        placeholder="Buscar vehículos..." 
+                        value={busqueda}
+                        onChange={e => setBusqueda(e.target.value)}
+                    />
                 </div>
-                <button className="flota-btn-add" onClick={abrirCrear}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    Registrar Vehículo
-                </button>
+                <div className="flota-toolbar-actions">
+                    <button className="flota-btn-filter" onClick={() => onToast('Filtros avanzados en panel (Desarrollo)')}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                        Filtros
+                    </button>
+                    <button className="flota-btn-add" onClick={abrirCrear}>
+                        + Nuevo Vehículo
+                    </button>
+                </div>
             </div>
 
             {/* ── Grid de Vehículos ─────────────────────────────────────── */}
             {cargando ? (
                 <div className="flota-loading">Cargando flota...</div>
-            ) : vehiculos.length === 0 ? (
+            ) : vehiculosFiltrados.length === 0 ? (
                 <div className="flota-empty">
-                    <span className="flota-empty-icon">🚐</span>
-                    <h3>No hay vehículos registrados</h3>
-                    <p>Registra el primer vehículo de la flota institucional</p>
-                    <button className="flota-btn-add" onClick={abrirCrear}>+ Registrar Vehículo</button>
+                    <div className="flota-empty-illustration">
+                        <svg width="160" height="160" viewBox="0 0 24 24" fill="none" stroke="#e2e8f0" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="9" width="18" height="10" rx="3" ry="3"/>
+                            <path d="M5 9v-2a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2"/>
+                            <circle cx="8" cy="16" r="2" fill="#cbd5e1" stroke="none"/>
+                            <circle cx="16" cy="16" r="2" fill="#cbd5e1" stroke="none"/>
+                            <path d="M3 13h18" stroke="#f1f5f9"/>
+                        </svg>
+                    </div>
+                    <h3>{busqueda ? 'No hay resultados para tu búsqueda' : 'No hay vehículos registrados'}</h3>
+                    <p>{busqueda ? `Intenta cambiar "${busqueda}" por otro término.` : 'Registra el primer vehículo de la flota institucional'}</p>
+                    {!busqueda && <button className="flota-btn-add-primary" onClick={abrirCrear}>+ Registrar Vehículo</button>}
                 </div>
             ) : (
                 <div className="flota-grid">
-                    {vehiculos.map(v => {
+                    {vehiculosFiltrados.map(v => {
                         const esUPN = v.propietario === 'institucional';
                         const imgSrcFallback = v.tipo === 'buseta' || v.tipo === 'microbus' || v.tipo === 'camioneta' 
                             ? 'https://cdn3d.iconscout.com/3d/premium/thumb/minivan-6780879-5573489.png'
@@ -273,7 +294,12 @@ export default function TabFlota({ token, onToast }) {
                             <CardMatcha
                                 key={v.id}
                                 title={v.placa}
-                                color={v.tipo}
+                                color={
+                                    v.tipo === 'bus' ? 'blue' : 
+                                    v.tipo === 'buseta' ? 'sky' : 
+                                    v.tipo === 'microbus' ? 'cyan' : 
+                                    v.tipo === 'camioneta' ? 'slate' : 'indigo'
+                                }
                                 badgeText={ESTADOS.find(e => e.value === v.estado_tecnico)?.label}
                                 badgeColor={ESTADOS.find(e => e.value === v.estado_tecnico)?.color || '#1e293b'}
                                 imageSrc={fotoSrc}

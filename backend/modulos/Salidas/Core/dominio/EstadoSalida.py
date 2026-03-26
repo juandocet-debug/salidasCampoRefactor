@@ -1,0 +1,16 @@
+from enum import Enum
+
+class EstadoSalida(str, Enum):
+    BORRADOR         = 'borrador'
+    ENVIADA          = 'enviada'
+    EN_REVISION      = 'en_revision'
+    FAVORABLE        = 'favorable'
+    PENDIENTE_AJUSTE = 'pendiente_ajuste'
+    AJUSTADA         = 'ajustada'
+    APROBADA         = 'aprobada'
+    RECHAZADA        = 'rechazada'
+    EN_PREPARACION   = 'en_preparacion'
+    EN_EJECUCION     = 'en_ejecucion'
+    FINALIZADA       = 'finalizada'
+    CERRADA          = 'cerrada'
+    CANCELADA        = 'cancelada'

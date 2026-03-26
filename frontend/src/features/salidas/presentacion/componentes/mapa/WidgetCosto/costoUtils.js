@@ -71,15 +71,26 @@ export function calcularJornada({ horasTotales, horasBuffer, maxHorasViaje, dura
  */
 export function calcularCostos({
     distanciaKm, duracionDias, horasTotales, pax,
-    tipoVehiculo, capacidadVehiculo, params,
+    flotaElegida = [], params,
     horaInicio,
 }) {
-    const rend         = getRendimiento(params, tipoVehiculo);
-    const numVehiculos = Math.ceil(pax / capacidadVehiculo) || 1;
+    const numVehiculos = Math.max(1, flotaElegida.length);
 
-    const combustible    = (distanciaKm / rend) * params.precio_galon * numVehiculos;
+    let combustible = 0;
+    if (flotaElegida.length === 0) {
+        // Fallback si no hay flota aún
+        const rend = getRendimiento(params, 'bus');
+        combustible = (distanciaKm / rend) * (params.precio_galon || 10500);
+    } else {
+        for (const v of flotaElegida) {
+            const t = v.tipo_vehiculo ? v.tipo_vehiculo.toLowerCase() : 'bus';
+            const rend = getRendimiento(params, t);
+            combustible += (distanciaKm / rend) * (params.precio_galon || 10500);
+        }
+    }
+
     const viaticos       = Math.max(0.5, duracionDias - 0.5);
-    const costoConductor = viaticos * params.costo_noche * numVehiculos;
+    const costoConductor = viaticos * (params.costo_noche || 80000) * numVehiculos;
 
     const jornada = calcularJornada({
         horasTotales,

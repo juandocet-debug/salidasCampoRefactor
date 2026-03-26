@@ -11,6 +11,7 @@ class ProgramaGetAll:
                 "id": p.id.value,
                 "nombre": p.nombre.value,
                 "facultad": p.facultad_id.value,
+                "facultad_id": p.facultad_id.value,
                 "facultad_nombre": p.facultad_nombre,
                 "activo": p.activo.value,
                 "estado": p.activo.value  # Retrocompatibilidad con el grid de React

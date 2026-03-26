@@ -3,21 +3,24 @@
 // Tab de ventanas de programación (fechas apertura/cierre).
 // ─────────────────────────────────────────────────────────────────────────────
 import React, { useState, useEffect, useCallback } from 'react';
-import { API_URL } from '@/shared/api/config';
+import { clienteHttp } from '@/shared/api/clienteHttp';
 import ModalConfirmar from '@/shared/componentes/generales/ModalConfirmar/ModalConfirmar';
 
-const API = `${API_URL}/api/ventanas/`;
+const API = '/api/ventanas/';
 
 export default function TabCalendario({ token, onToast }) {
     const [ventanas, setVentanas] = useState([]);
     const [nueva, setNueva] = useState({ nombre: '', fecha_apertura: '', fecha_cierre: '' });
     const [editId, setEditId] = useState(null);
     const [modalConfig, setModalConfig] = useState(null);
-    const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
 
     const cargar = useCallback(async () => {
-        const data = await fetch(API, { headers }).then(r => r.json());
-        setVentanas(data.results || data);
+        try {
+            const data = await clienteHttp.get(API);
+            setVentanas(data.data.results || data.data);
+        } catch (e) {
+            onToast('❌ Error al cargar ventanas');
+        }
     }, [token]);
 
     useEffect(() => { cargar(); }, [cargar]);
@@ -25,16 +28,20 @@ export default function TabCalendario({ token, onToast }) {
     const guardar = async () => {
         if (!nueva.nombre || !nueva.fecha_apertura || !nueva.fecha_cierre) return;
         
-        if (editId) {
-            await fetch(`${API}${editId}/`, { method: 'PUT', headers, body: JSON.stringify(nueva) });
-            onToast('✅ Ventana actualizada');
-            setEditId(null);
-        } else {
-            await fetch(API, { method: 'POST', headers, body: JSON.stringify(nueva) });
-            onToast('✅ Ventana de programación creada');
+        try {
+            if (editId) {
+                await clienteHttp.put(`${API}${editId}/`, nueva);
+                onToast('✅ Ventana actualizada');
+                setEditId(null);
+            } else {
+                await clienteHttp.post(API, nueva);
+                onToast('✅ Ventana de programación creada');
+            }
+            setNueva({ nombre: '', fecha_apertura: '', fecha_cierre: '' });
+            cargar();
+        } catch (e) {
+            onToast('❌ Error al guardar ventana');
         }
-        setNueva({ nombre: '', fecha_apertura: '', fecha_cierre: '' });
-        cargar();
     };
 
     const iniciarEdicion = (v) => {
@@ -54,10 +61,14 @@ export default function TabCalendario({ token, onToast }) {
             descripcion: 'Esta acción no se puede deshacer. ¿Deseas borrar esta ventana definitivamente?',
             labelConfirmar: 'Eliminar',
             accion: async () => {
-                await fetch(`${API}${id}/`, { method: 'DELETE', headers });
-                onToast('🗑️ Ventana eliminada');
-                setModalConfig(null);
-                cargar();
+                try {
+                    await clienteHttp.delete(`${API}${id}/`);
+                    onToast('🗑️ Ventana eliminada');
+                    setModalConfig(null);
+                    cargar();
+                } catch (e) {
+                    onToast('❌ Error al eliminar');
+                }
             }
         });
     };
@@ -68,14 +79,14 @@ export default function TabCalendario({ token, onToast }) {
             descripcion: `¿Estás seguro de que deseas ${v.activa ? 'desactivar' : 'activar'} esta ventana de programación?`,
             labelConfirmar: 'Aceptar',
             accion: async () => {
-                await fetch(`${API}${v.id}/`, {
-                    method: 'PUT',
-                    headers,
-                    body: JSON.stringify({ activa: !v.activa })
-                });
-                onToast('🔄 Estado de ventana actualizado');
-                setModalConfig(null);
-                cargar();
+                try {
+                    await clienteHttp.put(`${API}${v.id}/`, { activa: !v.activa });
+                    onToast('🔄 Estado de ventana actualizado');
+                    setModalConfig(null);
+                    cargar();
+                } catch (e) {
+                    onToast('❌ Error al cambiar estado');
+                }
             }
         });
     };

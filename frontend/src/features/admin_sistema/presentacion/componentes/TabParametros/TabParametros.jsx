@@ -4,9 +4,10 @@
 // y buscador IA. Sub-componentes: CardRendimiento, CardIA.
 // ─────────────────────────────────────────────────────────────────────────────
 import React, { useState, useEffect } from 'react';
-import { API_URL } from '@/shared/api/config';
+import { clienteHttp } from '@/shared/api/clienteHttp';
+import ModalParametrosCrud from './ModalParametrosCrud';
 
-const API = `${API_URL}/api/admin/parametros/`;
+const API = '/api/admin/parametros/configuracion/';
 
 
 // ── Sub-componente: campo numérico reutilizable ───────────────────────────────
@@ -30,32 +31,35 @@ function CampoNumerico({ label, campo, params, setParams }) {
 export default function TabParametros({ token, onToast }) {
     const [params,    setParams]   = useState(null);
     const [guardando, setGuardando] = useState(false);
+    const [modalAbierto, setModalAbierto] = useState(false);
+
+    const cargarParametros = () => {
+        if (!token) return;
+        clienteHttp.get(API)
+            .then(r => { if (r.data.ok) setParams(r.data.datos); })
+            .catch(() => onToast('❌ Error al cargar parámetros'));
+    };
 
     useEffect(() => {
-        if (!token) return;
-        fetch(API, { headers: { Authorization: `Bearer ${token}` } })
-            .then(r => r.json())
-            .then(d => { if (d.ok) setParams(d.datos); })
-            .catch(() => onToast('❌ Error al cargar parámetros'));
+        cargarParametros();
     }, [token]);
 
     const guardar = async () => {
         setGuardando(true);
-        const res  = await fetch(API, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-            body: JSON.stringify(params),
-        });
-        const data = await res.json();
-        setGuardando(false);
-        if (data.ok) {
-            setParams(data.datos);
-            const n   = data.salidas_actualizadas || 0;
-            const msg = n > 0
-                ? `✅ Parámetros actualizados — ${n} salida${n > 1 ? 's' : ''} recalculada${n > 1 ? 's' : ''}`
-                : '✅ Parámetros actualizados';
-            onToast(msg);
-        } else {
+        try {
+            const res = await clienteHttp.put(API, params);
+            const data = res.data;
+            setGuardando(false);
+            if (data.ok) {
+                setParams(data.datos);
+                const n   = data.salidas_actualizadas || 0;
+                const msg = n > 0
+                    ? `✅ Parámetros actualizados — ${n} salida${n > 1 ? 's' : ''} recalculada${n > 1 ? 's' : ''}`
+                    : '✅ Parámetros actualizados';
+                onToast(msg);
+            }
+        } catch (e) {
+            setGuardando(false);
             onToast('❌ Error al guardar');
         }
     };
@@ -75,9 +79,23 @@ export default function TabParametros({ token, onToast }) {
                         </svg>
                     </div>
                     <div className="herr-premium-title-group" style={{ flex: 1 }}>
-                        <h3 style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             Costos Generales
-                            <span className="herr-badge herr-badge--activo" style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem', transform: 'translateY(-1px)' }}>ACTIVO</span>
+                            <span className="herr-badge herr-badge--activo" style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem', transform: 'translateY(-1px)', marginLeft: '4px' }}>ACTIVO</span>
+                            
+                            {/* Botón Tuerquita - Integrado al Título */}
+                            <button 
+                                onClick={() => setModalAbierto(true)}
+                                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', background: 'transparent', color: '#94a3b8', border: '1px solid transparent', borderRadius: '50%', cursor: 'pointer', transition: 'all 0.2s', marginLeft: '2px', padding: 0 }}
+                                onMouseEnter={e => { e.currentTarget.style.background = '#f1f5f9'; e.currentTarget.style.color = '#3b82f6'; e.currentTarget.style.transform = 'rotate(15deg) scale(1.1)'; e.currentTarget.style.borderColor = '#e2e8f0'; }}
+                                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#94a3b8'; e.currentTarget.style.transform = 'rotate(0deg) scale(1)'; e.currentTarget.style.borderColor = 'transparent'; }}
+                                title="Configuración Avanzada de Parámetros"
+                            >
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                                </svg>
+                            </button>
                         </h3>
                         <p>Combustible, viáticos y horas extra del conductor</p>
                     </div>
@@ -110,6 +128,12 @@ export default function TabParametros({ token, onToast }) {
                 </div>
             </div>
 
+            <ModalParametrosCrud 
+                isOpen={modalAbierto} 
+                onClose={() => { setModalAbierto(false); cargarParametros(); }} 
+                token={token} 
+                onToast={onToast} 
+            />
         </>
     );
 }

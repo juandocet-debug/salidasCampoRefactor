@@ -31,11 +31,11 @@
     overflow: hidden;
 }
 
-/* Base pastel variants */
-.ui-matcha-top.bg-blue   { background: #e0f2fe; } .ui-matcha-top.bg-blue   .ui-matcha-banner { background: #bae6fd; color: #0369a1; }
-.ui-matcha-top.bg-green  { background: #dcfce7; } .ui-matcha-top.bg-green  .ui-matcha-banner { background: #bbf7d0; color: #166534; }
-.ui-matcha-top.bg-yellow { background: #fef08a; } .ui-matcha-top.bg-yellow .ui-matcha-banner { background: #fde047; color: #854d0e; }
-.ui-matcha-top.bg-orange { background: #ffedd5; } .ui-matcha-top.bg-orange .ui-matcha-banner { background: #fed7aa; color: #9a3412; }
+/* Base pastel variants - Línea de Azules */
+.ui-matcha-top.bg-sky    { background: #e0f2fe; } .ui-matcha-top.bg-sky    .ui-matcha-banner { background: #bae6fd; color: #0369a1; }
+.ui-matcha-top.bg-blue   { background: #dbeafe; } .ui-matcha-top.bg-blue   .ui-matcha-banner { background: #bfdbfe; color: #1d4ed8; }
+.ui-matcha-top.bg-indigo { background: #e0e7ff; } .ui-matcha-top.bg-indigo .ui-matcha-banner { background: #c7d2fe; color: #4338ca; }
+.ui-matcha-top.bg-cyan   { background: #cffafe; } .ui-matcha-top.bg-cyan   .ui-matcha-banner { background: #a5f3fc; color: #0e7490; }
 .ui-matcha-top.bg-slate  { background: #f1f5f9; } .ui-matcha-top.bg-slate  .ui-matcha-banner { background: #e2e8f0; color: #334155; }
 
 /* Azul rey degradado para las fotos limpias (vehículos png transparentes) */
@@ -119,15 +119,15 @@
 
 .ui-matcha-tags {
     display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
+    gap: 5px; /* Reducido para que quepan todos */
+    flex-wrap: wrap; /* Permitimos el wrap natural pero ajustamos tamaño para que no lo haga */
 }
 
 .ui-matcha-pill {
     background: #f1f5f9;
     color: #475569;
-    padding: 5px 10px;
-    border-radius: 10px;
+    padding: 4px 8px; /* Reducido para que quepan en una línea */
+    border-radius: 8px;
     font-size: 0.65rem;
     font-weight: 700;
     display: inline-flex;

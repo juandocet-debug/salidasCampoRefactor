@@ -1,6 +1,6 @@
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -8,6 +8,10 @@ from modulos.Usuarios.infraestructura.UsuarioController import UsuarioController
 from modulos.Catalogos.Facultad.infraestructura.FacultadController import FacultadController, CatalogoController
 from modulos.Catalogos.Programa.infraestructura.ProgramaController import ProgramaController
 from modulos.Catalogos.Ventana.infraestructura.VentanaController import VentanaController
+from modulos.Logistica.Vehiculo.infraestructura.VehiculoController import VehiculoController
+from modulos.Logistica.Vehiculo.infraestructura.VehiculoIAController import VehiculoIAController
+from modulos.Logistica.Parametro.infraestructura.ParametroController import ParametroController
+from modulos.Logistica.Parametro.infraestructura.ParametroConfiguracionController import ParametroConfiguracionController
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -34,5 +38,21 @@ urlpatterns = [
     
     # Endpoint masivo para el Tablero Académico
     path('api/admin/catalogos/', CatalogoController.as_view()),
+    
+    # Rutas para Parámetros Globales (Logística / Catálogos)
+    path('api/admin/parametros/configuracion/', ParametroConfiguracionController.as_view()),
+    path('api/admin/parametros/', ParametroController.as_view()),
+    path('api/admin/parametros/<str:pk>/', ParametroController.as_view()),
+
+    # Rutas para Transporte / Vehiculos
+    path('api/transporte/vehiculos/', VehiculoController.as_view()),
+    path('api/transporte/vehiculos/ia/', VehiculoIAController.as_view()),
+    path('api/transporte/vehiculos/<str:pk>/', VehiculoController.as_view()),
+
+    # Rutas para Salidas Core
+    path('api/salidas/core/', include('modulos.Salidas.Core.infraestructura.urls')),
+    path('api/salidas/planeacion/', include('modulos.Salidas.Planeacion.infraestructura.urls')),
+    path('api/salidas/itinerario/', include('modulos.Salidas.Itinerario.infraestructura.urls')),
+    path('api/salidas/itinerario/paradas/', include('modulos.Salidas.Itinerario.Parada.infraestructura.urls')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

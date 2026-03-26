@@ -4,8 +4,9 @@
 // Se activa cuando cambian origen/destino y ya hay distancia calculada por OSRM.
 // ─────────────────────────────────────────────────────────────────────────────
 import { useEffect, useRef } from 'react';
+import { clienteHttp } from '@/shared/api/clienteHttp';
 
-const API_TIEMPO = 'http://localhost:8000/api/profesor/salidas/ia/tiempo-ruta/';
+const API_TIEMPO = '/api/salidas/itinerario/ia/tiempo-ruta/';
 
 /**
  * @param {object[]} puntos      - Array de puntos de la ruta (con .nombre)
@@ -27,20 +28,15 @@ export function useRutaIA(puntos, distanciaKm, setRutaInfo, tag) {
 
         setRutaInfo(prev => ({ ...prev, duracion_min: 0, _pendienteGemini: true, _geminiError: false }));
 
-        fetch(API_TIEMPO, {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ origen: ori.nombre, destino: dst.nombre }),
-        })
-            .then(r => {
-                if (!r.ok) throw new Error(`Server ${r.status}`);
-                return r.json();
-            })
-            .then(data => {
-                if (data.ok && data.datos?.minutos) {
+        clienteHttp.post(API_TIEMPO, { origen: ori.nombre, destino: dst.nombre })
+            .then(res => {
+                const data = res.data;
+                if (data.ok) {
+                    const mins = data.datos?.minutos ?? 0;
+                    console.log(`[IA] ${tag} tiempo: ${mins} min`);
                     setRutaInfo(prev => ({
                         ...prev,
-                        duracion_min:     data.datos.minutos,
+                        duracion_min:     mins,
                         _pendienteGemini: false,
                         _gemini:          true,
                     }));

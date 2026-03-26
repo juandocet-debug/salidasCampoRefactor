@@ -38,7 +38,7 @@ const MENUS = {
         },
         {
             titulo: 'Cuenta', items: [
-                { etiqueta: 'Mi Perfil', ruta: '/perfil', icono: Ico.perfil },
+                { etiqueta: 'Usuarios', ruta: '/usuarios', icono: Ico.perfil },
             ]
         },
     ],
@@ -52,7 +52,7 @@ const MENUS = {
         },
         {
             titulo: 'Cuenta', items: [
-                { etiqueta: 'Mi Perfil', ruta: '/perfil', icono: Ico.perfil },
+                { etiqueta: 'Usuarios', ruta: '/usuarios', icono: Ico.perfil },
             ]
         },
     ],
@@ -60,14 +60,12 @@ const MENUS = {
         {
             titulo: 'Panel', items: [
                 { etiqueta: 'Tablero', ruta: '/tablero', icono: Ico.tablero },
-                { etiqueta: 'Transporte', ruta: '/transporte', icono: Ico.transporte },
-                { etiqueta: 'Presupuesto', ruta: '/presupuesto', icono: Ico.presupuesto },
                 { etiqueta: 'Parámetros', ruta: '/parametros', icono: Ico.parametros },
             ]
         },
         {
             titulo: 'Cuenta', items: [
-                { etiqueta: 'Mi Perfil', ruta: '/perfil', icono: Ico.perfil },
+                { etiqueta: 'Usuarios', ruta: '/usuarios', icono: Ico.perfil },
             ]
         },
     ],
@@ -81,7 +79,7 @@ const MENUS = {
         },
         {
             titulo: 'Cuenta', items: [
-                { etiqueta: 'Mi Perfil', ruta: '/perfil', icono: Ico.perfil },
+                { etiqueta: 'Usuarios', ruta: '/usuarios', icono: Ico.perfil },
             ]
         },
     ],
@@ -95,7 +93,7 @@ const MENUS = {
         },
         {
             titulo: 'Cuenta', items: [
-                { etiqueta: 'Mi Perfil', ruta: '/perfil', icono: Ico.perfil },
+                { etiqueta: 'Usuarios', ruta: '/usuarios', icono: Ico.perfil },
             ]
         },
     ],
@@ -104,13 +102,11 @@ const MENUS = {
             titulo: 'Administración', items: [
                 { etiqueta: 'Tablero', ruta: '/tablero', icono: Ico.tablero },
                 { etiqueta: 'Herramientas', ruta: '/herramientas', icono: Ico.herramientas },
-                { etiqueta: 'Transporte', ruta: '/transporte', icono: Ico.transporte },
-                { etiqueta: 'Presupuesto', ruta: '/presupuesto', icono: Ico.presupuesto },
             ]
         },
         {
             titulo: 'Cuenta', items: [
-                { etiqueta: 'Mi Perfil', ruta: '/perfil', icono: Ico.perfil },
+                { etiqueta: 'Usuarios', ruta: '/usuarios', icono: Ico.perfil },
             ]
         },
     ],

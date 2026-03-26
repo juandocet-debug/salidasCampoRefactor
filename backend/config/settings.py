@@ -42,7 +42,13 @@ APPS_PROYECTO = [
     'modulos.Catalogos.Facultad.infraestructura',
     'modulos.Catalogos.Programa.infraestructura',
     'modulos.Catalogos.Ventana.infraestructura',
-    
+    'modulos.Logistica.Vehiculo.infraestructura',
+    'modulos.Logistica.Parametro.infraestructura',
+    'modulos.Salidas.Core.infraestructura',
+    'modulos.Salidas.Planeacion.infraestructura',
+    'modulos.Salidas.Itinerario.infraestructura',
+    'modulos.Salidas.Itinerario.Parada.infraestructura',
+
     # Apps del sistema anterior (si deciden conservarse temporalmente)ura.apps.UsuariosInfraConfig',
 ]
 
