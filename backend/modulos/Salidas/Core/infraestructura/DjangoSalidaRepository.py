@@ -81,7 +81,7 @@ class DjangoSalidaRepository(SalidaRepository):
             'costo_estimado': salida.costo_estimado.value
         }
 
-        if hasattr(salida.id, 'value') and salida.id.value != 1:
+        if hasattr(salida.id, 'value') and salida.id.value is not None:
             obj, created = SalidaModelo.objects.update_or_create(id=salida.id.value, defaults=defaults)
         else:
             obj = SalidaModelo.objects.create(**defaults)

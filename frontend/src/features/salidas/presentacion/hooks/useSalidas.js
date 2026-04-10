@@ -45,7 +45,7 @@ export function useSalidas() {
     try {
       const data = await obtenerSalidasServicio();
       // Guard: asegurar siempre arreglo aunque el backend devuelva algo inesperado
-      setSalidas(Array.isArray(data) ? data : (data?.results ?? data?.salidas ?? []));
+      setSalidas(Array.isArray(data) ? data : (data?.datos ?? data?.results ?? data?.salidas ?? []));
     } catch (e) {
       setError(e.message);
     } finally {

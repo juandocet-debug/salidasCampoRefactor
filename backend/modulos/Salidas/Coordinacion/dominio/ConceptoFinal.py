@@ -1,0 +1,7 @@
+from enum import Enum
+
+class ConceptoFinal(Enum):
+    FAVORABLE = "FAVORABLE"
+    FAVORABLE_CON_AJUSTES = "FAVORABLE_CON_AJUSTES"
+    NO_FAVORABLE = "NO_FAVORABLE"
+    PENDIENTE = "PENDIENTE"

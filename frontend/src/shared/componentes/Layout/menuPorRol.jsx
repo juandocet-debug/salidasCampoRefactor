@@ -31,16 +31,10 @@ const MENUS = {
     coordinador_academico: [
         {
             titulo: 'Revisiones', items: [
-                { etiqueta: 'Tablero', ruta: '/tablero', icono: Ico.tablero },
                 { etiqueta: 'Revisiones', ruta: '/revisiones', icono: Ico.revision },
                 { etiqueta: 'Historial', ruta: '/historial', icono: Ico.historial },
             ]
-        },
-        {
-            titulo: 'Cuenta', items: [
-                { etiqueta: 'Usuarios', ruta: '/usuarios', icono: Ico.perfil },
-            ]
-        },
+        }
     ],
     consejo: [
         {

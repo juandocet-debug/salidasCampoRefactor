@@ -7,7 +7,7 @@ class SalidaNumEstudiantes:
     def __post_init__(self):
         if not isinstance(self.value, int):
             try:
-                object.__setattr__(self, 'value', int(self.value))
+                object.__setattr__(self, 'value', int(self.value if self.value is not None else 0))
             except (ValueError, TypeError):
                 raise ValueError("El número de estudiantes debe ser un entero.")
         if self.value < 0:

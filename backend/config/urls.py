@@ -54,5 +54,6 @@ urlpatterns = [
     path('api/salidas/planeacion/', include('modulos.Salidas.Planeacion.infraestructura.urls')),
     path('api/salidas/itinerario/', include('modulos.Salidas.Itinerario.infraestructura.urls')),
     path('api/salidas/itinerario/paradas/', include('modulos.Salidas.Itinerario.Parada.infraestructura.urls')),
+    path('api/salidas/coordinacion/', include('modulos.Salidas.Coordinacion.infraestructura.urls')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

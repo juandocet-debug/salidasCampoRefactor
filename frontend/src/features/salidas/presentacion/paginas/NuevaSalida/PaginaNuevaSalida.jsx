@@ -86,6 +86,7 @@ export default function PaginaNuevaSalida() {
         setCargando(true);
         try {
             const payload = construirPayload(form, esGrupal, profesoresAsociados);
+            console.error("=== PAYLOAD FRONTEND ENVIADO ===", JSON.stringify(payload.puntos_ruta_data));
             const msg = await enviarSalida(editarId, payload, token);
             agregarAlerta(msg, 'exito');
             navigate('/tablero');

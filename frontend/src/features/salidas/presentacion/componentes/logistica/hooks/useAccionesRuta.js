@@ -14,7 +14,7 @@ export function useAccionesRuta(setPuntosRuta, setPuntosRetorno, setForm, puntos
         if (indice === puntosRutaLength - 1) setForm(f => ({ ...f, parada_max: datos.nombre }));
         setPuntosRuta(prev => {
             const nuevos = [...prev];
-            nuevos[indice] = { ...nuevos[indice], ...datos };
+            nuevos[indice] = { ...nuevos[indice], ...datos, nombreParada: datos.nombre };
             return nuevos;
         });
     }, [setForm, puntosRutaLength, setPuntosRuta]);
@@ -23,7 +23,7 @@ export function useAccionesRuta(setPuntosRuta, setPuntosRetorno, setForm, puntos
     const actualizarPuntoRetorno = useCallback((indice, datos) => {
         setPuntosRetorno(prev => {
             const nuevos = [...prev];
-            nuevos[indice] = { ...nuevos[indice], ...datos };
+            nuevos[indice] = { ...nuevos[indice], ...datos, nombreParada: datos.nombre };
             return nuevos;
         });
     }, [setPuntosRetorno]);

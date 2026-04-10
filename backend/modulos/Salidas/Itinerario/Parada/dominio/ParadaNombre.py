@@ -5,5 +5,8 @@ class ParadaNombre:
     value: str
 
     def __post_init__(self):
-        if not self.value or len(self.value.strip()) == 0:
-            raise ValueError("El nombre de la parada no puede estar vacío")
+        # Si viene None o vacío de la BD, usar un nombre por defecto
+        if not self.value or len(str(self.value).strip()) == 0:
+            object.__setattr__(self, 'value', 'Sin nombre')
+        else:
+            object.__setattr__(self, 'value', str(self.value).strip())

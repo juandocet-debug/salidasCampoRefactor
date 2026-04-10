@@ -425,13 +425,18 @@ export async function buscarPueblosEnRuta(puntosRuta, routeCoords = null) {
     if (geminiLista?.length) {
         const distApprox = (oriCoords && dstCoords)
             ? distanciaKm(oriCoords.lat, oriCoords.lng, dstCoords.lat, dstCoords.lng) : 300;
-        const resultado = geminiLista.map((m, i) => ({
-            id: `g_${i}_${m.nombre}`,
-            nombre: m.nombre, depto: m.depto || '',
-            lat: null, lng: null,
-            kmDesdeOrigen: Math.round(((i + 1) / (geminiLista.length + 1)) * distApprox),
-            prioridad: 2, foto: null, descripcion: null, wikiUrl: null, _enriquecido: false,
-        }));
+        const resultado = geminiLista.map((m, i) => {
+            const nombre = typeof m === 'string' ? m : (m.nombre || 'Municipio');
+            const depto = typeof m === 'string' ? '' : (m.depto || '');
+            return {
+                id: `g_${i}_${nombre}`,
+                nombre,
+                depto,
+                lat: null, lng: null,
+                kmDesdeOrigen: Math.round(((i + 1) / (geminiLista.length + 1)) * distApprox),
+                prioridad: 2, foto: null, descripcion: null, wikiUrl: null, _enriquecido: false,
+            };
+        });
         _cache.set(key, resultado);
         return resultado;
     }
@@ -514,10 +519,13 @@ export async function cargarSalidaParaEdicion(editarId, token) {
         objetivo_general: data.planeacion?.obj_general || '',
         estrategia_metodologica: data.planeacion?.metodologia || '',
         objetivos_especificos: data.planeacion?.objetivos?.map(o => o.descripcion).join('\n') || '',
-        punto_partida: data.puntos_ruta?.find(p => p.tipo === 'origen')?.nombre
-            || data.puntos_ruta?.[0]?.nombre || '',
-        parada_max: data.puntos_ruta?.find(p => p.tipo === 'destino')?.nombre
-            || data.puntos_ruta?.[data.puntos_ruta.length - 1]?.nombre || '',
+        punto_partida: (data.puntos_ruta || []).filter(p => !p.es_retorno).find(p => p.motivo === 'origen' || p.motivo === 'viaje')?.nombre
+            || data.punto_partida || '',
+        parada_max: (() => {
+            const ida = (data.puntos_ruta || []).filter(p => !p.es_retorno);
+            if (ida.length > 0) return ida[ida.length - 1].nombre;
+            return data.parada_max || '';
+        })(),
         // Reconstruir puntos completos para el mapa: separar IDA y RETORNO
         _puntosRuta: (() => {
             const ida = (data.puntos_ruta || []).filter(p => !p.es_retorno);

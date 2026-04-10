@@ -14,6 +14,10 @@ class SalidaModelo(models.Model):
     justificacion = models.TextField(blank=True, null=True)
     estado = models.CharField(max_length=50, default='BORRADOR')
     
+    # UI Customization
+    icono = models.CharField(max_length=50, default='IcoMountain')
+    color = models.CharField(max_length=50, default='#16a34a')
+    
     # Stakeholder
     profesor_id = models.IntegerField(null=True, blank=True)
     
@@ -27,6 +31,23 @@ class SalidaModelo(models.Model):
     duracion_dias = models.DecimalField(max_digits=5, decimal_places=1, default=1.0)
     horas_viaje = models.DecimalField(max_digits=5, decimal_places=1, default=0.0)
     costo_estimado = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
+
+    # Paso 1 - Información adicional
+    resumen = models.CharField(max_length=100, blank=True, null=True)
+    relacion_syllabus = models.TextField(blank=True, null=True)
+
+    # Paso 2 - Planeación
+    objetivo_general = models.TextField(blank=True, null=True)
+    objetivos_especificos = models.TextField(blank=True, null=True)
+    estrategia_metodologica = models.TextField(blank=True, null=True)
+
+    # Paso 3 - Logística
+    punto_partida = models.CharField(max_length=300, blank=True, null=True)
+    parada_max = models.CharField(max_length=300, blank=True, null=True)
+
+    # Paso 4 - Evaluación
+    criterios_evaluacion = models.TextField(blank=True, null=True)
+    productos_esperados = models.TextField(blank=True, null=True)
 
     class Meta:
         db_table = 'salidas_core_salida'

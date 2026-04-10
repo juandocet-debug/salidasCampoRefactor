@@ -20,6 +20,7 @@ import PanelHerramientas from '@/features/admin_sistema/presentacion/paginas/Pan
 import PaginaVerificacionAbordaje from '@/features/abordaje/presentacion/paginas/PaginaVerificacionAbordaje/PaginaVerificacionAbordaje';
 import PaginaCodigoEstudiante from '@/features/abordaje/presentacion/paginas/PaginaCodigoEstudiante/PaginaCodigoEstudiante';
 import PaginaConstruccion from '@/shared/componentes/PaginaConstruccion/PaginaConstruccion';
+import CoordinadorDashboard from '@/features/coordinacion/CoordinadorDashboard';
 
 // ── Fallback de carga ─────────────────────────────────────────────
 function Cargando() {
@@ -33,6 +34,23 @@ function Cargando() {
     </div>
   );
 }
+
+// Redirección dinámica basada en rol
+function RutaPorDefecto({ usuario }) {
+  if (usuario?.rol === 'coordinador_academico') {
+    return <Navigate to="/revisiones" replace />;
+  }
+  return <Navigate to="/tablero" replace />;
+}
+
+// Proteger Tablero devolviendo al coordinador a revisiones
+function ControlTablero({ usuario }) {
+  if (usuario?.rol === 'coordinador_academico') {
+    return <Navigate to="/revisiones" replace />;
+  }
+  return <PaginaTablero />;
+}
+
 
 export default function App() {
   const usuario = useAutenticacion(s => s.usuario);
@@ -51,12 +69,12 @@ export default function App() {
           <Route element={<Layout usuario={usuario} onCerrarSesion={cerrarSesion} />}>
 
             {/* Tablero principal */}
-            <Route path="/tablero" element={<PaginaTablero />} />
+            <Route path="/tablero" element={<ControlTablero usuario={usuario} />} />
 
             {/* Rutas Fases */}
-            <Route path="/salidas" element={<PaginaConstruccion />} />
+            <Route path="/salidas" element={<PaginaHistorico />} />
             <Route path="/nueva-salida" element={<PaginaNuevaSalida />} />
-            <Route path="/revisiones" element={<PaginaConstruccion />} />
+            <Route path="/revisiones" element={<CoordinadorDashboard />} />
             <Route path="/decisiones" element={<PaginaConstruccion />} />
             <Route path="/historial" element={<PaginaConstruccion />} />
             <Route path="/historico" element={<PaginaHistorico />} />
@@ -73,9 +91,9 @@ export default function App() {
             <Route path="/documentos" element={<PaginaConstruccion />} />
             <Route path="/usuarios" element={<PaginaConstruccion />} />
 
-            {/* Redirige raíz → tablero */}
-            <Route index element={<Navigate to="/tablero" replace />} />
-            <Route path="*" element={<Navigate to="/tablero" replace />} />
+            {/* Redirige raíz → ruta por defecto según rol */}
+            <Route index element={<RutaPorDefecto usuario={usuario} />} />
+            <Route path="*" element={<RutaPorDefecto usuario={usuario} />} />
 
           </Route>
         </Route>

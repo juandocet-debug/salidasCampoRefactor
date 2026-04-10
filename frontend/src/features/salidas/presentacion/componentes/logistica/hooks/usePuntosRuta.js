@@ -55,22 +55,49 @@ export default function usePuntosRuta(form, setForm) {
         sincRetorno.current = true;
     }, [form._puntosRetorno]);
 
-    // ── Geocodificar puntos IDA sin coordenadas (salidas viejas) ─────────────
+    // ── Sincronizar cambios de texto en Paso1 → puntosRuta ───────────────────
+    // Cuando el usuario escribe el destino en el campo de texto (fuera del mapa),
+    // actualizar también el array puntosRuta para que el payload de guardado sea correcto.
+    useEffect(() => {
+        if (!form.punto_partida) return;
+        setPuntosRuta(prev => {
+            if (!prev.length || prev[0]?.nombre === form.punto_partida) return prev;
+            const nuevos = [...prev];
+            nuevos[0] = { ...nuevos[0], nombre: form.punto_partida, lat: null, lng: null };
+            return nuevos;
+        });
+    }, [form.punto_partida]);
+
+    useEffect(() => {
+        if (!form.parada_max) return;
+        setPuntosRuta(prev => {
+            const last = prev.length - 1;
+            if (last < 1 || prev[last]?.nombre === form.parada_max) return prev;
+            const nuevos = [...prev];
+            nuevos[last] = { ...nuevos[last], nombre: form.parada_max, lat: null, lng: null };
+            return nuevos;
+        });
+    }, [form.parada_max]);
+
+
+    // ── Geocodificar puntos IDA sin coordenadas ──────────────────────────────
     useEffect(() => {
         const sinCoords = puntosRuta.filter(p => p.nombre && !p.lat);
         if (!sinCoords.length) return;
+        let activo = true;
         (async () => {
             const nuevos = [...puntosRuta];
             let cambio = false;
             for (let i = 0; i < nuevos.length; i++) {
                 if (nuevos[i].nombre && !nuevos[i].lat) {
                     const coords = await geocodificar(nuevos[i].nombre);
-                    if (coords) { nuevos[i] = { ...nuevos[i], ...coords }; cambio = true; }
+                    if (activo && coords) { nuevos[i] = { ...nuevos[i], ...coords }; cambio = true; }
                 }
             }
-            if (cambio) setPuntosRuta(nuevos);
+            if (activo && cambio) setPuntosRuta(nuevos);
         })();
-    }, []); // Solo al montar
+        return () => { activo = false; };
+    }, [puntosRuta]); // Se ejecuta cuando cambia puntosRuta (incluye nuevos destinos sin coords)
 
     // ── OSRM: distancia RETORNO (solo distancia, sin duración) ──────────────
     useEffect(() => {

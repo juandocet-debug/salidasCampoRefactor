@@ -108,7 +108,6 @@ export default function InputDireccion({
             google ? buscarGoogle(v) : buscarFallback(v);
         }, 200);
     };
-
     // ── Seleccionar ──────────────────────────────────────────────────
     const seleccionar = s => {
         setTexto(s.nombre);
@@ -127,11 +126,14 @@ export default function InputDireccion({
                             lat: place.geometry.location.lat(),
                             lng: place.geometry.location.lng(),
                         });
+                    } else {
+                        // Fallback si la API de Google Maps no puede obtener los detalles (ej: sin billing)
+                        onChange?.({ nombre: s.nombre, lat: null, lng: null });
                     }
                 }
             );
         } else {
-            onChange?.({ nombre: s.nombre, lat: s.lat, lng: s.lng });
+            onChange?.({ nombre: s.nombre, lat: s.lat || null, lng: s.lng || null });
         }
     };
 

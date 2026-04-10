@@ -29,25 +29,31 @@ class SalidaEdit:
         if not salida_existente:
             raise ValueError(f"La salida con ID {id_salida} no existe.")
 
+        # Sanitizar campos numericos: si viene None en el payload, usar el valor existente
+        def _get(key, fallback):
+            v = data.get(key)
+            return v if v is not None else fallback
+
         salida_actualizada = Salida(
             id=salida_existente.id,
-            codigo=SalidaCodigo(data.get('codigo', salida_existente.codigo.value)),
-            nombre=SalidaNombre(data.get('nombre', salida_existente.nombre.value)),
-            asignatura=SalidaAsignatura(data.get('asignatura', salida_existente.asignatura.value)),
-            semestre=SalidaSemestre(data.get('semestre', salida_existente.semestre.value)),
-            facultad_id=FacultadId(data.get('facultad_id', salida_existente.facultad_id.value)),
-            programa_id=ProgramaId(data.get('programa_id', salida_existente.programa_id.value)),
-            num_estudiantes=SalidaNumEstudiantes(data.get('num_estudiantes', salida_existente.num_estudiantes.value)),
-            justificacion=SalidaJustificacion(data.get('justificacion', salida_existente.justificacion.value)),
-            estado=EstadoSalida(data.get('estado', salida_existente.estado.value)),
-            profesor_id=ProfesorId(data.get('profesor_id', salida_existente.profesor_id.value)),
-            fecha_inicio=SalidaFechaInicio(data.get('fecha_inicio', salida_existente.fecha_inicio.value)),
-            fecha_fin=SalidaFechaFin(data.get('fecha_fin', salida_existente.fecha_fin.value)),
-            hora_inicio=SalidaHoraInicio(data.get('hora_inicio', salida_existente.hora_inicio.value)),
-            distancia_total_km=SalidaDistanciaTotalKm(data.get('distancia_total_km', salida_existente.distancia_total_km.value)),
-            duracion_dias=SalidaDuracionDias(data.get('duracion_dias', salida_existente.duracion_dias.value)),
-            horas_viaje=SalidaHorasViaje(data.get('horas_viaje', salida_existente.horas_viaje.value)),
-            costo_estimado=SalidaCostoEstimado(data.get('costo_estimado', salida_existente.costo_estimado.value)),
-            vehiculos_asignados=SalidaVehiculosAsignados(data.get('vehiculos_asignados', salida_existente.vehiculos_asignados.value))
+            codigo=SalidaCodigo(_get('codigo', salida_existente.codigo.value)),
+            nombre=SalidaNombre(_get('nombre', salida_existente.nombre.value)),
+            asignatura=SalidaAsignatura(_get('asignatura', salida_existente.asignatura.value)),
+            semestre=SalidaSemestre(_get('semestre', salida_existente.semestre.value)),
+            facultad_id=FacultadId(_get('facultad_id', salida_existente.facultad_id.value)),
+            programa_id=ProgramaId(_get('programa_id', salida_existente.programa_id.value)),
+            num_estudiantes=SalidaNumEstudiantes(_get('num_estudiantes', salida_existente.num_estudiantes.value)),
+            justificacion=SalidaJustificacion(_get('justificacion', salida_existente.justificacion.value)),
+            estado=EstadoSalida(_get('estado', salida_existente.estado.value)),
+            profesor_id=ProfesorId(_get('profesor_id', salida_existente.profesor_id.value)),
+            fecha_inicio=SalidaFechaInicio(_get('fecha_inicio', salida_existente.fecha_inicio.value)),
+            fecha_fin=SalidaFechaFin(_get('fecha_fin', salida_existente.fecha_fin.value)),
+            hora_inicio=SalidaHoraInicio(_get('hora_inicio', salida_existente.hora_inicio.value)),
+            distancia_total_km=SalidaDistanciaTotalKm(_get('distancia_total_km', salida_existente.distancia_total_km.value)),
+            duracion_dias=SalidaDuracionDias(_get('duracion_dias', salida_existente.duracion_dias.value)),
+            horas_viaje=SalidaHorasViaje(_get('horas_viaje', salida_existente.horas_viaje.value)),
+            costo_estimado=SalidaCostoEstimado(_get('costo_estimado', salida_existente.costo_estimado.value)),
+            vehiculos_asignados=SalidaVehiculosAsignados(_get('vehiculos_asignados', salida_existente.vehiculos_asignados.value) or [])
         )
         return self.repository.save(salida_actualizada)
+
