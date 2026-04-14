@@ -1,7 +1,7 @@
 // src/modulos/profesor/componentes/logistica/useRutaIA.js
 // ─────────────────────────────────────────────────────────────────────────────
 // Hook: Consulta tiempos reales de ruta a la IA (backend Groq/Llama).
-// Se activa cuando cambian origen/destino y ya hay distancia calculada por OSRM.
+// Se activa en cuanto hay nombres de origen/destino, EN PARALELO con OSRM.
 // ─────────────────────────────────────────────────────────────────────────────
 import { useEffect, useRef } from 'react';
 import { clienteHttp } from '@/shared/api/clienteHttp';
@@ -10,33 +10,37 @@ const API_TIEMPO = '/api/salidas/itinerario/ia/tiempo-ruta/';
 
 /**
  * @param {object[]} puntos      - Array de puntos de la ruta (con .nombre)
- * @param {number}   distanciaKm - Condición de activación: la IA solo se consulta si > 0
+ * @param {number}   distanciaKm - Ya no bloquea; referencia para no sobreescribir distancia OSRM
  * @param {Function} setRutaInfo - Setter del estado rutaInfo correspondiente
  * @param {string}   tag         - Etiqueta para logs ('IDA' | 'RETORNO')
  */
 export function useRutaIA(puntos, distanciaKm, setRutaInfo, tag) {
     const ultimaConsultaRef = useRef('');
+    const oriNombre = puntos[0]?.nombre || '';
+    const dstNombre = puntos[puntos.length - 1]?.nombre || '';
 
     useEffect(() => {
-        const ori = puntos[0];
-        const dst = puntos[puntos.length - 1];
-        if (!ori?.nombre || !dst?.nombre || distanciaKm <= 0) return;
+        // Disparar en cuanto haya nombres, SIN esperar distancia de OSRM
+        if (!oriNombre || !dstNombre) return;
 
-        const key = `${ori.nombre}_${dst.nombre}`;
+        const key = `${oriNombre}_${dstNombre}`;
         if (ultimaConsultaRef.current === key) return;
         ultimaConsultaRef.current = key;
 
-        setRutaInfo(prev => ({ ...prev, duracion_min: 0, _pendienteGemini: true, _geminiError: false }));
+        setRutaInfo(prev => ({ ...prev, _pendienteGemini: true, _geminiError: false }));
 
-        clienteHttp.post(API_TIEMPO, { origen: ori.nombre, destino: dst.nombre })
+        clienteHttp.post(API_TIEMPO, { origen: oriNombre, destino: dstNombre })
             .then(res => {
                 const data = res.data;
                 if (data.ok) {
                     const mins = data.datos?.minutos ?? 0;
-                    console.log(`[IA] ${tag} tiempo: ${mins} min`);
+                    const km   = data.datos?.distancia_km ?? 0;
+                    console.log(`[IA] ${tag} tiempo: ${mins} min / ${km} km`);
                     setRutaInfo(prev => ({
                         ...prev,
-                        duracion_min:     mins,
+                        duracion_min: mins,
+                        // Solo usar distancia IA si OSRM aún no ha llegado
+                        ...(km > 0 && prev.distancia_km === 0 ? { distancia_km: km } : {}),
                         _pendienteGemini: false,
                         _gemini:          true,
                     }));
@@ -49,5 +53,7 @@ export function useRutaIA(puntos, distanciaKm, setRutaInfo, tag) {
                 console.warn(`[IA] ${tag} error:`, err);
                 setRutaInfo(prev => ({ ...prev, _pendienteGemini: false, _geminiError: true }));
             });
-    }, [puntos, distanciaKm]);
+    // Disparar solo cuando cambian los NOMBRES (en paralelo con OSRM, no después)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [oriNombre, dstNombre]);
 }

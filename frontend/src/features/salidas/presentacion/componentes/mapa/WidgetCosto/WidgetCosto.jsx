@@ -4,95 +4,16 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import { useEffect } from 'react';
 import { useParametrosSistema } from '@/features/salidas/presentacion/componentes/mapa/utils/useParametrosSistema';
-import { useFlotaDisponible } from '@/features/salidas/presentacion/componentes/logistica/hooks/useFlotaDisponible';
 import { cop, calcularCostos } from './costoUtils';
 import './WidgetCosto.css';
-import imgFuel     from '@/assets/portadas/fuel_3d.png';
-import imgLodge    from '@/assets/portadas/lodge_3d.png';
-import imgTime     from '@/assets/portadas/time_3d.png';
-import imgBus      from '@/assets/bus_1.png';
-import imgBuseta   from '@/assets/bus_2.png';
-import imgCamioneta from '@/assets/bus_3.png';
-import { CardMatcha } from '@/shared/componentes/generales/Tarjetas/Tarjetas';
+import imgFuel  from '@/assets/portadas/fuel_3d.png';
+import imgLodge from '@/assets/portadas/lodge_3d.png';
+import imgTime  from '@/assets/portadas/time_3d.png';
 
 // Re-exportar para que los consumidores existentes no rompan
 export { tipoVehiculoSugerido } from './costoUtils';
 
-const TIPOS_VEHICULO = {
-    bus:       { img: imgBus,       label: 'Bus',       capacidad: 50 },
-    buseta:    { img: imgBuseta,    label: 'Buseta',    capacidad: 30 },
-    camioneta: { img: imgCamioneta, label: 'Camioneta', capacidad: 15 },
-};
 
-// ── Sub-componente: Selector de tipo de vehículo ──────────────────────────────
-function SelectorFlota({ pax, vehiculosAsignados, onVehiculosChange, vehiculos, cargando, error }) {
-    if (cargando) return <div className="flota-loading" style={{ padding: '1rem', color: '#64748b' }}>Cargando flota...</div>;
-    if (error) return <div style={{ padding: '1rem', color: '#ef4444' }}>Error: {error}</div>;
-    if (!vehiculos || vehiculos.length === 0) return <div style={{ padding: '1rem', color: '#f59e0b' }}>⚠️ No hay vehículos registrados o disponibles en este momento.</div>;
-
-    const handleToggle = (id) => {
-        if (vehiculosAsignados.includes(id)) {
-            onVehiculosChange(vehiculosAsignados.filter(v => v !== id));
-        } else {
-            onVehiculosChange([...vehiculosAsignados, id]);
-        }
-    };
-
-    return (
-        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'nowrap', overflowX: 'auto', paddingBottom: '0.5rem', scrollBehavior: 'smooth' }}>
-            {vehiculos.map(v => {
-                const isActive = vehiculosAsignados.includes(v.id);
-                
-                const esUPN = v.propietario === 'institucional';
-                const imgSrcFallback = v.tipo === 'buseta' || v.tipo === 'microbus' || v.tipo === 'camioneta' 
-                    ? 'https://cdn3d.iconscout.com/3d/premium/thumb/minivan-6780879-5573489.png'
-                    : 'https://cdn3d.iconscout.com/3d/premium/thumb/bus-4993648-4159573.png';
-                
-                const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-                const fotoSrc = v.foto_url
-                    ? (v.foto_url.startsWith('http') ? v.foto_url : `${API_BASE}${v.foto_url}`)
-                    : imgSrcFallback;
-
-                const colorTheme =
-                    v.tipo === 'bus' ? 'blue' : 
-                    v.tipo === 'buseta' ? 'sky' : 
-                    v.tipo === 'microbus' ? 'cyan' : 
-                    v.tipo === 'camioneta' ? 'slate' : 'indigo';
-                
-                return (
-                    <div 
-                        key={v.id} 
-                        onClick={() => handleToggle(v.id)}
-                        style={{ 
-                            flex: '0 0 auto', 
-                            width: '240px', /* Tarjeta más compacta */
-                            cursor: 'pointer',
-                            transform: isActive ? 'scale(1.02)' : 'scale(1)',
-                            opacity: isActive ? 1 : 0.65,
-                            transition: 'all 0.3s ease'
-                        }}
-                    >
-                        <div style={{ pointerEvents: 'none' }}>
-                            <CardMatcha
-                                title={v.placa}
-                                color={colorTheme}
-                                badgeText={isActive ? 'SELECCIONADO' : 'DISPONIBLE'}
-                                badgeColor={isActive ? '#10b981' : '#3b82f6'}
-                                imageSrc={fotoSrc}
-                                bannerText={esUPN ? 'Institucional — UPN' : 'Flota Externa'}
-                                tags={[
-                                    v.tipo ? (v.tipo.charAt(0).toUpperCase() + v.tipo.slice(1)) : 'Bus',
-                                    `${v.capacidad || 0} PAX`,
-                                    v.tipo_combustible === 'diesel' ? '⛽ Diésel' : '🔋 ' + (v.tipo_combustible || '')
-                                ]}
-                            />
-                        </div>
-                    </div>
-                );
-            })}
-        </div>
-    );
-}
 
 // ── Sub-componente: Timeline de desglose de jornada ──────────────────────────
 function TimelineJornada({ jornada, horasTotales, numVehiculos, p }) {
@@ -176,17 +97,13 @@ export default function WidgetCosto({
     onVehiculosChange,
 }) {
     const paramsSistema = useParametrosSistema();
-    const { vehiculos, cargando, error } = useFlotaDisponible();
-    const p             = { ...paramsSistema, ...parametros };
-    const pax           = parseInt(numEstudiantes) || 0;
-
-    // Filtramos los vehículos completos basados en los IDs asignados
-    const flotaElegida = vehiculos.filter(v => vehiculosAsignados.includes(v.id));
+    const p   = { ...paramsSistema, ...parametros };
+    const pax = parseInt(numEstudiantes) || 0;
 
     const { combustible, costoConductor, costoExtra, total, numVehiculos, viaticos, jornada } =
         calcularCostos({
             distanciaKm, duracionDias, horasTotales, pax,
-            flotaElegida,
+            flotaElegida: [],
             params: p, horaInicio,
         });
 
@@ -194,7 +111,7 @@ export default function WidgetCosto({
         if (distanciaKm > 0 && onCostoCalculado) {
             onCostoCalculado(Math.round(total));
         }
-    }, [total, distanciaKm, horaFin, duracionDias, numEstudiantes, vehiculosAsignados]);
+    }, [total, distanciaKm, horaFin, duracionDias, numEstudiantes]);
 
     if (distanciaKm === 0) {
         return (
@@ -206,15 +123,6 @@ export default function WidgetCosto({
 
     return (
         <div className="wc-container">
-            <SelectorFlota 
-                pax={pax} 
-                vehiculosAsignados={vehiculosAsignados} 
-                onVehiculosChange={onVehiculosChange} 
-                vehiculos={vehiculos} 
-                cargando={cargando}
-                error={error}
-            />
-
             <div className="wc-top">
                 <span className="wc-top-label">Costo Estimado Total</span>
                 <span className="wc-top-total">{cop(total)}</span>

@@ -79,7 +79,17 @@ class EstimarTiempoRutaController(APIView):
         
         ia_port = DjangoRutaIAAdapter()
         try:
-            minutos = EstimarTiempoRuta(ia_port=ia_port).run(origen, destino)
-            return Response({'ok': True, 'datos': {'minutos': minutos}}, status=status.HTTP_200_OK)
+            resultado = EstimarTiempoRuta(ia_port=ia_port).run(origen, destino)
+            # resultado ahora es dict: {minutos, distancia_km}
+            if isinstance(resultado, dict):
+                minutos      = resultado.get('minutos', 0)
+                distancia_km = resultado.get('distancia_km', 0)
+            else:
+                minutos      = int(resultado)  # compatibilidad retroactiva
+                distancia_km = 0
+            return Response({
+                'ok': True,
+                'datos': {'minutos': minutos, 'distancia_km': distancia_km}
+            }, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'ok': False, 'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

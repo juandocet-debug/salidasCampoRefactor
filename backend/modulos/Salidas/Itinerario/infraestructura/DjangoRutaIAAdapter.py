@@ -130,22 +130,21 @@ class DjangoRutaIAAdapter(GeneradorRutaIAPort):
             return _extraer_lista_json(texto)
         return []
 
-    def estimar_tiempo_ruta(self, origen: str, destino: str) -> int:
-        # Usamos 8b-instant + response_format JSON para maxima velocidad
+    def estimar_tiempo_ruta(self, origen: str, destino: str) -> dict:
         prompt = (
             f'Tiempo de viaje en bus desde "{origen}" hasta "{destino}" en Colombia. '
             'Considera trafico y cordilleras. '
-            'Responde SOLO JSON: {"minutos": NUMERO_TOTAL_ENTERO}'
+            'Responde SOLO JSON: {"minutos": NUMERO_ENTERO, "distancia_km": NUMERO_KM_REALES_EN_CARRETERA}'
         )
         groq_key = config('GROQ_API_KEY', default='')
         if not groq_key:
-            return 0
+            return {'minutos': 0, 'distancia_km': 0}
         try:
             payload = json.dumps({
                 'model': 'llama-3.1-8b-instant',
                 'messages': [{'role': 'user', 'content': prompt}],
                 'temperature': 0.0,
-                'max_tokens': 50,
+                'max_tokens': 60,
                 'response_format': {'type': 'json_object'},
             }).encode('utf-8')
             req = urllib.request.Request(
@@ -157,8 +156,9 @@ class DjangoRutaIAAdapter(GeneradorRutaIAPort):
                     texto = json.loads(resp.read().decode('utf-8'))['choices'][0]['message']['content']
                     obj = _extraer_objeto_json(texto)
                     minutos = obj.get('minutos', 0) or obj.get('horas', 0) * 60
-                    print(f'[IA] Tiempo {origen}->{destino}: {minutos} min')
-                    return int(minutos)
+                    distancia = obj.get('distancia_km', 0)
+                    print(f'[IA] {origen}->{destino}: {minutos} min / {distancia} km')
+                    return {'minutos': int(minutos), 'distancia_km': float(distancia)}
         except Exception as e:
             print('[IA] Error Tiempo:', e)
-        return 0
+        return {'minutos': 0, 'distancia_km': 0}

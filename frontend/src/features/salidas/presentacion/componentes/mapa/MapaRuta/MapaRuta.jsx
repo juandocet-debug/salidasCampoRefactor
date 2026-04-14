@@ -1,7 +1,7 @@
 // src/modulos/profesor/componentes/mapa/MapaRuta.jsx
 // ─────────────────────────────────────────────────────────────────────────────
-// Mapa interactivo Leaflet + OSRM — marcadores con letras A, B, C…
-// Fix: cancelToken previene race condition cuando el efecto corre antes que termine calcularRuta
+// Mapa interactivo Leaflet — marcadores con letras A, B, C…
+// Distancia calculada con Haversine (sin OSRM) — no depende de ninguna API externa.
 // ─────────────────────────────────────────────────────────────────────────────
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
@@ -15,24 +15,43 @@ import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({ iconUrl: markerIcon, iconRetinaUrl: markerIcon2x, shadowUrl: markerShadow });
 
-const OSRM = 'https://router.project-osrm.org/route/v1/driving';
 const BOGOTA = [4.6097, -74.0817];
 const LETRAS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
+/** Haversine: distancia en km entre dos puntos {lat, lng} */
+function haversine(a, b) {
+    const R = 6371;
+    const dLat = (b.lat - a.lat) * Math.PI / 180;
+    const dLng = (b.lng - a.lng) * Math.PI / 180;
+    const sinLat = Math.sin(dLat / 2);
+    const sinLng = Math.sin(dLng / 2);
+    const c = 2 * Math.asin(Math.sqrt(
+        sinLat * sinLat +
+        Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * sinLng * sinLng
+    ));
+    return +(R * c).toFixed(1);
+}
+
+/** Distancia total de una lista de puntos usando Haversine */
+function distanciaTotal(puntos) {
+    let km = 0;
+    for (let i = 0; i < puntos.length - 1; i++) {
+        km += haversine(puntos[i], puntos[i + 1]);
+    }
+    return +km.toFixed(1);
+}
+
 export default function MapaRuta({ puntos = [], onDistanciaCalculada }) {
-    const mapRef = useRef(null);
+    const mapRef  = useRef(null);
     const instRef = useRef(null);
     const markRef = useRef([]);
     const routeRef = useRef(null);
-    const cancelRef = useRef(false); // Cancela fetches colgados si el componente se desmonta
 
     // Inicializar mapa UNA sola vez
     useEffect(() => {
         if (instRef.current || !mapRef.current) return;
-        cancelRef.current = false;
         try {
             instRef.current = L.map(mapRef.current, { zoomControl: false }).setView(BOGOTA, 6);
-            // CartoDB Voyager — mapa moderno y limpio
             L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
                 attribution: '© OpenStreetMap © CARTO',
                 subdomains: 'abcd',
@@ -43,7 +62,6 @@ export default function MapaRuta({ puntos = [], onDistanciaCalculada }) {
             console.warn('Leaflet init error:', e);
         }
         return () => {
-            cancelRef.current = true; // Cancela cualquier fetch en vuelo
             try { instRef.current?.remove(); } catch { /* ignore */ }
             instRef.current = null;
         };
@@ -68,7 +86,7 @@ export default function MapaRuta({ puntos = [], onDistanciaCalculada }) {
         // Marcadores: origen=verde, destino=rojo, paradas=teal
         validos.forEach((p, i) => {
             try {
-                const isOrigen = i === 0;
+                const isOrigen  = i === 0;
                 const isDestino = i === validos.length - 1;
                 const bgColor = isOrigen ? '#16a34a' : isDestino ? '#dc2626' : '#4A8DAC';
                 const letra = LETRAS[i] || '•';
@@ -90,44 +108,63 @@ export default function MapaRuta({ puntos = [], onDistanciaCalculada }) {
             map.fitBounds(L.latLngBounds(validos.map(p => [p.lat, p.lng])), { padding: [50, 50], maxZoom: 14 });
         } catch { /* ignore */ }
 
-        if (validos.length >= 2) calcularRuta(validos, map);
-        else onDistanciaCalculada?.({ distancia_km: 0, duracion_min: 0 });
+        if (validos.length >= 2) {
+            let activo = true;
+            const latlngsStr = validos.map(p => `${p.lng},${p.lat}`).join(';');
+            const url = `https://router.project-osrm.org/route/v1/driving/${latlngsStr}?overview=full&geometries=geojson`;
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (!activo || !instRef.current) return;
+                    let routePts = [];
+                    let km = 0;
+
+                    if (data.code === 'Ok') {
+                        routePts = data.routes[0].geometry.coordinates.map(c => ({ lat: c[1], lng: c[0] }));
+                        km = data.routes[0].distance / 1000;
+                    } else {
+                        routePts = validos.map(p => ({ lat: p.lat, lng: p.lng }));
+                        km = distanciaTotal(validos);
+                    }
+
+                    try {
+                        const pts = routePts.map(p => [p.lat, p.lng]);
+                        const glowLayer = L.polyline(pts, { color: '#4A8DAC', weight: 10, opacity: 0.18, lineCap: 'round', lineJoin: 'round' }).addTo(map);
+                        const lineLayer = L.polyline(pts, { color: '#345B8D', weight: 4,  opacity: 0.9,  lineCap: 'round', lineJoin: 'round' }).addTo(map);
+                        routeRef.current = L.layerGroup([glowLayer, lineLayer]).addTo(map);
+                        map.fitBounds(L.latLngBounds(pts), { padding: [50, 50], maxZoom: 14 });
+                    } catch { /* ignore */ }
+
+                    onDistanciaCalculada?.({
+                        distancia_km: +km.toFixed(1),
+                        duracion_min: 0,
+                        routeCoords: routePts,
+                    });
+                })
+                .catch(() => {
+                    if (!activo || !instRef.current) return;
+                    const km = distanciaTotal(validos);
+                    const pts = validos.map(p => [p.lat, p.lng]);
+                    try {
+                        const glowLayer = L.polyline(pts, { color: '#4A8DAC', weight: 10, opacity: 0.18, lineCap: 'round', lineJoin: 'round' }).addTo(map);
+                        const lineLayer = L.polyline(pts, { color: '#345B8D', weight: 4,  opacity: 0.9,  lineCap: 'round', lineJoin: 'round' }).addTo(map);
+                        routeRef.current = L.layerGroup([glowLayer, lineLayer]).addTo(map);
+                        map.fitBounds(L.latLngBounds(pts), { padding: [50, 50], maxZoom: 14 });
+                    } catch { /* ignore */ }
+
+                    onDistanciaCalculada?.({
+                        distancia_km: km,
+                        duracion_min: 0,
+                        routeCoords: validos.map(p => ({ lat: p.lat, lng: p.lng })),
+                    });
+                });
+
+            return () => { activo = false; };
+        } else {
+            onDistanciaCalculada?.({ distancia_km: 0, duracion_min: 0 });
+        }
     }, [puntos]);
-
-    const calcularRuta = async (pts, map) => {
-        try {
-            const coords = pts.map(p => `${p.lng},${p.lat}`).join(';');
-            const res = await fetch(`${OSRM}/${coords}?overview=full&geometries=geojson`);
-            const data = await res.json();
-
-            // Si el componente fue desmontado o el mapa destruido mientras esperábamos → salir
-            if (cancelRef.current || !instRef.current || !instRef.current._container) return;
-
-            if (data.code !== 'Ok' || !data.routes?.[0]) return;
-            const r = data.routes[0];
-
-            if (routeRef.current) {
-                try { map.removeLayer(routeRef.current); } catch { /* ignore */ }
-            }
-            // Doble capa: glow azul + línea sólida encima
-            const glowLayer = L.geoJSON(r.geometry, {
-                style: { color: '#4A8DAC', weight: 10, opacity: 0.18, lineCap: 'round', lineJoin: 'round' },
-            }).addTo(map);
-            const lineLayer = L.geoJSON(r.geometry, {
-                style: { color: '#345B8D', weight: 4, opacity: 0.9, lineCap: 'round', lineJoin: 'round' },
-            }).addTo(map);
-            routeRef.current = L.layerGroup([glowLayer, lineLayer]).addTo(map);
-
-            onDistanciaCalculada?.({
-                distancia_km: +(r.distance / 1000).toFixed(1),
-                duracion_min: +(r.duration / 60).toFixed(0),
-                // Coordenadas de la carretera real para búsqueda de municipios
-                routeCoords: r.geometry.coordinates
-                    .filter((_, i) => i % 5 === 0)
-                    .map(c => ({ lat: c[1], lng: c[0] })),
-            });
-        } catch (e) { console.warn('OSRM error:', e); }
-    };
 
     return <div ref={mapRef} className="mapa-ruta" />;
 }

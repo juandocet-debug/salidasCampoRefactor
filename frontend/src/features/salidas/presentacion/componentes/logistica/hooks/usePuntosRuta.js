@@ -99,7 +99,7 @@ export default function usePuntosRuta(form, setForm) {
         return () => { activo = false; };
     }, [puntosRuta]); // Se ejecuta cuando cambia puntosRuta (incluye nuevos destinos sin coords)
 
-    // ── OSRM: distancia RETORNO (solo distancia, sin duración) ──────────────
+    // ── Haversine: distancia RETORNO (sin API externa) ──────────────────────
     useEffect(() => {
         const ori = puntosRetorno[0];
         const dst = puntosRetorno[puntosRetorno.length - 1];
@@ -110,19 +110,18 @@ export default function usePuntosRuta(form, setForm) {
         const pts = puntosRetorno.filter(p => p.lat && p.lng);
         if (pts.length < 2) return;
 
-        let activo = true;
-        const coords = pts.map(p => `${p.lng},${p.lat}`).join(';');
-        fetch(`https://router.project-osrm.org/route/v1/driving/${coords}?overview=false`)
-            .then(r => r.json())
-            .then(data => {
-                if (!activo || data.code !== 'Ok' || !data.routes?.[0]) return;
-                setRutaInfoRetorno({
-                    distancia_km:    +(data.routes[0].distance / 1000).toFixed(1),
-                    duracion_min:    0,
-                    _pendienteGemini: true,
-                });
-            }).catch(() => {});
-        return () => { activo = false; };
+        // Haversine: sin OSRM, sin CORS, sin delays
+        const R = 6371;
+        let km = 0;
+        for (let i = 0; i < pts.length - 1; i++) {
+            const a = pts[i], b = pts[i + 1];
+            const dLat = (b.lat - a.lat) * Math.PI / 180;
+            const dLng = (b.lng - a.lng) * Math.PI / 180;
+            const s = Math.sin(dLat / 2) ** 2 +
+                Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+            km += R * 2 * Math.asin(Math.sqrt(s));
+        }
+        setRutaInfoRetorno({ distancia_km: +km.toFixed(1), duracion_min: 0, _pendienteGemini: true });
     }, [puntosRetorno]);
 
     // ── IA: tiempos reales (Groq/Llama 3) ────────────────────────────────────

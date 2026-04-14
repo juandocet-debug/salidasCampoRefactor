@@ -9,6 +9,7 @@ import TabAcademico  from '../../componentes/TabAcademico/TabAcademico';
 import TabCalendario from '../../componentes/TabCalendario/TabCalendario';
 import TabFlota      from '../../componentes/TabFlota/TabFlota';
 import TabComponentes from '../../componentes/TabComponentes/TabComponentes';
+import TabSalidas from '../../componentes/TabSalidas/TabSalidas';
 import './PanelHerramientas.css';
 
 const TABS = [
@@ -27,6 +28,10 @@ const TABS = [
     {
         id: 'componentes', label: 'Librería UI', desc: 'Componentes y Cards', statNum: '03', statText: 'Modelos', actionTxt: 'Ver UI', progreso: '100%', componente: TabComponentes,
         icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    },
+    {
+        id: 'salidas', label: 'Salidas', desc: 'Gestión de todas las salidas', statNum: '—', statText: 'Registros', actionTxt: 'Gestionar', progreso: '100%', componente: TabSalidas,
+        icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M3 12h18M3 6l9-3 9 3M3 18l9 3 9-3" /></svg>,
     }
 ];
 

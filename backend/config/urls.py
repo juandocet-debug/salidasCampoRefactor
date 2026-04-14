@@ -12,6 +12,8 @@ from modulos.Logistica.Vehiculo.infraestructura.VehiculoController import Vehicu
 from modulos.Logistica.Vehiculo.infraestructura.VehiculoIAController import VehiculoIAController
 from modulos.Logistica.Parametro.infraestructura.ParametroController import ParametroController
 from modulos.Logistica.Parametro.infraestructura.ParametroConfiguracionController import ParametroConfiguracionController
+from modulos.Salidas.Core.infraestructura.AdminSalidasController import AdminSalidasController, CleanupHuerfanosController
+from modulos.Salidas.Core.infraestructura.OsrmProxyController import OsrmProxyController
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -55,5 +57,15 @@ urlpatterns = [
     path('api/salidas/itinerario/', include('modulos.Salidas.Itinerario.infraestructura.urls')),
     path('api/salidas/itinerario/paradas/', include('modulos.Salidas.Itinerario.Parada.infraestructura.urls')),
     path('api/salidas/coordinacion/', include('modulos.Salidas.Coordinacion.infraestructura.urls')),
+
+    # Rutas para Administrador del Sistema — Gestión de Salidas
+    path('api/admin/salidas/', AdminSalidasController.as_view(), name='admin-salidas-list'),
+    path('api/admin/salidas/<int:pk>/', AdminSalidasController.as_view(), name='admin-salidas-detail'),
+
+    # Proxy OSRM — evita CORS del navegador
+    path('api/routing/osrm/', OsrmProxyController.as_view(), name='osrm-proxy'),
+
+    # Limpieza de huérfanos (temporal)
+    path('api/admin/limpiar-huerfanos/', CleanupHuerfanosController.as_view(), name='limpiar-huerfanos'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

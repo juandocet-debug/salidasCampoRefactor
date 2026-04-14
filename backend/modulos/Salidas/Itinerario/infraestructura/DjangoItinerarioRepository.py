@@ -44,15 +44,20 @@ class DjangoItinerarioRepository(ItinerarioRepository):
 
     def save(self, itinerario: Itinerario) -> Itinerario:
         defaults = {
-            'salida_id': itinerario.salida_id.value,
             'poligonal_mapa': itinerario.poligonal_mapa.value,
-            'distancia_km': itinerario.distancia_km.value,
-            'duracion_horas': itinerario.duracion_horas.value
+            'distancia_km':   itinerario.distancia_km.value,
+            'duracion_horas': itinerario.duracion_horas.value,
         }
         if itinerario.id.value:
-            obj, _ = ItinerarioModelo.objects.update_or_create(id=itinerario.id.value, defaults=defaults)
+            # Actualizar por ID primario
+            obj, _ = ItinerarioModelo.objects.update_or_create(
+                id=itinerario.id.value, defaults=defaults
+            )
         else:
-            obj = ItinerarioModelo.objects.create(**defaults)
+            # Upsert por salida_id para evitar UNIQUE constraint
+            obj, _ = ItinerarioModelo.objects.update_or_create(
+                salida_id=itinerario.salida_id.value, defaults=defaults
+            )
         return self._to_domain_itinerario(obj)
 
     def get_by_id(self, id_itinerario: int) -> Optional[Itinerario]:
