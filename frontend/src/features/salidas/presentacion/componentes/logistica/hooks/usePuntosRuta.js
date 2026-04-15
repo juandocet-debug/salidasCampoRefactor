@@ -99,7 +99,9 @@ export default function usePuntosRuta(form, setForm) {
         return () => { activo = false; };
     }, [puntosRuta]); // Se ejecuta cuando cambia puntosRuta (incluye nuevos destinos sin coords)
 
-    // ── Haversine: distancia RETORNO (sin API externa) ──────────────────────
+    // ── Distancia RETORNO preliminar (cuando el mapa no está en ese tab) ────────
+    const lastPtsHashRef = useRef('');
+
     useEffect(() => {
         const ori = puntosRetorno[0];
         const dst = puntosRetorno[puntosRetorno.length - 1];
@@ -110,19 +112,52 @@ export default function usePuntosRuta(form, setForm) {
         const pts = puntosRetorno.filter(p => p.lat && p.lng);
         if (pts.length < 2) return;
 
-        // Haversine: sin OSRM, sin CORS, sin delays
+        // Detectar si los puntos cambiaron geográficamente para saber si debemos resetear el kilometraje
+        const currentHash = pts.map(p => `${p.lat},${p.lng}`).join('|');
+        const ptsChanged = currentHash !== lastPtsHashRef.current;
+        lastPtsHashRef.current = currentHash;
+
+        const oriIda = puntosRuta[0];
+        const dstIda = puntosRuta[puntosRuta.length - 1];
+
+        // Helper rápido de Haversine para comparar
+        const getDistKm = (a, b) => {
+            if (!a?.lat || !b?.lat) return 9999;
+            const dLat = (b.lat - a.lat) * Math.PI / 180;
+            const dLng = (b.lng - a.lng) * Math.PI / 180;
+            const s = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+            return 6371 * 2 * Math.asin(Math.sqrt(s));
+        };
+
+        const esEspejo = pts.length === 2 && 
+                         getDistKm(ori, dstIda) < 5.0 && 
+                         getDistKm(dst, oriIda) < 5.0;
+
+        if (esEspejo && rutaInfoIda.distancia_km > 0) {
+            setRutaInfoRetorno(prev => prev.distancia_km === rutaInfoIda.distancia_km && !ptsChanged
+                ? prev 
+                : { ...prev, distancia_km: rutaInfoIda.distancia_km, _pendienteGemini: true }
+            );
+            return;
+        }
+
         const R = 6371;
         let km = 0;
         for (let i = 0; i < pts.length - 1; i++) {
             const a = pts[i], b = pts[i + 1];
             const dLat = (b.lat - a.lat) * Math.PI / 180;
             const dLng = (b.lng - a.lng) * Math.PI / 180;
-            const s = Math.sin(dLat / 2) ** 2 +
-                Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+            const s = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
             km += R * 2 * Math.asin(Math.sqrt(s));
         }
-        setRutaInfoRetorno({ distancia_km: +km.toFixed(1), duracion_min: 0, _pendienteGemini: true });
-    }, [puntosRetorno]);
+        
+        setRutaInfoRetorno(prev => {
+            // Proteger la distancia calculada por OSRM (que es mayor a la recta Haversine)
+            // SOLO si los puntos no han cambiado. Si cambiaron (ej: digitó Cali), pisar con la nueva ruta.
+            if (!ptsChanged && prev.distancia_km > 0 && Math.abs(prev.distancia_km - km) > 1) return prev;
+            return { ...prev, distancia_km: +km.toFixed(1), duracion_min: 0, _pendienteGemini: true };
+        });
+    }, [puntosRetorno, rutaInfoIda.distancia_km, puntosRuta]);
 
     // ── IA: tiempos reales (Groq/Llama 3) ────────────────────────────────────
     useRutaIA(puntosRuta,    rutaInfoIda.distancia_km,    setRutaInfoIda,    'IDA');

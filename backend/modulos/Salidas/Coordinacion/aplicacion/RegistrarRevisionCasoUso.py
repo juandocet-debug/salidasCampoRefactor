@@ -79,7 +79,7 @@ class RegistrarRevisionCasoUso:
 
         # 2. Repercutir el efecto en la propia Entidad Salida
         salida_id_obj = SalidaId(salida_id)
-        salida = self.salida_repo.obtener_por_id(salida_id_obj)
+        salida = self.salida_repo.get_by_id(salida_id_obj.value)
         
         if salida:
             if concepto == ConceptoFinal.FAVORABLE:
@@ -90,7 +90,7 @@ class RegistrarRevisionCasoUso:
                 salida.cambiar_estado(EstadoSalida.RECHAZADA)
             
             # Guardamos la salida actualizada en su repositorio
-            self.salida_repo.guardar(salida)
+            self.salida_repo.save(salida)
         else:
             raise ValueError("No se encontró la salida especificada para actualizar su estado.")
             

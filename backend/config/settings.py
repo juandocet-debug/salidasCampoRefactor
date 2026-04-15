@@ -49,6 +49,7 @@ APPS_PROYECTO = [
     'modulos.Salidas.Itinerario.infraestructura',
     'modulos.Salidas.Itinerario.Parada.infraestructura',
     'modulos.Salidas.Coordinacion.infraestructura',
+    'modulos.Salidas.Consejo.infraestructura',
 
     # Apps del sistema anterior (si deciden conservarse temporalmente)ura.apps.UsuariosInfraConfig',
 ]

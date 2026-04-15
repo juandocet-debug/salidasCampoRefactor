@@ -21,6 +21,7 @@ import PaginaVerificacionAbordaje from '@/features/abordaje/presentacion/paginas
 import PaginaCodigoEstudiante from '@/features/abordaje/presentacion/paginas/PaginaCodigoEstudiante/PaginaCodigoEstudiante';
 import PaginaConstruccion from '@/shared/componentes/PaginaConstruccion/PaginaConstruccion';
 import CoordinadorDashboard from '@/features/coordinacion/CoordinadorDashboard';
+import ConsejoDashboard from '@/features/consejo/ConsejoDashboard';
 
 // ── Fallback de carga ─────────────────────────────────────────────
 function Cargando() {
@@ -75,7 +76,7 @@ export default function App() {
             <Route path="/salidas" element={<PaginaHistorico />} />
             <Route path="/nueva-salida" element={<PaginaNuevaSalida />} />
             <Route path="/revisiones" element={<CoordinadorDashboard />} />
-            <Route path="/decisiones" element={<PaginaConstruccion />} />
+            <Route path="/decisiones" element={<ConsejoDashboard />} />
             <Route path="/historial" element={<PaginaConstruccion />} />
             <Route path="/historico" element={<PaginaHistorico />} />
             <Route path="/parametros" element={<PaginaConstruccion />} />

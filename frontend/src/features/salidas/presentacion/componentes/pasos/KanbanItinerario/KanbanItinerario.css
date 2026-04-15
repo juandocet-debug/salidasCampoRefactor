@@ -28,6 +28,28 @@
     align-items: flex-start;
 }
 
+.nsal-kanban-board--readonly {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    overflow-x: visible;
+}
+
+.nsal-kanban-board--readonly .nsal-kanban-col {
+    min-width: 250px;
+    max-width: 320px;
+    flex: 1 1 250px;
+}
+
+.nsal-kanban-board--readonly .nsal-kcard {
+    height: auto;
+    min-height: 120px;
+    cursor: pointer;
+}
+.nsal-kanban-board--readonly .nsal-kcard:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
 .nsal-kanban-board::-webkit-scrollbar { height: 8px; }
 .nsal-kanban-board::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
 .nsal-kanban-board::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }

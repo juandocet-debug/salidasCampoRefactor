@@ -43,17 +43,19 @@ export default function KanbanItinerario({
     onQuitarParadaRetorno,
     onMoverParada,
     onMoverParadaRetorno,
+    isReadOnly = false,
 }) {
     const dStart = fechaInicio ? new Date(fechaInicio + 'T00:00:00') : null;
 
     const gruposIda     = useMemo(() => agruparPorDia(puntosRuta.slice(1, -1),     dStart), [puntosRuta,     fechaInicio]);
     const gruposRetorno = useMemo(() => agruparPorDia(puntosRetorno.slice(1, -1),   dStart), [puntosRetorno,  fechaInicio]);
     const grupos        = tabActivo === 'retorno' ? gruposRetorno : gruposIda;
-    const llavesOrdenadas = Object.keys(grupos).sort();
+    // Ocultar columna de "Sin Asignar" (solicitud de diseño)
+    const llavesOrdenadas = Object.keys(grupos).filter(k => k !== '9999-99-99').sort();
 
     // ── Drag & Drop ──────────────────────────────────────────────────────────
-    const handleDragOver  = (e) => { e.preventDefault(); e.currentTarget.classList.add('nsal-kanban-col--dragover'); };
-    const handleDragLeave = (e) => { e.preventDefault(); e.currentTarget.classList.remove('nsal-kanban-col--dragover'); };
+    const handleDragOver  = (e) => { if (isReadOnly) return; e.preventDefault(); e.currentTarget.classList.add('nsal-kanban-col--dragover'); };
+    const handleDragLeave = (e) => { if (isReadOnly) return; e.preventDefault(); e.currentTarget.classList.remove('nsal-kanban-col--dragover'); };
     const handleDrop      = (e, targetDateKey) => {
         e.preventDefault();
         e.currentTarget.classList.remove('nsal-kanban-col--dragover');
@@ -100,14 +102,16 @@ export default function KanbanItinerario({
                         <span className="p3l-tab-count">{puntosRetorno.slice(1, -1).length}</span>
                     </button>
                 </div>
-                <button
-                    type="button"
-                    className="nsal-btn-agregar-parada"
-                    style={{ margin: 0, width: 'auto', padding: '10px 24px' }}
-                    onClick={onNuevaParada}
-                >
-                    + Agregar{tabActivo === 'retorno' ? ' al Retorno' : ' a la Ruta'}
-                </button>
+                {!isReadOnly && (
+                    <button
+                        type="button"
+                        className="nsal-btn-agregar-parada"
+                        style={{ margin: 0, width: 'auto', padding: '10px 24px' }}
+                        onClick={onNuevaParada}
+                    >
+                        + Agregar{tabActivo === 'retorno' ? ' al Retorno' : ' a la Ruta'}
+                    </button>
+                )}
             </div>
 
             {/* Board o empty state */}
@@ -120,14 +124,14 @@ export default function KanbanItinerario({
                     </p>
                 </div>
             ) : (
-                <div className="nsal-kanban-board" ref={boardRef}>
+                <div className={`nsal-kanban-board ${isReadOnly ? 'nsal-kanban-board--readonly' : ''}`} ref={boardRef}>
                     {llavesOrdenadas.map(key => (
                         <div
                             key={key}
                             className="nsal-kanban-col"
                             onDragOver={handleDragOver}
                             onDragLeave={handleDragLeave}
-                            onDrop={(e) => handleDrop(e, key)}
+                            onDrop={(e) => { if (!isReadOnly) handleDrop(e, key); }}
                         >
                             <div className="nsal-kanban-col-head">
                                 <div className="nsal-kanban-col-title-group">
@@ -146,6 +150,7 @@ export default function KanbanItinerario({
                                         indice={p.originalIndex}
                                         onEditar={onEditarParada}
                                         onQuitar={tabActivo === 'retorno' ? onQuitarParadaRetorno : onQuitarParada}
+                                        isReadOnly={isReadOnly}
                                     />
                                 ))}
                             </div>

@@ -122,7 +122,7 @@ const ListaTarjetasProfesor = ({ salidas = [], cargando = false, onSalidaElimina
                         <div className={`card-new ${claseTema}`} key={salida.id} style={{ background: isLight ? '#ffffff' : cardColor }}>
                             {/* Imagen Gigante (Ahora como icono integrado) */}
                             {PORTADAS[salida.icono] ? (
-                                <div className="card-new__bg-icon" style={{ opacity: 1, width: '220px', height: '220px', right: '-25px', top: 'auto', bottom: '-40px', transform: 'rotate(-5deg)', zIndex: 0 }}>
+                                <div className="card-new__bg-icon" style={{ opacity: 1, width: '220px', height: '220px', right: '-10px', top: 'auto', bottom: '-10px', transform: 'rotate(-5deg)', zIndex: 0 }}>
                                     <img src={PORTADAS[salida.icono]} alt="Portada" style={{ width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
                                 </div>
                             ) : (

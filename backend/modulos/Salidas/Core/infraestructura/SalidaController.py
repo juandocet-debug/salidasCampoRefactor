@@ -163,6 +163,11 @@ class SalidaController(APIView):
             from modulos.Salidas.Core.infraestructura.models import SalidaModelo
             modelos_dict = {m.id: m for m in SalidaModelo.objects.all()}
             
+            # Obtener Revisiones Pedagógicas (para feedback)
+            from modulos.Salidas.Coordinacion.infraestructura.models import RevisionPedagogicaModel
+            revisiones = RevisionPedagogicaModel.objects.all()
+            revisiones_dict = {r.salida_id: r for r in revisiones}
+            
             data = [{
                 'id': s.id.value, 
                 'codigo': s.codigo.value, 
@@ -179,6 +184,14 @@ class SalidaController(APIView):
                 'parada_max': modelos_dict[s.id.value].parada_max or '' if s.id.value in modelos_dict else '',
                 'costo_estimado': float(modelos_dict[s.id.value].costo_estimado or 0) if s.id.value in modelos_dict else 0,
                 'resumen': modelos_dict[s.id.value].resumen or '' if s.id.value in modelos_dict else '',
+                'ultima_revision': (lambda r: {
+                    'concepto_final': r.concepto_final,
+                    'pertinencia': {'estado': r.pertinencia_estado, 'observacion': r.pertinencia_obs},
+                    'objetivos': {'estado': r.objetivos_estado, 'observacion': r.objetivos_obs},
+                    'metodologia': {'estado': r.metodologia_estado, 'observacion': r.metodologia_obs},
+                    'viabilidad': {'estado': r.viabilidad_estado, 'observacion': r.viabilidad_obs},
+                    'fecha': str(r.fecha_revision)
+                })(revisiones_dict[s.id.value]) if s.id.value in revisiones_dict else None,
             } for s in resultados]
             return Response({'ok': True, 'datos': data}, status=status.HTTP_200_OK)
 
@@ -380,10 +393,11 @@ class EnviarSalidaView(APIView):
             return Response({'ok': False, 'error': 'Salida no encontrada.'},
                             status=status.HTTP_404_NOT_FOUND)
 
-        if salida.estado.upper() != 'BORRADOR':
-            return Response({'ok': False, 'error': f'La salida no está en borrador (estado actual: {salida.estado}).'},
+        if salida.estado.upper() not in ['BORRADOR', 'PENDIENTE_AJUSTE', 'RECHAZADA']:
+            return Response({'ok': False, 'error': f'La salida no está en un estado válido para envío (estado actual: {salida.estado}).'},
                             status=status.HTTP_400_BAD_REQUEST)
 
+        # Si estaba rechazada o con ajuste, se marca "enviada" (que luego la UI entendería como en revisión)
         salida.estado = 'enviada'
         salida.save(update_fields=['estado'])
         return Response({'ok': True, 'mensaje': 'Salida enviada a revisión del coordinador.'},

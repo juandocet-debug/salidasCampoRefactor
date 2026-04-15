@@ -5,3 +5,5 @@ class PuntoParadaTipo(str, Enum):
     DESCANSO = 'descanso'
     TRABAJO_CAMPO = 'trabajo_campo'
     LLEGADA = 'llegada'
+    VIAJE = 'viaje'
+    RETORNO = 'retorno'

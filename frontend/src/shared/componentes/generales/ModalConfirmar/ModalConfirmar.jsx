@@ -11,6 +11,12 @@ const IcoBorrar = () => (
     </svg>
 );
 
+const IcoEnviar = () => (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+    </svg>
+);
+
 /**
  * ModalConfirmar — modal de confirmación de acción destructiva.
  * @param {string}   titulo      - Título del modal (ej: "¿Eliminar salida?")
@@ -24,16 +30,18 @@ export default function ModalConfirmar({
     titulo      = '¿Eliminar elemento?',
     descripcion,
     labelConfirmar = 'Sí, eliminar',
-    labelCargando  = 'Eliminando...',
+    labelCargando  = 'Procesando...',
     cargando    = false,
+    tipo        = 'peligro', // 'peligro' | 'accion'
+    estiloContenedor = {}, // Permitir override de anchos
     onConfirmar,
     onCancelar,
 }) {
     return (
         <div className="otm-confirmar-overlay" onClick={onCancelar}>
-            <div className="otm-confirmar" onClick={e => e.stopPropagation()}>
-                <div className="otm-confirmar__icono">
-                    <IcoBorrar />
+            <div className="otm-confirmar" style={estiloContenedor} onClick={e => e.stopPropagation()}>
+                <div className={`otm-confirmar__icono otm-confirmar__icono--${tipo}`}>
+                    {tipo === 'accion' ? <IcoEnviar /> : <IcoBorrar />}
                 </div>
                 <h3 className="otm-confirmar__titulo">{titulo}</h3>
                 {descripcion && (
@@ -48,7 +56,7 @@ export default function ModalConfirmar({
                         Cancelar
                     </button>
                     <button
-                        className="otm-confirmar__borrar"
+                        className={`otm-confirmar__boton otm-confirmar__boton--${tipo}`}
                         onClick={onConfirmar}
                         disabled={cargando}
                     >

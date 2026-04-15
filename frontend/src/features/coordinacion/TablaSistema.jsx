@@ -34,11 +34,11 @@ export const TablaSistema = ({ salidas = [], cargando = false, titulo = "Sistema
                 <tbody>
                     {salidas.map(s => {
                         const esPendiente = vistaActiva === 'pendientes' || s.estado === 'EN_REVISION';
-                        const prof = s.profesor_nombre || s.profesor || 'Carlos Méndez';
-                        const dest = s.destino || 'PNN Chingaza, Colombia';
-                        const feInicio = s.fecha_inicio ? new Date(s.fecha_inicio).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : '15 Mar 2026';
-                        const feFin = s.fecha_fin ? new Date(s.fecha_fin).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : '17 Mar 2026';
-                        const codigo = s.codigo || `SAL-004${s.id}`;
+                        const prof = s.profesor_nombre || 'Profesor sin asignar';
+                        const dest = s.destino || 'Sin destino definido';
+                        const feInicio = s.fecha_inicio ? new Date(s.fecha_inicio).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' }) : 'Por definir';
+                        const feFin = s.fecha_fin ? new Date(s.fecha_fin).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' }) : 'Por definir';
+                        const codigo = s.codigo || s.id;
                         const isExpanded = expandidoId === s.id;
 
                         // Estilos de pills idénticos a los del sistema del cliente (video)
@@ -62,7 +62,10 @@ export const TablaSistema = ({ salidas = [], cargando = false, titulo = "Sistema
                                         </div>
                                     </td>
                                     
-                                    <td style={{ padding: '16px 20px', color: '#64748b' }}>{s.nombre || 'Geología Estructural'}</td>
+                                    <td style={{ padding: '16px 20px', color: '#334155' }}>
+                                        <div style={{ fontWeight: '600' }}>{s.asignatura || 'Sin asignatura'}</div>
+                                        <div style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', marginTop: '2px' }}>{s.nombre}</div>
+                                    </td>
                                     <td style={{ padding: '16px 20px', color: '#64748b' }}>{dest}</td>
                                     <td style={{ padding: '16px 20px', color: '#64748b' }}>{feInicio} - {feFin}</td>
                                     
@@ -94,7 +97,7 @@ export const TablaSistema = ({ salidas = [], cargando = false, titulo = "Sistema
                                                 <button 
                                                     title="Ver Detalles"
                                                     style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '50%', color: '#64748b', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', cursor: 'pointer', transition: 'all 0.2s' }}
-                                                    onClick={(e) => e.stopPropagation()}>
+                                                    onClick={(e) => { e.stopPropagation(); onRevisar?.(s); }}>
                                                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                                                 </button>
                                             )}
@@ -127,7 +130,13 @@ export const TablaSistema = ({ salidas = [], cargando = false, titulo = "Sistema
                                                     </div>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '8px' }}>
                                                         <span style={{ color: '#64748b', width: '90px' }}>Estudiantes:</span>
-                                                        <span style={{ color: '#1e293b', fontWeight: '500' }}>{s.num_estudiantes || 0} Confirmados</span>
+                                                        <span style={{ color: '#1e293b', fontWeight: '500' }}>{s.num_estudiantes || 0} Proyectados</span>
+                                                    </div>
+                                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px', marginBottom: '8px' }}>
+                                                        <span style={{ color: '#64748b', width: '90px' }}>Resumen:</span>
+                                                        <span style={{ color: '#475569', fontSize: '13px', lineHeight: '1.4' }}>
+                                                            {s.resumen ? (s.resumen.split(' ').slice(0, 20).join(' ') + (s.resumen.split(' ').length > 20 ? '...' : '')) : 'Sin descripción registrada.'}
+                                                        </span>
                                                     </div>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                                                         <span style={{ color: '#64748b', width: '90px' }}>Semestre:</span>
@@ -135,12 +144,17 @@ export const TablaSistema = ({ salidas = [], cargando = false, titulo = "Sistema
                                                     </div>
                                                 </div>
 
-                                                {/* Sección 2: Itinerario Rápido */}
+                                                {/* Sección 2: Info Pedagógica Clave */}
                                                 <div>
-                                                    <h4 style={{ margin: '0 0 10px 0', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#94a3b8' }}>Logística Clave</h4>
-                                                    <p style={{ margin: '0 0 8px 0', color: '#475569', fontSize: '12px' }}>{s.num_estudiantes > 0 ? '✓ Cupos Asignados' : '⚠ Sin estimación de cupos'}</p>
-                                                    <p style={{ margin: '0 0 8px 0', color: '#475569', fontSize: '12px' }}>{s.fecha_inicio ? '✓ Calendario definido' : '⚠ Fechas por confirmar'}</p>
-                                                    <p style={{ margin: '0', color: '#ef4444', fontSize: '12px' }}>⚠ Revisión Pedagógica Pendiente</p>
+                                                    <h4 style={{ margin: '0 0 10px 0', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#94a3b8' }}>Objetivo Pedagógico</h4>
+                                                    <p style={{ margin: '0 0 10px 0', color: '#475569', fontSize: '13px', lineHeight: '1.4' }}>
+                                                        {s.objetivo_general 
+                                                            ? (s.objetivo_general.split(' ').slice(0, 30).join(' ') + (s.objetivo_general.split(' ').length > 30 ? '...' : '')) 
+                                                            : s.justificacion 
+                                                                ? (s.justificacion.split(' ').slice(0, 30).join(' ') + (s.justificacion.split(' ').length > 30 ? '...' : '')) 
+                                                                : 'El docente aún no ha registrado el objetivo ni la justificación de esta salida.'}
+                                                    </p>
+                                                    <p style={{ margin: '0', color: '#8b5cf6', fontSize: '12px', fontWeight: 'bold' }}>📍 Destino: {s.destino || 'No especificado'}</p>
                                                 </div>
                                                 
                                                 {/* Sección 3: Acciones Rápidas Cortas */}

@@ -417,7 +417,10 @@ export async function buscarPueblosEnRuta(puntosRuta, routeCoords = null) {
     if (!oriNombre && !oriCoords) return [];
     if (!dstNombre && !dstCoords) return [];
 
-    const key = `${oriNombre}_${dstNombre}`;
+    // Incluir coordenadas en la key para que rutas con mismo nombre pero diferente destino no colisionen
+    const oriKey = oriCoords ? `${ori.lat?.toFixed(2)},${ori.lng?.toFixed(2)}` : oriNombre;
+    const dstKey = dstCoords ? `${dst.lat?.toFixed(2)},${dst.lng?.toFixed(2)}` : dstNombre;
+    const key = `${oriKey}__${dstKey}`;
     if (_cache.has(key)) return _cache.get(key);
 
     // ── ÚNICO ORIGEN: GEMINI (datos verídicos) ──────────────────────────

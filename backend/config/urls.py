@@ -57,6 +57,7 @@ urlpatterns = [
     path('api/salidas/itinerario/', include('modulos.Salidas.Itinerario.infraestructura.urls')),
     path('api/salidas/itinerario/paradas/', include('modulos.Salidas.Itinerario.Parada.infraestructura.urls')),
     path('api/salidas/coordinacion/', include('modulos.Salidas.Coordinacion.infraestructura.urls')),
+    path('api/salidas/consejo/', include('modulos.Salidas.Consejo.infraestructura.urls')),
 
     # Rutas para Administrador del Sistema — Gestión de Salidas
     path('api/admin/salidas/', AdminSalidasController.as_view(), name='admin-salidas-list'),

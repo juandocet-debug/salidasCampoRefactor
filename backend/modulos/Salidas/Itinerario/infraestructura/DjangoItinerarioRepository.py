@@ -17,9 +17,11 @@ from modulos.Salidas.Itinerario.dominio.PuntoParadaTipo import PuntoParadaTipo
 
 try:
     from .models import ItinerarioModelo, PuntoParadaModelo
+    from modulos.Salidas.Itinerario.Parada.infraestructura.models import ParadaModelo
 except ImportError:
     ItinerarioModelo = None
     PuntoParadaModelo = None
+    ParadaModelo = None
 
 class DjangoItinerarioRepository(ItinerarioRepository):
     def _to_domain_itinerario(self, obj) -> Itinerario:
@@ -82,11 +84,11 @@ class DjangoItinerarioRepository(ItinerarioRepository):
             'tipo': punto.tipo.value
         }
         if punto.id.value:
-            obj, _ = PuntoParadaModelo.objects.update_or_create(id=punto.id.value, defaults=defaults)
+            obj, _ = ParadaModelo.objects.update_or_create(id=punto.id.value, defaults=defaults)
         else:
-            obj = PuntoParadaModelo.objects.create(**defaults)
+            obj = ParadaModelo.objects.create(**defaults)
         return self._to_domain_punto(obj)
 
     def get_puntos_by_itinerario(self, itinerario_id: int) -> List[PuntoParada]:
-        qs = PuntoParadaModelo.objects.filter(itinerario_id=itinerario_id).order_by('orden')
+        qs = ParadaModelo.objects.filter(itinerario_id=itinerario_id).order_by('orden')
         return [self._to_domain_punto(x) for x in qs]

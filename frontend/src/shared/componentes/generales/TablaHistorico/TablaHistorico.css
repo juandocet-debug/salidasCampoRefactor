@@ -3,8 +3,8 @@
 .tabla-historico {
     background: #ffffff;
     border: 1px solid #e2e8f0;
-    border-radius: 20px;
-    padding: 24px;
+    border-radius: 16px;
+    padding: 20px;
     box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.03);
     width: 100%;
 }
@@ -58,11 +58,11 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 12px;
+    padding: 8px 12px;
     cursor: pointer;
     border-bottom: 1px solid #f1f5f9;
     transition: background 0.2s;
-    border-radius: 12px;
+    border-radius: 10px;
 }
 
 .th-item-container--abierto .th-item {
@@ -74,14 +74,14 @@
 }
 
 .th-item__icono {
-    background: #F4F7FB;
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
+    background: transparent;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #799DCB;
+    color: #94a3b8;
     flex-shrink: 0;
 }
 
@@ -172,6 +172,16 @@
     color: #1e40af;
 }
 
+.th-item__badge--riesgo {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.th-item__badge--peligro {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
 /* ── Botones de acción inline ──────────────────────────────────────────────── */
 .th-item__acciones {
     display: flex;
@@ -180,52 +190,36 @@
 }
 
 .th-btn-accion {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
-    background: #f1f5f9;
-    color: #64748b;
+    background: transparent;
+    color: #94a3b8;
 }
 
 .th-btn-accion:hover {
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.th-btn-accion--enviar {
-    background: #dbeafe;
-    color: #2563eb;
 }
 
 .th-btn-accion--enviar:hover {
-    background: #2563eb;
-    color: #fff;
+    background: #eff6ff;
+    color: #2563eb;
 }
 
-.th-btn-accion--editar {
+.th-btn-accion--editar:hover {
     background: #fef3c7;
     color: #d97706;
 }
 
-.th-btn-accion--editar:hover {
-    background: #d97706;
-    color: #fff;
-}
-
-.th-btn-accion--borrar {
+.th-btn-accion--borrar:hover {
     background: #fee2e2;
     color: #dc2626;
-}
-
-.th-btn-accion--borrar:hover {
-    background: #dc2626;
-    color: #fff;
 }
 
 /* Accordion Content */

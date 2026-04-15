@@ -113,8 +113,30 @@ export default function MapaRuta({ puntos = [], onDistanciaCalculada }) {
             const latlngsStr = validos.map(p => `${p.lng},${p.lat}`).join(';');
             const url = `https://router.project-osrm.org/route/v1/driving/${latlngsStr}?overview=full&geometries=geojson`;
 
-            fetch(url)
-                .then(res => res.json())
+            const attemptFetch = async () => {
+                try {
+                    let res = await fetch(url);
+                    let data = await res.json();
+                    
+                    // Si OSRM falla (ej. NoRoute por un solo-sentido atrapado), probar el inverso
+                    if (data.code !== 'Ok' && validos.length >= 2) {
+                        const latlngsRev = [...validos].reverse().map(p => `${p.lng},${p.lat}`).join(';');
+                        const urlRev = `https://router.project-osrm.org/route/v1/driving/${latlngsRev}?overview=full&geometries=geojson`;
+                        const resRev = await fetch(urlRev);
+                        const dataRev = await resRev.json();
+                        if (dataRev.code === 'Ok') {
+                            // Invertir coordenadas del dibujo para que fluya del origen al destino
+                            dataRev.routes[0].geometry.coordinates.reverse();
+                            data = dataRev;
+                        }
+                    }
+                    return data;
+                } catch (e) {
+                    return { code: 'Error' };
+                }
+            };
+
+            attemptFetch()
                 .then(data => {
                     if (!activo || !instRef.current) return;
                     let routePts = [];

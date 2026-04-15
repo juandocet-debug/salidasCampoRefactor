@@ -47,6 +47,8 @@ const ESTADO_CONFIG = {
     favorable:   { label: 'Favorable',   clase: 'aprobada' },
     aprobada:    { label: 'Aprobada',    clase: 'aprobada' },
     finalizada:  { label: 'Finalizada',  clase: 'finalizada' },
+    pendiente_ajuste: { label: 'Pendiente Ajuste', clase: 'riesgo' },
+    rechazada:   { label: 'Rechazada',   clase: 'peligro' }
 };
 
 const estadoNormalizado = (e) => (e || 'borrador').toLowerCase();
@@ -66,6 +68,7 @@ const TablaHistorico = ({
     onEnviar,
     onEditar,
     onEliminar,
+    onVerDictamen,
 }) => {
     const [expandidoId, setExpandidoId] = useState(null);
     const toggleFila = (id) => setExpandidoId(expandidoId === id ? null : id);
@@ -122,14 +125,85 @@ const TablaHistorico = ({
                                         {item.num_estudiantes ? ` · ${item.num_estudiantes} estudiantes` : ''}
                                     </span>
                                 </div>
-                                <div className="th-item__meta">
-                                    <span className="th-item__fecha">{fmtFecha(item.fecha_inicio)}</span>
-                                    <span className={`th-item__badge th-item__badge--${cfg.clase}`}>
-                                        {cfg.label}
-                                    </span>
+                                <div className="th-item__meta" style={{ display: 'flex', alignItems: 'center', gap: '20px', flex: 1, justifyContent: 'flex-end' }}>
+                                    
+                                    {/* ── Mini Stepper de Progreso ── */}
+                                    <div className="th-mini-stepper" style={{ display: 'flex', alignItems: 'center', gap: '4px', opacity: 0.9 }}>
+                                        {[
+                                            { id: 1, name: 'Borrador', states: ['borrador'] },
+                                            { id: 2, name: 'Coordinación', states: ['enviada', 'en_revision', 'rechazada', 'pendiente_ajuste'] },
+                                            { id: 3, name: 'Consolidado', states: ['favorable', 'ajustada', 'favorable_con_ajustes'] },
+                                            { id: 4, name: 'Logística', states: ['aprobada', 'en_preparacion'] },
+                                            { id: 5, name: 'Ejecución', states: ['en_ejecucion', 'finalizada', 'cerrada'] }
+                                        ].map((etapa, idx, arr) => {
+                                            const uiOrden = arr.findIndex(e => e.states.includes(est)) + 1 || 1;
+                                            const isActive = uiOrden === etapa.id;
+                                            const isPast = uiOrden > etapa.id;
+                                            
+                                            return (
+                                                <React.Fragment key={etapa.id}>
+                                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                                                        <div style={{ 
+                                                            width: isActive ? '12px' : '8px', 
+                                                            height: isActive ? '12px' : '8px', 
+                                                            borderRadius: '50%',
+                                                            background: isPast ? '#10b981' : isActive ? '#3b82f6' : '#e2e8f0',
+                                                            boxShadow: isActive ? '0 0 0 3px rgba(59,130,246,0.2)' : 'none',
+                                                            transition: 'all 0.3s'
+                                                        }} title={etapa.name} />
+                                                        {isActive && <span style={{ fontSize: '9px', fontWeight: '800', color: '#3b82f6', position: 'absolute', transform: 'translateY(16px)', letterSpacing: '0.5px' }}>{etapa.name.substring(0,5).toUpperCase()}</span>}
+                                                    </div>
+                                                    {idx < arr.length - 1 && (
+                                                        <div style={{ width: '16px', height: '2px', background: isPast ? '#10b981' : '#e2e8f0', borderRadius: '1px' }} />
+                                                    )}
+                                                </React.Fragment>
+                                            );
+                                        })}
+                                    </div>
 
-                                    {/* ── Acciones (solo borrador) ── */}
-                                    {esBorrador && (
+                                    <span className="th-item__fecha" style={{ minWidth: '80px', textAlign: 'right' }}>{fmtFecha(item.fecha_inicio)}</span>
+                                    
+                                    {/* ── Smart Badge Contextual ── */}
+                                    {(() => {
+                                        let b_text = cfg.label;
+                                        let b_actor = '';
+                                        let b_emoji = '';
+                                        
+                                        if (est === 'favorable') { b_text = 'Favorable'; b_actor = 'Coordinación'; b_emoji = '✅'; }
+                                        else if (est === 'favorable_con_ajustes') { b_text = 'Con Ajustes'; b_actor = 'Coordinación'; b_emoji = '✅'; }
+                                        else if (est === 'pendiente_ajuste') { b_text = 'Ajustes Req.'; b_actor = 'Coordinación'; b_emoji = '⚠️'; }
+                                        else if (est === 'rechazada') { b_text = 'Improcedente'; b_actor = 'Coordinación'; b_emoji = '🚫'; }
+                                        else if (est === 'en_revision') { b_text = 'Evaluando'; b_actor = 'Coordinador'; b_emoji = '⏳'; }
+                                        else if (est === 'aprobada') { b_text = 'Aprobada'; b_actor = 'Logística'; b_emoji = '🎯'; }
+                                        else if (est === 'borrador') { b_text = 'Borrador'; b_actor = 'Profesor'; b_emoji = '📝'; }
+                                        else if (est === 'enviada') { b_text = 'Enviada'; b_actor = 'Sistema'; b_emoji = '📨'; }
+
+                                        return (
+                                            <div className={`th-item__badge th-item__badge--${cfg.clase}`} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px' }}>
+                                                {b_emoji && <span style={{ fontSize: '12px' }}>{b_emoji}</span>}
+                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: '1.2' }}>
+                                                    <span style={{ fontSize: '11px', fontWeight: '800' }}>{b_text}</span>
+                                                    {b_actor && <span style={{ fontSize: '9px', fontWeight: '600', opacity: 0.75, letterSpacing: '0.2px' }}>{b_actor}</span>}
+                                                </div>
+                                            </div>
+                                        );
+                                    })()}
+                                    
+                                    {/* Etiqueta de Feedback si tiene revision y fue devuelta */}
+                                    {item.ultima_revision && (est === 'pendiente_ajuste' || est === 'rechazada') && (
+                                        <div 
+                                            onClick={(e) => { e.stopPropagation(); onVerDictamen?.(item); }}
+                                            style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', background: est === 'rechazada' ? '#fee2e2' : '#fef3c7', padding: '6px 12px', borderRadius: '20px', border: `1px solid ${est === 'rechazada' ? '#f87171' : '#fbbf24'}` }}
+                                        >
+                                            <svg width="14" height="14" fill="none" stroke={est === 'rechazada' ? '#991b1b' : '#b45309'} strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                            <span style={{ color: est === 'rechazada' ? '#991b1b' : '#b45309', fontWeight: '800', fontSize: '10px', letterSpacing: '0.5px' }}>
+                                                VER CONCEPTO 
+                                            </span>
+                                        </div>
+                                    )}
+
+                                    {/* ── Acciones (editar/borrar si no ha escalado irremediablemente) ── */}
+                                    {(est === 'borrador' || est === 'pendiente_ajuste' || est === 'rechazada') && (
                                         <div className="th-item__acciones">
                                             <button
                                                 className="th-btn-accion th-btn-accion--enviar"
@@ -155,7 +229,7 @@ const TablaHistorico = ({
                                         </div>
                                     )}
 
-                                    <button className="th-btn-acordeon">
+                                    <button className="th-btn-acordeon" style={{ marginLeft: '6px' }}>
                                         <IcoChevron abierto={esAbierto} />
                                     </button>
                                 </div>
