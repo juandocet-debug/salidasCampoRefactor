@@ -3,7 +3,7 @@ import RevisionPedagogicaPanel from './RevisionPedagogicaPanel';
 import KanbanItinerario from '@/features/salidas/presentacion/componentes/pasos/KanbanItinerario/KanbanItinerario';
 import MapaRuta from '@/features/salidas/presentacion/componentes/mapa/MapaRuta/MapaRuta';
 
-export const VistaRevision = ({ salida: salidaList, onVolver, PanelDerecho }) => {
+const VistaRevision = ({ salida: salidaList, onVolver, PanelDerecho }) => {
     const [tabInfo, setTabInfo] = useState('general');
     const [salidaDetail, setSalidaDetail] = useState(null);
     const [isLoadingDetail, setIsLoadingDetail] = useState(true);
@@ -190,7 +190,7 @@ export const VistaRevision = ({ salida: salidaList, onVolver, PanelDerecho }) =>
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', paddingBottom: '16px', borderBottom: '1px solid #f1f5f9' }}>
                                         <span style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 'bold', letterSpacing: '1px' }}>PROGRAMA ACADÉMICO</span>
-                                        <span style={{ fontSize: '14px', color: '#334155' }}>{salida?.programa_id ? `Programa ${salida.programa_id}` : 'No Definido'}</span>
+                                        <span style={{ fontSize: '14px', color: '#334155' }}>{salida?.programa || (salida?.programa_id ? `Programa ${salida.programa_id}` : 'No Definido')}</span>
                                     </div>
                                     
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '16px', borderBottom: '1px solid #f1f5f9' }}>
@@ -225,6 +225,7 @@ export const VistaRevision = ({ salida: salidaList, onVolver, PanelDerecho }) =>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
                                         {/* Mapa en la parte superior */}
                                         {/* Rutas en la parte superior (Reemplazo del Mapa interactivo) */}
+                                        {/* Rutas en la parte superior (Reemplazo del Mapa interactivo) */}
                                         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(250px, 1fr) minmax(250px, 1fr)', gap: '20px' }}>
                                             <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
@@ -235,14 +236,14 @@ export const VistaRevision = ({ salida: salidaList, onVolver, PanelDerecho }) =>
                                                     <span style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 'bold', letterSpacing: '1px', textTransform: 'uppercase' }}>PUNTO DE PARTIDA</span>
                                                     <div style={{ background: '#fff', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '12px', marginTop: '6px' }}>
                                                         <div style={{ background: '#1e293b', color: '#fff', width: '22px', height: '22px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 'bold' }}>A</div>
-                                                        <span style={{ color: '#334155', fontSize: '14px' }}>{salida?.punto_partida || 'Sin definir'}</span>
+                                                        <span style={{ color: '#334155', fontSize: '14px' }}>{pRuta.length > 0 ? pRuta[0].nombre : (salida?.punto_partida || 'Sin definir')}</span>
                                                     </div>
                                                 </div>
                                                 <div>
                                                     <span style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 'bold', letterSpacing: '1px', textTransform: 'uppercase' }}>DESTINO FINAL</span>
                                                     <div style={{ background: '#fff', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '12px', marginTop: '6px' }}>
                                                         <div style={{ background: '#1e293b', color: '#fff', width: '22px', height: '22px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 'bold' }}>B</div>
-                                                        <span style={{ color: '#94a3b8', fontSize: '14px' }}>{salida?.parada_max || 'Sin definir'}</span>
+                                                        <span style={{ color: '#94a3b8', fontSize: '14px' }}>{pRuta.length > 0 ? pRuta[pRuta.length - 1].nombre : (salida?.parada_max || 'Sin definir')}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -256,15 +257,46 @@ export const VistaRevision = ({ salida: salidaList, onVolver, PanelDerecho }) =>
                                                     <span style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 'bold', letterSpacing: '1px', textTransform: 'uppercase' }}>PUNTO DE PARTIDA (RETORNO)</span>
                                                     <div style={{ background: '#fff', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '12px', marginTop: '6px' }}>
                                                         <div style={{ background: '#1e293b', color: '#fff', width: '22px', height: '22px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 'bold' }}>A</div>
-                                                        <span style={{ color: '#94a3b8', fontSize: '14px' }}>{salida?.parada_max || 'Sin definir'}</span>
+                                                        <span style={{ color: '#94a3b8', fontSize: '14px' }}>{pRetorno.length > 0 ? pRetorno[0].nombre : (salida?.parada_max || 'Sin definir')}</span>
                                                     </div>
                                                 </div>
                                                 <div>
                                                     <span style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 'bold', letterSpacing: '1px', textTransform: 'uppercase' }}>DESTINO FINAL (RETORNO)</span>
                                                     <div style={{ background: '#fff', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '12px', marginTop: '6px' }}>
                                                         <div style={{ background: '#1e293b', color: '#fff', width: '22px', height: '22px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 'bold' }}>B</div>
-                                                        <span style={{ color: '#94a3b8', fontSize: '14px' }}>{salida?.punto_partida || 'Sin definir'}</span>
+                                                        <span style={{ color: '#94a3b8', fontSize: '14px' }}>{pRetorno.length > 0 ? pRetorno[pRetorno.length - 1].nombre : (salida?.punto_partida || 'Sin definir')}</span>
                                                     </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Dashboard métricas itinerario */}
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginTop: '10px' }}>
+                                            <div style={{ background: '#fff', border: '1px solid #e2e8f0', padding: '16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                                <div style={{ background: '#eff6ff', color: '#3b82f6', padding: '12px', borderRadius: '10px' }}>
+                                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>
+                                                </div>
+                                                <div>
+                                                    <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600' }}>RECORRIDO ESTRUCTURAL</div>
+                                                    <div style={{ fontSize: '18px', color: '#0f172a', fontWeight: '800' }}>{salida?.distancia_total_km || 0} km</div>
+                                                </div>
+                                            </div>
+                                            <div style={{ background: '#fff', border: '1px solid #e2e8f0', padding: '16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                                <div style={{ background: '#fdf4ff', color: '#d946ef', padding: '12px', borderRadius: '10px' }}>
+                                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                                </div>
+                                                <div>
+                                                    <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600' }}>TIEMPO EN RUTA</div>
+                                                    <div style={{ fontSize: '18px', color: '#0f172a', fontWeight: '800' }}>{salida?.horas_viaje || 0} hrs</div>
+                                                </div>
+                                            </div>
+                                            <div style={{ background: '#fff', border: '1px solid #e2e8f0', padding: '16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                                <div style={{ background: '#ecfccb', color: '#65a30d', padding: '12px', borderRadius: '10px' }}>
+                                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                                </div>
+                                                <div>
+                                                    <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600' }}>DURACIÓN GENERAL</div>
+                                                    <div style={{ fontSize: '18px', color: '#0f172a', fontWeight: '800' }}>{salida?.duracion_dias || 1} días</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -299,31 +331,16 @@ export const VistaRevision = ({ salida: salidaList, onVolver, PanelDerecho }) =>
                                 </div>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
                                     <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                                        <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#64748b', fontWeight: 'bold', letterSpacing: '1px' }}>COSTO TOTAL MÁXIMO</span>
-                                        <div style={{ fontSize: '32px', fontWeight: '800', color: '#0f172a', margin: '8px 0' }}>{salida?.costo || '$4,500,000'} COP</div>
-                                        <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Incluye factores administrativos (10%)</p>
+                                        <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#64748b', fontWeight: 'bold', letterSpacing: '1px' }}>COSTO TOTAL PROYECTADO</span>
+                                        <div style={{ fontSize: '32px', fontWeight: '800', color: '#0f172a', margin: '8px 0' }}>
+                                            ${(salida?.costo_estimado || 0).toLocaleString('es-CO')} COP
+                                        </div>
+                                        <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Cálculo estimado basado en el itinerario completo.</p>
                                     </div>
                                 </div>
-                                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px', color: '#334155' }}>
-                                    <tbody>
-                                        <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-                                            <td style={{ padding: '16px 0', display: 'flex', alignItems: 'center', gap: '12px' }}><div style={{background: '#eff6ff', borderRadius: '8px', padding: '8px', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px'}}>🚌</div> <span style={{fontWeight: '500'}}>Transporte</span></td>
-                                            <td style={{ textAlign: 'right', fontWeight: '600' }}>$2,500,000</td>
-                                        </tr>
-                                        <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-                                            <td style={{ padding: '16px 0', display: 'flex', alignItems: 'center', gap: '12px' }}><div style={{background: '#eff6ff', borderRadius: '8px', padding: '8px', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px'}}>🏨</div> <span style={{fontWeight: '500'}}>Alojamiento</span></td>
-                                            <td style={{ textAlign: 'right', fontWeight: '600' }}>$1,200,000</td>
-                                        </tr>
-                                        <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-                                            <td style={{ padding: '16px 0', display: 'flex', alignItems: 'center', gap: '12px' }}><div style={{background: '#eff6ff', borderRadius: '8px', padding: '8px', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px'}}>🎟️</div> <span style={{fontWeight: '500'}}>Entradas</span></td>
-                                            <td style={{ textAlign: 'right', fontWeight: '600' }}>$500,000</td>
-                                        </tr>
-                                        <tr>
-                                            <td style={{ padding: '16px 0', display: 'flex', alignItems: 'center', gap: '12px' }}><div style={{background: '#eff6ff', borderRadius: '8px', padding: '8px', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px'}}>🛡️</div> <span style={{fontWeight: '500'}}>Imprevistos</span></td>
-                                            <td style={{ textAlign: 'right', fontWeight: '600' }}>$300,000</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <div style={{ background: '#eff6ff', padding: '16px', borderRadius: '8px', color: '#1e3a8a', fontSize: '14px', border: '1px solid #bfdbfe' }}>
+                                    <span style={{ fontWeight: 'bold' }}>Nota:</span> Para esta versión académica, el centro de costos proyectado se resume en el componente global y los gastos de movilidad basados en los {salida?.duracion_dias || 1} días proyectados.
+                                </div>
                             </div>
                         )}
                         {tabInfo !== 'general' && tabInfo !== 'itinerario' && tabInfo !== 'academicos' && tabInfo !== 'presupuesto' && (
@@ -391,7 +408,9 @@ export const VistaRevision = ({ salida: salidaList, onVolver, PanelDerecho }) =>
                 <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(3px)' }}>
                     <div style={{ background: '#fff', borderRadius: '12px', padding: '30px', width: '90%', maxWidth: '800px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', maxHeight: '90vh', overflowY: 'auto' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px', paddingBottom: '15px', borderBottom: '1px solid #e2e8f0' }}>
-                            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#ecfeff', color: '#0891b2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>ℹ️</div>
+                            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#ecfeff', color: '#0891b2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clipRule="evenodd" /></svg>
+                            </div>
                             <div>
                                 <h2 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>Información Principal</h2>
                                 <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>Configuración establecida por el profesor</span>
@@ -417,8 +436,8 @@ export const VistaRevision = ({ salida: salidaList, onVolver, PanelDerecho }) =>
                                 </div>
                                 <div>
                                     <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase' }}>DURACIÓN ESTIMADA</span>
-                                    <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: '8px', color: '#334155', fontSize: '14px', marginTop: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontWeight: '500' }}>{paradaVer.tiempo_estimado || '--'}</span>
+                                    <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: '8px', color: '#334155', fontSize: '15px', marginTop: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ fontWeight: '500' }}>{paradaVer.tiempo_estimado || paradaVer.tiempoEstimado || '--'}</span>
                                         <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 'bold' }}>MIN</span>
                                     </div>
                                 </div>
@@ -427,9 +446,11 @@ export const VistaRevision = ({ salida: salidaList, onVolver, PanelDerecho }) =>
                             {/* Fila 3 */}
                             <div>
                                 <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase' }}>PARADA ESPECÍFICA / DIRECCIÓN</span>
-                                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: '8px', color: '#334155', fontSize: '14px', marginTop: '6px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                                    <span>📍</span> 
-                                    <span>{paradaVer.actividad || 'Sin detallar'}</span>
+                                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: '8px', color: '#334155', fontSize: '15px', marginTop: '6px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                                    <div style={{ color: '#ef4444', flexShrink: 0, width: '18px', height: '18px' }}>
+                                        <svg viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 00.281-.145c.182-.1.422-.25.69-.44a13.684 13.684 0 001.986-1.725C14.866 14.89 16.5 12.29 16.5 9a6.5 6.5 0 10-13 0c0 3.29 1.634 5.89 3.209 7.612a13.684 13.684 0 001.986 1.725 8.007 8.007 0 00.69.44c.12.066.216.11.281.145l.018.008.006.003zM10 11.25a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" clipRule="evenodd" /></svg>
+                                    </div>
+                                    <span>{paradaVer.actividad || paradaVer.actividad || 'Sin detallar'}</span>
                                 </div>
                             </div>
                         </div>
@@ -437,23 +458,32 @@ export const VistaRevision = ({ salida: salidaList, onVolver, PanelDerecho }) =>
                         {/* Bloque 2: Programacion */}
                         <div style={{ marginTop: '30px', borderTop: '2px dashed #e2e8f0', paddingTop: '25px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-                                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#fffbeb', color: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>📅</div>
+                                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#fffbeb', color: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.75 2a.75.75 0 01.75.75V4h7V2.75a.75.75 0 011.5 0V4h.25A2.75 2.75 0 0118 6.75v8.5A2.75 2.75 0 0115.25 18H4.75A2.75 2.75 0 012 15.25v-8.5A2.75 2.75 0 014.75 4H5V2.75A.75.75 0 015.75 2zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75z" clipRule="evenodd" /></svg>
+                                </div>
                                 <h3 style={{ margin: 0, fontSize: '16px', color: '#0f172a' }}>Programación del Itinerario</h3>
                             </div>
 
                             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(200px, 1fr) minmax(200px, 1fr)', gap: '20px' }}>
                                 <div>
                                     <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase' }}>FECHA ESPECÍFICA</span>
-                                    <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: '8px', color: '#334155', fontSize: '14px', marginTop: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontWeight: '500' }}>{paradaVer.fechaProgramada || 'dd/mm/aaaa'}</span>
-                                        <span>📅</span>
+                                    <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: '8px', color: '#334155', fontSize: '15px', marginTop: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ fontWeight: '500' }}>{paradaVer.fechaProgramada || paradaVer.fecha_programada || 'dd/mm/aaaa'}</span>
+                                        <div style={{ color: '#94a3b8', width: '20px', height: '20px' }}>
+                                            <svg viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.75 2a.75.75 0 01.75.75V4h7V2.75a.75.75 0 011.5 0V4h.25A2.75 2.75 0 0118 6.75v8.5A2.75 2.75 0 0115.25 18H4.75A2.75 2.75 0 012 15.25v-8.5A2.75 2.75 0 014.75 4H5V2.75A.75.75 0 015.75 2zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75z" clipRule="evenodd" /></svg>
+                                        </div>
                                     </div>
                                 </div>
                                 <div>
                                     <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase' }}>HORA (APROX)</span>
-                                    <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: '8px', color: '#334155', fontSize: '14px', marginTop: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontWeight: '500' }}>{paradaVer.horaProgramada || '--:--'}</span>
-                                        <span>🕒</span>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px' }}>
+                                        <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '10px 18px', borderRadius: '8px', color: '#0f172a', fontSize: '16px', fontWeight: '700', minWidth: '60px', textAlign: 'center', letterSpacing: '2px' }}>
+                                            {(paradaVer.horaProgramada || paradaVer.hora_programada || '--:--').split(':')[0] || '--'}
+                                        </div>
+                                        <strong style={{ color: '#94a3b8', fontSize: '1.3rem' }}>:</strong>
+                                        <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '10px 18px', borderRadius: '8px', color: '#0f172a', fontSize: '16px', fontWeight: '700', minWidth: '60px', textAlign: 'center', letterSpacing: '2px' }}>
+                                            {(paradaVer.horaProgramada || paradaVer.hora_programada || '--:--').split(':')[1] || '--'}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
