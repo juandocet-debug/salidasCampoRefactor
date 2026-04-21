@@ -22,6 +22,7 @@ import PaginaCodigoEstudiante from '@/features/abordaje/presentacion/paginas/Pag
 import PaginaConstruccion from '@/shared/componentes/PaginaConstruccion/PaginaConstruccion';
 import CoordinadorDashboard from '@/features/coordinacion/CoordinadorDashboard';
 import ConsejoDashboard from '@/features/consejo/ConsejoDashboard';
+import CoordinadorLogisticaDashboard from '@/features/coordinadorLogistica/CoordinadorLogisticaDashboard';
 
 // ── Fallback de carga ─────────────────────────────────────────────
 function Cargando() {
@@ -36,18 +37,21 @@ function Cargando() {
   );
 }
 
-// Redirección dinámica basada en rol
-function RutaPorDefecto({ usuario }) {
-  if (usuario?.rol === 'coordinador_academico') {
-    return <Navigate to="/revisiones" replace />;
-  }
+// Redirección dinámica general
+function RutaPorDefecto() {
   return <Navigate to="/tablero" replace />;
 }
 
-// Proteger Tablero devolviendo al coordinador a revisiones
+// Renderizar el dashboard exacto de cada rol bajo la URL genérica /tablero
 function ControlTablero({ usuario }) {
   if (usuario?.rol === 'coordinador_academico') {
-    return <Navigate to="/revisiones" replace />;
+    return <CoordinadorDashboard />;
+  }
+  if (usuario?.rol === 'consejo_facultad' || usuario?.rol === 'consejo') {
+    return <ConsejoDashboard />;
+  }
+  if (usuario?.rol === 'coordinador_salidas') {
+    return <CoordinadorLogisticaDashboard />;
   }
   return <PaginaTablero />;
 }
@@ -83,6 +87,7 @@ export default function App() {
             <Route path="/herramientas" element={<PanelHerramientas />} />
             <Route path="/checklist" element={<PaginaConstruccion />} />
             <Route path="/novedades" element={<PaginaConstruccion />} />
+            <Route path="/logistica" element={<CoordinadorLogisticaDashboard />} />
             {/* Abordaje: conductor verifica / estudiante ve su código */}
             <Route path="/abordaje/:salidaId" element={<PaginaVerificacionAbordaje />} />
             <Route path="/mi-codigo/:salidaId" element={<PaginaCodigoEstudiante />} />

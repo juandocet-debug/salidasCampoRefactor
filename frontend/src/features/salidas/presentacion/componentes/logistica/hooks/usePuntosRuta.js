@@ -164,8 +164,15 @@ export default function usePuntosRuta(form, setForm) {
     useRutaIA(puntosRetorno, rutaInfoRetorno.distancia_km, setRutaInfoRetorno, 'RETORNO');
 
     // ── Tiempos calculados (conducción + paradas) ─────────────────────────────
-    const tiempos        = useMemo(() => calcularTiemposTramo(puntosRuta,    rutaInfoIda.duracion_min),    [puntosRuta,    rutaInfoIda]);
-    const tiemposRetorno = useMemo(() => calcularTiemposTramo(puntosRetorno, rutaInfoRetorno.duracion_min), [puntosRetorno, rutaInfoRetorno]);
+    const tiempos = useMemo(() => calcularTiemposTramo(puntosRuta, rutaInfoIda.duracion_min), [puntosRuta, rutaInfoIda]);
+    // Para el retorno: si la IA aún no calculó duracion_min (=0) usar el tiempo de ida como referencia
+    // (misma ruta invertida = mismo tiempo aprox)
+    const duracionRetornoEfectiva = rutaInfoRetorno.duracion_min > 0
+        ? rutaInfoRetorno.duracion_min
+        : rutaInfoIda.duracion_min > 0
+            ? rutaInfoIda.duracion_min   // espejo de ida: misma ruta = mismo tiempo
+            : 0;
+    const tiemposRetorno = useMemo(() => calcularTiemposTramo(puntosRetorno, duracionRetornoEfectiva), [puntosRetorno, rutaInfoRetorno, rutaInfoIda]);
 
     // ── Persistir en form padre ────────────────────────────────────────────────
     useEffect(() => {

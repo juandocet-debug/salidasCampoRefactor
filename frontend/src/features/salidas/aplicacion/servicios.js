@@ -417,13 +417,38 @@ export async function buscarPueblosEnRuta(puntosRuta, routeCoords = null) {
     if (!oriNombre && !oriCoords) return [];
     if (!dstNombre && !dstCoords) return [];
 
-    // Incluir coordenadas en la key para que rutas con mismo nombre pero diferente destino no colisionen
     const oriKey = oriCoords ? `${ori.lat?.toFixed(2)},${ori.lng?.toFixed(2)}` : oriNombre;
     const dstKey = dstCoords ? `${dst.lat?.toFixed(2)},${dst.lng?.toFixed(2)}` : dstNombre;
     const key = `${oriKey}__${dstKey}`;
     if (_cache.has(key)) return _cache.get(key);
 
-    // ── ÚNICO ORIGEN: GEMINI (datos verídicos) ──────────────────────────
+    // ── PRIORIDAD 1: Coordenadas reales del mapa → Overpass (100% preciso) ──
+    // Si tenemos el polyline real de la ruta trazada, usamos esas coords GPS
+    // para encontrar municipios exactamente sobre el camino dibujado.
+    const roadPts = routeCoords && routeCoords.length > 10 ? routeCoords : null;
+
+    if (roadPts && oriCoords && dstCoords) {
+        try {
+            console.log('[Pueblos] Usando coordenadas reales de ruta → Overpass');
+            const candidatos = await filtrarConOverpass(roadPts, oriCoords, dstCoords);
+            if (candidatos.length > 0) {
+                const resultado = candidatos.map((m, i) => ({
+                    id: `ov_${i}_${m.nombre}`,
+                    nombre: m.nombre,
+                    depto: m.depto || 'Colombia',
+                    lat: m.lat, lng: m.lng,
+                    kmDesdeOrigen: m.kmDesdeOrigen,
+                    prioridad: 1, foto: null, descripcion: null, wikiUrl: null, _enriquecido: false,
+                }));
+                _cache.set(key, resultado);
+                return resultado;
+            }
+        } catch (e) {
+            console.warn('[Pueblos] Overpass falló, intentando Gemini', e.message);
+        }
+    }
+
+    // ── PRIORIDAD 2: Gemini (fallback si no hay coordenadas reales) ──────────
     const geminiLista = await buscarConGemini(oriNombre, dstNombre);
     if (geminiLista?.length) {
         const distApprox = (oriCoords && dstCoords)
@@ -444,8 +469,8 @@ export async function buscarPueblosEnRuta(puntosRuta, routeCoords = null) {
         return resultado;
     }
 
-    // Si Gemini no disponible → vacío (no mostrar datos no verídicos)
-    console.warn('[Pueblos] Gemini no disponible — no se muestran pueblos');
+    // Sin opciones
+    console.warn('[Pueblos] Sin datos disponibles — Overpass y Gemini fallaron');
     return [];
 }
 
@@ -514,6 +539,7 @@ export async function cargarSalidaParaEdicion(editarId, token) {
         fecha_fin: data.fecha_fin || '',
         hora_inicio: data.hora_inicio || '',
         hora_fin: data.hora_fin || '',
+        hora_fin_manual: !!data.hora_fin,   // si cargó del backend, respetarla
         justificacion: data.justificacion || '',
         resumen: data.resumen || '',
         relacion_syllabus: data.relacion_syllabus || '',

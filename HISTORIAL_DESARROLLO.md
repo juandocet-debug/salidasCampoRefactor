@@ -1,5 +1,23 @@
 # Historial de Desarrollo - OTIUM (Salidas de Campo)
 
+## [21 de Abril de 2026] - Reestructuración UX/UI del Perfil Logístico y Consejo
+
+### 🎯 Logros Principales
+- **Reestructuración de UI Logística (UX Premium):** Transformación total del Dashboard Logístico. Se reemplazaron tablas con datos genéricos / emojis por un sistema de Listado Acordeón estandarizado. Al hacer clic, despliega un sub-panel grid altamente pulido y 100% enfocado en transporte.
+- **Micro-Segmentación de Roles (Frontend):** Se limpió el ruido visual (Justificaciones y Objetivos Pedagógicos) en la vista Logística para mostrar solo "Resumen Estratégico", "Manifiesto de Pasajeros" e "Itinerario Técnico" (Km, Tiempos, Costos y Viáticos). 
+- **Integración de Capas (Dominio - ORM):** Alteración directa sobre el `ValueObjectsLogistica.py` (DTO) y el Repositorio de BD del backend (Arquitectura Hexagonal). Ahora el equipo de transporte recibe por fin datos calculados reales (Horas exactas de salida/llegada, desagregación de Estudiantes vs Docentes y proyección de costo real de viáticos sincronizando con `costoUtils.js`).
+- **Vista de Consejo:** Finalización del despliegue en cascada del Consejo de Facultad para la lectura expedita de los radicados pedagógicos en curso.
+
+### 🛠️ Retos Encontrados
+- **Disidencia de DTOs BD a UI:** Se notó que los ValueObjects de la capa Logística no contenían detalles críticos de pasajeros ni fechas formales, sino la identificación básica del viaje. Se logró permear la estructura originada en Core hasta el Repositorio sin romper los contratos del flujo Hexagonal.
+- **Aproximación de Viáticos Nativos:** Se descubrió que la plataforma estimaba viáticos dinámicamente en UI basado en la duración de días pero no lo persistía aislado. Se resolvió extrapolando el algoritmo interno (`min 0.5, duracionDias - 0.5`) hacia el modelo de presentación Py.
+
+### 🚀 Próximos Pasos Proyectados
+- **Flujo de Acciones de Asignación Logística:** Habilitar y conectar a DB de transporte los formularios interactivos que empuja el botón "Asignar", seleccionando Empresas o Vehículos Propios.
+- **Módulo de Cierre Operativo:** Desarrollar el flujo del conductor/supervisor donde se hace checklist y registro del cuentakilómetros real al regreso de la universidad.
+
+---
+
 ## [17 de Abril de 2026] - Refactorización de Dashboard de Coordinación y Endpoints Core
 
 ### 🎯 Logros Principales

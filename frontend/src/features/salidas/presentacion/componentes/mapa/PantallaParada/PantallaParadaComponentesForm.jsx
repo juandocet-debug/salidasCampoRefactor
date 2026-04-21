@@ -136,8 +136,37 @@ export function BloqueProgramacion({ form, set, fechasViaje, fechaInicioSalida, 
                 </label>
                 <label className="pp-campo">
                     <span className="pp-label">Hora (Aprox)</span>
-                    <input className="pp-input" type="time" value={form.horaProgramada}
-                        onChange={e => set('horaProgramada', e.target.value)} />
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <select
+                            className="pp-select"
+                            value={(form.horaProgramada || '').split(':')[0] || ''}
+                            onChange={e => {
+                                const m = (form.horaProgramada || '').split(':')[1] || '00';
+                                set('horaProgramada', `${e.target.value}:${m}`);
+                            }}
+                            style={{ width: '75px', textAlign: 'center' }}
+                        >
+                            <option value="" disabled>HH</option>
+                            {Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0')).map(h => (
+                                <option key={h} value={h}>{h}</option>
+                            ))}
+                        </select>
+                        <strong style={{ color: '#64748b', fontSize: '1.2rem' }}>:</strong>
+                        <select
+                            className="pp-select"
+                            value={(form.horaProgramada || '').split(':')[1] || ''}
+                            onChange={e => {
+                                const h = (form.horaProgramada || '').split(':')[0] || '08';
+                                set('horaProgramada', `${h}:${e.target.value}`);
+                            }}
+                            style={{ width: '75px', textAlign: 'center' }}
+                        >
+                            <option value="" disabled>MM</option>
+                            {Array.from({ length: 12 }, (_, i) => (i * 5).toString().padStart(2, '0')).map(m => (
+                                <option key={m} value={m}>{m}</option>
+                            ))}
+                        </select>
+                    </div>
                 </label>
             </div>
         </div>
@@ -161,8 +190,12 @@ export function BloqueNotas({ form, set }) {
                 <label className="pp-campo pp-campo--full">
                     <span className="pp-label">Notas Privadas / Recordatorios (Itinerario)</span>
                     <input className="pp-input" type="text" value={form.notasItinerario}
+                        maxLength={15}
                         onChange={e => set('notasItinerario', e.target.value)}
                         placeholder="Ej: Llevar hidratación, contactar al guía." />
+                    <small style={{ color: form.notasItinerario.length >= 15 ? '#ef4444' : '#94a3b8', fontSize: '0.7rem', textAlign: 'right' }}>
+                        {form.notasItinerario.length}/15
+                    </small>
                 </label>
             </div>
         </div>

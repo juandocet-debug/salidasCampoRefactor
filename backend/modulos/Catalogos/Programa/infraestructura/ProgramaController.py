@@ -7,6 +7,7 @@ from ..aplicacion.ProgramaCreate.ProgramaCreate import ProgramaCreate
 from ..aplicacion.ProgramaGetAll.ProgramaGetAll import ProgramaGetAll
 from ..aplicacion.ProgramaEdit.ProgramaEdit import ProgramaEdit
 from ..aplicacion.ProgramaDelete.ProgramaDelete import ProgramaDelete
+from modulos.Catalogos.Materia.infraestructura.DjangoMateriaRepository import DjangoMateriaRepository
 
 class ProgramaController(APIView):
     def get(self, request, pk=None, *args, **kwargs):
@@ -15,7 +16,8 @@ class ProgramaController(APIView):
             # Lógica para un GET por ID. (Omitido por concisión de Ticket)
             pass
         else:
-            caso_uso = ProgramaGetAll(repository=repo)
+            repo_mat = DjangoMateriaRepository()
+            caso_uso = ProgramaGetAll(repository=repo, materia_repository=repo_mat)
             return Response(caso_uso.run())
 
     def post(self, request, *args, **kwargs):
@@ -54,9 +56,14 @@ class ProgramaController(APIView):
 
     def delete(self, request, pk, *args, **kwargs):
         repo = DjangoProgramaRepository()
-        caso_uso = ProgramaDelete(repository=repo)
+        repo_mat = DjangoMateriaRepository()
+        caso_uso = ProgramaDelete(repository=repo, materia_repository=repo_mat)
         try:
             caso_uso.run(id_val=pk)
             return Response({"message": "Programa eliminado con éxito"}, status=status.HTTP_200_OK)
         except ValueError as e:
-            return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

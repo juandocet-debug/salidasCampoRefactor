@@ -8,6 +8,7 @@ from modulos.Usuarios.infraestructura.UsuarioController import UsuarioController
 from modulos.Catalogos.Facultad.infraestructura.FacultadController import FacultadController, CatalogoController
 from modulos.Catalogos.Programa.infraestructura.ProgramaController import ProgramaController
 from modulos.Catalogos.Ventana.infraestructura.VentanaController import VentanaController
+from modulos.Catalogos.Materia.infraestructura.MateriaController import MateriaController
 from modulos.Logistica.Vehiculo.infraestructura.VehiculoController import VehiculoController
 from modulos.Logistica.Vehiculo.infraestructura.VehiculoIAController import VehiculoIAController
 from modulos.Logistica.Parametro.infraestructura.ParametroController import ParametroController
@@ -25,10 +26,14 @@ urlpatterns = [
     # Rutas para Programa
     path('api/programas/', ProgramaController.as_view()),
     path('api/programas/<int:pk>/', ProgramaController.as_view()),
-    
+
     # Rutas para Ventana
     path('api/ventanas/', VentanaController.as_view()),
     path('api/ventanas/<int:pk>/', VentanaController.as_view()),
+
+    # Rutas para Materia
+    path('api/materias/', MateriaController.as_view()),
+    path('api/materias/<int:pk>/', MateriaController.as_view()),
     
     # Rutas para Usuarios
     path('api/usuarios/', UsuarioController.as_view()),
@@ -58,6 +63,7 @@ urlpatterns = [
     path('api/salidas/itinerario/paradas/', include('modulos.Salidas.Itinerario.Parada.infraestructura.urls')),
     path('api/salidas/coordinacion/', include('modulos.Salidas.Coordinacion.infraestructura.urls')),
     path('api/salidas/consejo/', include('modulos.Salidas.Consejo.infraestructura.urls')),
+    path('api/salidas/logistica/', include('modulos.Salidas.CoordinadorLogistica.infraestructura.urls')),
 
     # Rutas para Administrador del Sistema — Gestión de Salidas
     path('api/admin/salidas/', AdminSalidasController.as_view(), name='admin-salidas-list'),

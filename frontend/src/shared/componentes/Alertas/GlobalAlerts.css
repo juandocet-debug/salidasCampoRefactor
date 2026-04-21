@@ -1,102 +1,104 @@
 .otium-global-alerts {
     position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 10000;
-    /* Asegurarse de que esté sobre todo */
+    top: 24px;
+    right: 24px;
+    z-index: 99999;
     display: flex;
     flex-direction: column;
     gap: 12px;
     pointer-events: none;
-    /* No bloquear clicks debajo del contenedor */
 }
 
 .otium-alert {
     pointer-events: auto;
-    /* Sí bloquear en las alertas */
     display: flex;
     align-items: center;
-    background: white;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
     min-width: 300px;
-    max-width: 450px;
+    max-width: 420px;
     border-radius: 12px;
-    padding: 16px;
-    gap: 16px;
-    animation: otium-slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    border-left: 6px solid #cbd5e1;
-    font-family: var(--fuente), sans-serif;
+    padding: 14px 18px;
+    gap: 14px;
+    animation: otium-slide-in-smooth 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    font-family: 'Inter', system-ui, sans-serif;
+    color: #1e293b;
+    position: relative;
+    overflow: hidden;
 }
 
-.otium-alert--exito {
-    border-left-color: #10b981;
+/* Elegante tira de color a la izquierda para identificar el tipo de alerta */
+.otium-alert::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    border-radius: 4px 0 0 4px;
 }
 
-.otium-alert--exito .otium-alert__icon {
-    color: #10b981;
+.otium-alert--exito::before { background: #10b981; }
+.otium-alert--error::before { background: #ef4444; }
+.otium-alert--info::before { background: #3b82f6; }
+.otium-alert--advertencia::before { background: #f59e0b; }
+
+/* Contenedor del ícono minimalista */
+.otium-alert__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    flex-shrink: 0;
 }
 
-.otium-alert--error {
-    border-left-color: #ef4444;
-}
+.otium-alert--exito .otium-alert__icon { background: #ecfdf5; color: #10b981; }
+.otium-alert--error .otium-alert__icon { background: #fef2f2; color: #ef4444; }
+.otium-alert--info .otium-alert__icon { background: #eff6ff; color: #3b82f6; }
+.otium-alert--advertencia .otium-alert__icon { background: #fffbeb; color: #f59e0b; }
 
-.otium-alert--error .otium-alert__icon {
-    color: #ef4444;
-}
+.otium-alert__icon svg { width: 18px; height: 18px; stroke-width: 2.5px; }
 
-.otium-alert--info {
-    border-left-color: #4A8DAC;
-}
-
-.otium-alert--info .otium-alert__icon {
-    color: #4A8DAC;
-}
-
-.otium-alert--advertencia {
-    border-left-color: #f59e0b;
-}
-
-.otium-alert--advertencia .otium-alert__icon {
-    color: #f59e0b;
-}
-
-.otium-alert__icon svg {
-    width: 24px;
-    height: 24px;
-    display: block;
-}
-
+/* Texto de la alerta */
 .otium-alert__content {
     flex: 1;
-    font-size: 0.95rem;
-    color: #1e293b;
+    font-size: 0.92rem;
     font-weight: 500;
     line-height: 1.4;
+    color: #334155;
+    letter-spacing: -0.1px;
 }
 
+/* Botón cerrar suave y sutil */
 .otium-alert__close {
     background: transparent;
     border: none;
     color: #94a3b8;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     cursor: pointer;
     line-height: 1;
-    padding: 0 4px;
-    transition: color 0.2s;
+    padding: 0;
+    margin-right: -4px;
+    transition: all 0.2s ease;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
 }
 
 .otium-alert__close:hover {
     color: #0f172a;
+    background: #f1f5f9;
 }
 
-@keyframes otium-slide-in {
-    from {
-        transform: translateX(100%) opacity(0);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateX(0) opacity(1);
-        opacity: 1;
-    }
+/* Animación de entrada suave en lugar del rebote brusco */
+@keyframes otium-slide-in-smooth {
+    0% { transform: translateY(-15px) scale(0.98); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
 }

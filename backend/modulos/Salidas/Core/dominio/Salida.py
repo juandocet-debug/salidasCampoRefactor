@@ -14,6 +14,7 @@ from modulos.Salidas.Core.dominio.ProfesorId import ProfesorId
 from modulos.Salidas.Core.dominio.SalidaFechaInicio import SalidaFechaInicio
 from modulos.Salidas.Core.dominio.SalidaFechaFin import SalidaFechaFin
 from modulos.Salidas.Core.dominio.SalidaHoraInicio import SalidaHoraInicio
+from modulos.Salidas.Core.dominio.SalidaHoraFin import SalidaHoraFin
 from modulos.Salidas.Core.dominio.SalidaDistanciaTotalKm import SalidaDistanciaTotalKm
 from modulos.Salidas.Core.dominio.SalidaDuracionDias import SalidaDuracionDias
 from modulos.Salidas.Core.dominio.SalidaHorasViaje import SalidaHorasViaje
@@ -36,6 +37,7 @@ class Salida:
     fecha_inicio: SalidaFechaInicio
     fecha_fin: SalidaFechaFin
     hora_inicio: SalidaHoraInicio
+    hora_fin: SalidaHoraFin
     distancia_total_km: SalidaDistanciaTotalKm
     duracion_dias: SalidaDuracionDias
     horas_viaje: SalidaHorasViaje

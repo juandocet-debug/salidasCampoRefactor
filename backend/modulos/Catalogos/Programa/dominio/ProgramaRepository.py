@@ -19,3 +19,8 @@ class ProgramaRepository(ABC):
     @abstractmethod
     def delete(self, id: ProgramaId) -> None:
         pass
+
+    @abstractmethod
+    def get_by_facultad_id(self, facultad_id: int) -> List[Programa]:
+        """Retorna todos los programas asociados a una facultad."""
+        pass

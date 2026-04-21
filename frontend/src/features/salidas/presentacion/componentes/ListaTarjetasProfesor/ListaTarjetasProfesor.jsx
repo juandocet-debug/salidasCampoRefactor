@@ -65,14 +65,12 @@ const fmtFechaHora = (fecha, hora) => {
 };
 
 // ── Componente principal ──────────────────────────────────────────────────────
-const ListaTarjetasProfesor = ({ salidas = [], cargando = false, onSalidaEliminada }) => {
+const ListaTarjetasProfesor = ({ salidas = [], cargando = false, onSalidaEliminada, onSalidaEnviada }) => {
     const navigate = useNavigate();
     const { token } = useAutenticacion();
     const { agregarAlerta } = useAlertas();
     const [salidaABorrar, setSalidaABorrar] = useState(null);
     const [borrando, setBorrando] = useState(false);
-
-    const esBorrador = (estado) => estado === 'borrador';
 
     const handleEditar = (salida) => navigate(`/nueva-salida?editar=${salida.id}`);
 
@@ -110,7 +108,8 @@ const ListaTarjetasProfesor = ({ salidas = [], cargando = false, onSalidaElimina
                 {salidas.map(salida => {
                     const IcoComponent = ICONOS[salida.icono] || ICONOS['IcoMap'];
                     const cardColor = salida.color || '#4A8DAC';
-                    const puedeEditar = esBorrador(salida.estado);
+                    const est = (salida.estado || '').toLowerCase();
+                    const puedeEditar = ['borrador', 'pendiente_ajuste', 'rechazada'].includes(est);
                     const isLight = colorEsClaro(cardColor);
 
                     const claseTema = isLight ? 'card-new--light' : 'card-new--dark';
@@ -134,6 +133,11 @@ const ListaTarjetasProfesor = ({ salidas = [], cargando = false, onSalidaElimina
                             <div className="card-new__content" style={{ zIndex: 1 }}>
                                 {/* Encabezado: Titulo y Subtítulo */}
                                 <div className="card-new__header">
+                                    {(est === 'pendiente_ajuste' || est === 'rechazada') && (
+                                        <div style={{ display: 'inline-block', marginBottom: '8px', padding: '4px 10px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '12px', fontSize: '10px', fontWeight: '800', color: '#b45309', letterSpacing: '0.5px' }}>
+                                            ⚠️ AJUSTES REQ. · {salida.decision_consejo ? 'CONSEJO' : 'COORD.'}
+                                        </div>
+                                    )}
                                     <h3 className="card-new__title">{salida.nombre || 'Sin Nombre'}</h3>
                                     <p className="card-new__subtitle">{truncarPalabras(salida.resumen || salida.asignatura)}</p>
                                 </div>
@@ -142,6 +146,11 @@ const ListaTarjetasProfesor = ({ salidas = [], cargando = false, onSalidaElimina
                                 <div className="card-new__actions-top">
                                     {puedeEditar ? (
                                         <>
+                                            <button className="c-btn-action top-btn c-btn-action--enviar" onClick={(e) => { e.stopPropagation(); if(onSalidaEnviada) onSalidaEnviada(salida); }} title="Enviar a revisión">
+                                                <span className="action-circle">
+                                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                                                </span>
+                                            </button>
                                             <button className="c-btn-action top-btn c-btn-action--editar" onClick={(e) => { e.stopPropagation(); handleEditar(salida); }} title="Editar Salida">
                                                 <span className="action-circle">
                                                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
@@ -165,7 +174,16 @@ const ListaTarjetasProfesor = ({ salidas = [], cargando = false, onSalidaElimina
                                 {/* Mini-ticket Salida → Llegada */}
                                 {(salida.fecha_inicio || salida.fecha_fin) && (() => {
                                     const sal = fmtFechaHora(salida.fecha_inicio, salida.hora_inicio);
-                                    const lle = fmtFechaHora(salida.fecha_fin, salida.hora_fin);
+                                    let horaEfectivaLle = salida.hora_fin;
+                                    if (!horaEfectivaLle && salida.hora_inicio) {
+                                        const hv = Number(salida.horas_viaje) || 0;
+                                        const [h, m] = salida.hora_inicio.split(':').map(Number);
+                                        const totalMin = (h * 60 + m) + Math.round(hv * 60);
+                                        const hLlegada = Math.floor(totalMin / 60) % 24;
+                                        const mLlegada = totalMin % 60;
+                                        horaEfectivaLle = `${String(hLlegada).padStart(2, '0')}:${String(mLlegada).padStart(2, '0')}`;
+                                    }
+                                    const lle = fmtFechaHora(salida.fecha_fin, horaEfectivaLle);
                                     if (!sal && !lle) return null;
                                     return (
                                         <div className="card-ticket">

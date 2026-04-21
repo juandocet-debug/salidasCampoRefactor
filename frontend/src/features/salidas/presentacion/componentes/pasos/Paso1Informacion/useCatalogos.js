@@ -4,6 +4,7 @@ import { clienteHttp } from '@/shared/api/clienteHttp';
 export function useCatalogos() {
     const [facultades, setFacultades] = useState([]);
     const [programas,  setProgramas]  = useState([]);
+    const [materias,   setMaterias]   = useState([]);
     const [ventanas,   setVentanas]   = useState([]);
     const [cargando,   setCargando]   = useState(true);
 
@@ -14,6 +15,7 @@ export function useCatalogos() {
                 if (d.ok && d.datos) {
                     setFacultades(d.datos.facultades || []);
                     setProgramas(d.datos.programas  || []);
+                    setMaterias(d.datos.materias    || []);
                     setVentanas(d.datos.ventanas    || []);
                 }
             })
@@ -21,5 +23,5 @@ export function useCatalogos() {
             .finally(() => setCargando(false));
     }, []);
 
-    return { facultades, programas, ventanas, cargando };
+    return { facultades, programas, materias, ventanas, cargando };
 }

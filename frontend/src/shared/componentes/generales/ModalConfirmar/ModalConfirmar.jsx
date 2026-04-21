@@ -30,6 +30,7 @@ export default function ModalConfirmar({
     titulo      = '¿Eliminar elemento?',
     descripcion,
     labelConfirmar = 'Sí, eliminar',
+    labelCancelar  = 'Cancelar',
     labelCargando  = 'Procesando...',
     cargando    = false,
     tipo        = 'peligro', // 'peligro' | 'accion'
@@ -53,15 +54,17 @@ export default function ModalConfirmar({
                         onClick={onCancelar}
                         disabled={cargando}
                     >
-                        Cancelar
+                        {labelCancelar || 'Cancelar'}
                     </button>
-                    <button
-                        className={`otm-confirmar__boton otm-confirmar__boton--${tipo}`}
-                        onClick={onConfirmar}
-                        disabled={cargando}
-                    >
-                        {cargando ? labelCargando : labelConfirmar}
-                    </button>
+                    {labelConfirmar !== null && (
+                        <button
+                            className={`otm-confirmar__boton otm-confirmar__boton--${tipo}`}
+                            onClick={onConfirmar}
+                            disabled={cargando}
+                        >
+                            {cargando ? labelCargando : labelConfirmar}
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

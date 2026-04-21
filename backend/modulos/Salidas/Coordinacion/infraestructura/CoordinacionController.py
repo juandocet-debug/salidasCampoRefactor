@@ -31,7 +31,20 @@ class SalidasPendientesCoordinadorController(APIView):
             metadata_repo=DjangoSalidaMetadataRepository(),
         )
         dtos = caso_uso.ejecutar()
-        return Response([dto.to_dict() for dto in dtos], status=status.HTTP_200_OK)
+        
+        from modulos.Usuarios.infraestructura.models import UsuarioModel
+        from modulos.Catalogos.Programa.infraestructura.models import ProgramaModel
+        usuarios_dict = {u.id: f"{u.nombre} {u.apellido}".strip() for u in UsuarioModel.objects.all()}
+        programas_dict = {p.id: p.nombre for p in ProgramaModel.objects.all()}
+        
+        data = []
+        for dto in dtos:
+            d = dto.to_dict()
+            d['profesor_nombre'] = usuarios_dict.get(d['profesor_id'], 'Docente')
+            d['programa'] = programas_dict.get(d['programa_id'], '')
+            data.append(d)
+            
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class SalidasAprobadasCoordinadorController(APIView):
@@ -44,7 +57,20 @@ class SalidasAprobadasCoordinadorController(APIView):
             metadata_repo=DjangoSalidaMetadataRepository(),
         )
         dtos = caso_uso.ejecutar()
-        return Response([dto.to_dict() for dto in dtos], status=status.HTTP_200_OK)
+        
+        from modulos.Usuarios.infraestructura.models import UsuarioModel
+        from modulos.Catalogos.Programa.infraestructura.models import ProgramaModel
+        usuarios_dict = {u.id: f"{u.nombre} {u.apellido}".strip() for u in UsuarioModel.objects.all()}
+        programas_dict = {p.id: p.nombre for p in ProgramaModel.objects.all()}
+        
+        data = []
+        for dto in dtos:
+            d = dto.to_dict()
+            d['profesor_nombre'] = usuarios_dict.get(d['profesor_id'], 'Docente')
+            d['programa'] = programas_dict.get(d['programa_id'], '')
+            data.append(d)
+            
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class RegistrarRevisionController(APIView):

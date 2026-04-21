@@ -15,7 +15,9 @@ from modulos.Salidas.Core.dominio.ProfesorId import ProfesorId
 from modulos.Salidas.Core.dominio.SalidaFechaInicio import SalidaFechaInicio
 from modulos.Salidas.Core.dominio.SalidaFechaFin import SalidaFechaFin
 from modulos.Salidas.Core.dominio.SalidaHoraInicio import SalidaHoraInicio
+from modulos.Salidas.Core.dominio.SalidaHoraFin import SalidaHoraFin
 from modulos.Salidas.Core.dominio.SalidaDistanciaTotalKm import SalidaDistanciaTotalKm
+
 from modulos.Salidas.Core.dominio.SalidaDuracionDias import SalidaDuracionDias
 from modulos.Salidas.Core.dominio.SalidaHorasViaje import SalidaHorasViaje
 from modulos.Salidas.Core.dominio.SalidaCostoEstimado import SalidaCostoEstimado
@@ -50,6 +52,7 @@ class DjangoSalidaRepository(SalidaRepository):
             fecha_inicio=SalidaFechaInicio(model_obj.fecha_inicio),
             fecha_fin=SalidaFechaFin(model_obj.fecha_fin),
             hora_inicio=SalidaHoraInicio(model_obj.hora_inicio),
+            hora_fin=SalidaHoraFin(model_obj.hora_fin),
             distancia_total_km=SalidaDistanciaTotalKm(model_obj.distancia_total_km),
             duracion_dias=SalidaDuracionDias(model_obj.duracion_dias),
             horas_viaje=SalidaHorasViaje(model_obj.horas_viaje),
@@ -75,6 +78,7 @@ class DjangoSalidaRepository(SalidaRepository):
             'fecha_inicio': salida.fecha_inicio.value,
             'fecha_fin': salida.fecha_fin.value,
             'hora_inicio': salida.hora_inicio.value,
+            'hora_fin': salida.hora_fin.value,
             'distancia_total_km': salida.distancia_total_km.value,
             'duracion_dias': salida.duracion_dias.value,
             'horas_viaje': salida.horas_viaje.value,

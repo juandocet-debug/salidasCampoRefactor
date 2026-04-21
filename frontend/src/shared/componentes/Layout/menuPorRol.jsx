@@ -51,8 +51,9 @@ const MENUS = {
     ],
     coordinador_salidas: [
         {
-            titulo: 'Panel', items: [
-                { etiqueta: 'Tablero', ruta: '/tablero', icono: Ico.tablero },
+            titulo: 'Logística de Salidas', items: [
+                { etiqueta: 'Gestión Operativa', ruta: '/logistica', icono: Ico.transporte },
+                { etiqueta: 'Presupuesto', ruta: '/presupuesto', icono: Ico.presupuesto },
                 { etiqueta: 'Parámetros', ruta: '/parametros', icono: Ico.parametros },
             ]
         },

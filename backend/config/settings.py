@@ -42,6 +42,7 @@ APPS_PROYECTO = [
     'modulos.Catalogos.Facultad.infraestructura',
     'modulos.Catalogos.Programa.infraestructura',
     'modulos.Catalogos.Ventana.infraestructura',
+    'modulos.Catalogos.Materia.infraestructura',
     'modulos.Logistica.Vehiculo.infraestructura',
     'modulos.Logistica.Parametro.infraestructura',
     'modulos.Salidas.Core.infraestructura',

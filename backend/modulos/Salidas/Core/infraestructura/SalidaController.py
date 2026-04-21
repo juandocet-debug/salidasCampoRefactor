@@ -123,6 +123,7 @@ class SalidaController(APIView):
                 'fecha_inicio': str(salida.fecha_inicio.value) if salida.fecha_inicio.value else None,
                 'fecha_fin': str(salida.fecha_fin.value) if salida.fecha_fin.value else None,
                 'hora_inicio': str(salida.hora_inicio.value) if salida.hora_inicio.value else None,
+                'hora_fin': str(salida.hora_fin.value) if salida.hora_fin.value else None,
                 'distancia_total_km': float(salida.distancia_total_km.value or 0),
                 'duracion_dias': float(salida.duracion_dias.value or 1),
                 'horas_viaje': float(salida.horas_viaje.value or 0),
@@ -163,11 +164,25 @@ class SalidaController(APIView):
             from modulos.Salidas.Core.infraestructura.models import SalidaModelo
             modelos_dict = {m.id: m for m in SalidaModelo.objects.all()}
             
-            # Obtener Revisiones Pedagógicas (para feedback)
+            # Obtener Revisiones Pedagógicas (para feedback del Coordinador)
             from modulos.Salidas.Coordinacion.infraestructura.models import RevisionPedagogicaModel
             revisiones = RevisionPedagogicaModel.objects.all()
             revisiones_dict = {r.salida_id: r for r in revisiones}
+
+            # Obtener Decisiones del Consejo (para distinguir quién pidió ajustes)
+            from modulos.Salidas.Consejo.infraestructura.models import DecisionConsejoModel
+            decisiones_consejo = DecisionConsejoModel.objects.all()
+            decisiones_consejo_dict = {d.salida_id: d for d in decisiones_consejo}
             
+            # Resolver usuarios y extras para mapeo
+            from modulos.Usuarios.infraestructura.models import UsuarioModel
+            from modulos.Catalogos.Programa.infraestructura.models import ProgramaModel
+            from modulos.Catalogos.Facultad.infraestructura.models import FacultadModel
+            
+            usuarios_dict = {u.id: f"{u.nombre} {u.apellido}".strip() for u in UsuarioModel.objects.all()}
+            programas_dict = {p.id: p.nombre for p in ProgramaModel.objects.all()}
+            facultades_dict = {f.id: f.nombre for f in FacultadModel.objects.all()}
+
             data = [{
                 'id': s.id.value, 
                 'codigo': s.codigo.value, 
@@ -177,13 +192,22 @@ class SalidaController(APIView):
                 'fecha_inicio': getattr(s.fecha_inicio, 'value', s.fecha_inicio),
                 'fecha_fin': getattr(s.fecha_fin, 'value', s.fecha_fin),
                 'hora_inicio': getattr(s.hora_inicio, 'value', s.hora_inicio),
+                'hora_fin': getattr(s.hora_fin, 'value', s.hora_fin),
                 'icono': modelos_dict[s.id.value].icono if s.id.value in modelos_dict and modelos_dict[s.id.value].icono else 'IcoMountain',
                 'color': modelos_dict[s.id.value].color if s.id.value in modelos_dict and modelos_dict[s.id.value].color else '#16a34a',
                 'num_estudiantes': getattr(s.num_estudiantes, 'value', s.num_estudiantes) or 0,
                 'punto_partida': modelos_dict[s.id.value].punto_partida or '' if s.id.value in modelos_dict else '',
                 'parada_max': modelos_dict[s.id.value].parada_max or '' if s.id.value in modelos_dict else '',
+                'destino': modelos_dict[s.id.value].parada_max or '' if s.id.value in modelos_dict else '',
                 'costo_estimado': float(modelos_dict[s.id.value].costo_estimado or 0) if s.id.value in modelos_dict else 0,
                 'resumen': modelos_dict[s.id.value].resumen or '' if s.id.value in modelos_dict else '',
+                'profesor_nombre': usuarios_dict.get(s.profesor_id.value, 'Docente'),
+                'profesor_id': s.profesor_id.value,
+                'programa_id': s.programa_id.value,
+                'programa': programas_dict.get(s.programa_id.value, ''),
+                'facultad': facultades_dict.get(s.facultad_id.value, ''),
+                'justificacion': modelos_dict[s.id.value].justificacion if s.id.value in modelos_dict else '',
+                'objetivo_general': modelos_dict[s.id.value].objetivo_general if s.id.value in modelos_dict else '',
                 'ultima_revision': (lambda r: {
                     'concepto_final': r.concepto_final,
                     'pertinencia': {'estado': r.pertinencia_estado, 'observacion': r.pertinencia_obs},
@@ -192,6 +216,13 @@ class SalidaController(APIView):
                     'viabilidad': {'estado': r.viabilidad_estado, 'observacion': r.viabilidad_obs},
                     'fecha': str(r.fecha_revision)
                 })(revisiones_dict[s.id.value]) if s.id.value in revisiones_dict else None,
+                'decision_consejo': (lambda d: {
+                    'concepto_financiero': d.concepto_financiero,
+                    'observaciones': d.observaciones or '',
+                    'acta': d.acta or '',
+                    'fecha_acta': str(d.fecha_acta) if d.fecha_acta else None,
+                    'fecha_decision': str(d.fecha_decision),
+                })(decisiones_consejo_dict[s.id.value]) if s.id.value in decisiones_consejo_dict else None,
             } for s in resultados]
             return Response({'ok': True, 'datos': data}, status=status.HTTP_200_OK)
 

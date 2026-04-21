@@ -34,13 +34,15 @@ export default function ResumenRuta({ rutaInfo, tiempos, maxHoras, onBuscarHotel
     const barColor = tiempos.excede ? '#ef4444' : pct > 75 ? '#f59e0b' : '#22c55e';
 
     // Texto de tiempo para Volante y Total
-    const tiempoVolante = pendiente ? '⏳ Calculando...'
+    const tiempoVolante = pendiente && !tieneGemini ? '⏳ Calculando...'
         : errorGemini ? '⚠️ No disponible'
-        : fmtTiempo(rutaInfo?.duracion_min ?? tiempos.minConduccion);
+        : fmtTiempo(rutaInfo?.duracion_min || tiempos.minConduccion);
 
-    const tiempoTotal = pendiente ? '⏳ ...'
-        : errorGemini ? '⚠️ N/D'
-        : fmtTiempo(rutaInfo?.duracion_min ?? tiempos.totalMin);
+    // Total: si hay tiempos de paradas/conducción disponibles, mostrarlos aunque la IA esté pendiente
+    const tiempoTotal = errorGemini ? '⚠️ N/D'
+        : (rutaInfo?.duracion_min || tiempos.totalMin) > 0
+            ? fmtTiempo(rutaInfo?.duracion_min || tiempos.totalMin)
+            : '⏳ ...';
 
     return (
         <div className="rr">

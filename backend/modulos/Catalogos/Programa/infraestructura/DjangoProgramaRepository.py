@@ -56,3 +56,16 @@ class DjangoProgramaRepository(ProgramaRepository):
 
     def delete(self, id: ProgramaId) -> None:
         ProgramaModel.objects.filter(id=id.value).delete()
+
+    def get_by_facultad_id(self, facultad_id: int) -> List[Programa]:
+        models = ProgramaModel.objects.filter(facultad_id=facultad_id).select_related('facultad')
+        return [
+            Programa(
+                id=ProgramaId(value=m.id),
+                nombre=ProgramaNombre(value=m.nombre),
+                activo=ProgramaEstado(value=m.activo),
+                facultad_id=ProgramaFacultadId(value=m.facultad_id),
+                facultad_nombre=m.facultad.nombre if m.facultad else "Sin Facultad"
+            )
+            for m in models
+        ]

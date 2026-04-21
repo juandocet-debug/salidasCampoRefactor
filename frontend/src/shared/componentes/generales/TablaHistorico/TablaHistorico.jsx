@@ -129,13 +129,22 @@ const TablaHistorico = ({
                                     
                                     {/* ── Mini Stepper de Progreso ── */}
                                     <div className="th-mini-stepper" style={{ display: 'flex', alignItems: 'center', gap: '4px', opacity: 0.9 }}>
-                                        {[
-                                            { id: 1, name: 'Borrador', states: ['borrador'] },
-                                            { id: 2, name: 'Coordinación', states: ['enviada', 'en_revision', 'rechazada', 'pendiente_ajuste'] },
-                                            { id: 3, name: 'Consolidado', states: ['favorable', 'ajustada', 'favorable_con_ajustes'] },
-                                            { id: 4, name: 'Logística', states: ['aprobada', 'en_preparacion'] },
-                                            { id: 5, name: 'Ejecución', states: ['en_ejecucion', 'finalizada', 'cerrada'] }
-                                        ].map((etapa, idx, arr) => {
+                                        {(() => {
+                                            const tieneConsejo = Boolean(item.decision_consejo);
+                                            const etapas = [
+                                                { id: 1, name: 'Borrador', states: ['borrador'] },
+                                                { id: 2, name: 'Coordinación', states: tieneConsejo
+                                                    ? ['enviada', 'en_revision', 'rechazada']
+                                                    : ['enviada', 'en_revision', 'rechazada', 'pendiente_ajuste'] },
+                                                { id: 3, name: 'Consolidado', states: tieneConsejo
+                                                    ? ['favorable', 'ajustada', 'favorable_con_ajustes', 'pendiente_ajuste']
+                                                    : ['favorable', 'ajustada', 'favorable_con_ajustes'] },
+                                                { id: 4, name: 'Logística', states: ['aprobada', 'en_preparacion'] },
+                                                { id: 5, name: 'Ejecución', states: ['en_ejecucion', 'finalizada', 'cerrada'] },
+                                            ];
+                                            return etapas;
+                                        })().map((etapa, idx, arr) => {
+
                                             const uiOrden = arr.findIndex(e => e.states.includes(est)) + 1 || 1;
                                             const isActive = uiOrden === etapa.id;
                                             const isPast = uiOrden > etapa.id;
@@ -171,7 +180,13 @@ const TablaHistorico = ({
                                         
                                         if (est === 'favorable') { b_text = 'Favorable'; b_actor = 'Coordinación'; b_emoji = '✅'; }
                                         else if (est === 'favorable_con_ajustes') { b_text = 'Con Ajustes'; b_actor = 'Coordinación'; b_emoji = '✅'; }
-                                        else if (est === 'pendiente_ajuste') { b_text = 'Ajustes Req.'; b_actor = 'Coordinación'; b_emoji = '⚠️'; }
+                                        else if (est === 'pendiente_ajuste') {
+                                            if (item.decision_consejo) {
+                                                b_text = 'Ajustes Req.'; b_actor = 'Consejo'; b_emoji = '⚠️';
+                                            } else {
+                                                b_text = 'Ajustes Req.'; b_actor = 'Coordinación'; b_emoji = '⚠️';
+                                            }
+                                        }
                                         else if (est === 'rechazada') { b_text = 'Improcedente'; b_actor = 'Coordinación'; b_emoji = '🚫'; }
                                         else if (est === 'en_revision') { b_text = 'Evaluando'; b_actor = 'Coordinador'; b_emoji = '⏳'; }
                                         else if (est === 'aprobada') { b_text = 'Aprobada'; b_actor = 'Logística'; b_emoji = '🎯'; }
@@ -190,17 +205,18 @@ const TablaHistorico = ({
                                     })()}
                                     
                                     {/* Etiqueta de Feedback si tiene revision y fue devuelta */}
-                                    {item.ultima_revision && (est === 'pendiente_ajuste' || est === 'rechazada') && (
+                                    {(item.ultima_revision || item.decision_consejo) && (est === 'pendiente_ajuste' || est === 'rechazada') && (
                                         <div 
                                             onClick={(e) => { e.stopPropagation(); onVerDictamen?.(item); }}
                                             style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', background: est === 'rechazada' ? '#fee2e2' : '#fef3c7', padding: '6px 12px', borderRadius: '20px', border: `1px solid ${est === 'rechazada' ? '#f87171' : '#fbbf24'}` }}
                                         >
                                             <svg width="14" height="14" fill="none" stroke={est === 'rechazada' ? '#991b1b' : '#b45309'} strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                                             <span style={{ color: est === 'rechazada' ? '#991b1b' : '#b45309', fontWeight: '800', fontSize: '10px', letterSpacing: '0.5px' }}>
-                                                VER CONCEPTO 
+                                                {item.decision_consejo ? 'VER CONCEPTO CONSEJO' : 'VER CONCEPTO'}
                                             </span>
                                         </div>
                                     )}
+
 
                                     {/* ── Acciones (editar/borrar si no ha escalado irremediablemente) ── */}
                                     {(est === 'borrador' || est === 'pendiente_ajuste' || est === 'rechazada') && (

@@ -39,8 +39,12 @@ export function useRutaIA(puntos, distanciaKm, setRutaInfo, tag) {
                     setRutaInfo(prev => ({
                         ...prev,
                         duracion_min: mins,
-                        // Solo usar distancia IA si OSRM aún no ha llegado
-                        ...(km > 0 && prev.distancia_km === 0 ? { distancia_km: km } : {}),
+                        // Usar distancia IA si:
+                        // 1) No hay distancia aún (=0), O
+                        // 2) La IA da >15% más que el valor actual → el actual era Haversine (línea recta)
+                        ...(km > 0 && (prev.distancia_km === 0 || km > prev.distancia_km * 1.15)
+                            ? { distancia_km: km }
+                            : {}),
                         _pendienteGemini: false,
                         _gemini:          true,
                     }));

@@ -14,6 +14,9 @@ export function useAutoHoraFin({ form, setForm, tiempos, tiemposRetorno, rutaInf
     React.useEffect(() => {
         if (!form.hora_inicio) return;
 
+        // Si el usuario fijó la hora_fin manualmente, respetarla y no sobrescribir
+        if (form.hora_fin_manual) return;
+
         const minIda     = tiempos?.totalMin     > 0 ? tiempos.totalMin     : (rutaInfoIda.duracion_min     || 0);
         const minRetorno = tiemposRetorno?.totalMin > 0 ? tiemposRetorno.totalMin : (rutaInfoRetorno.duracion_min || 0);
         const totalMin   = minIda + minRetorno;
@@ -31,8 +34,10 @@ export function useAutoHoraFin({ form, setForm, tiempos, tiemposRetorno, rutaInf
         }
     }, [
         form.hora_inicio,
+        form.hora_fin_manual,
         tiempos?.totalMin, tiemposRetorno?.totalMin,
         rutaInfoIda.duracion_min, rutaInfoRetorno.duracion_min,
+        rutaInfoIda.distancia_km, rutaInfoRetorno.distancia_km,
     ]);
 }
 

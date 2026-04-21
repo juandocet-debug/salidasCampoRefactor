@@ -10,12 +10,17 @@ import TabCalendario from '../../componentes/TabCalendario/TabCalendario';
 import TabFlota      from '../../componentes/TabFlota/TabFlota';
 import TabComponentes from '../../componentes/TabComponentes/TabComponentes';
 import TabSalidas from '../../componentes/TabSalidas/TabSalidas';
+import CoordinadorLogisticaDashboard from '@/features/coordinadorLogistica/CoordinadorLogisticaDashboard';
 import './PanelHerramientas.css';
 
 const TABS = [
     {
         id: 'flota', label: 'Flota', desc: 'Buses y conductores', statNum: '12', statText: 'Vehículos', actionTxt: 'Asignar', progreso: '90%', componente: TabFlota,
         icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17 5H3a2 2 0 00-2 2v9h2a3 3 0 006 0h6a3 3 0 006 0h2V12l-3-5h-3zM6 18a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm12 0a1.5 1.5 0 110-3 1.5 1.5 0 010 3zM17 9.5V7h2.5l2.1 3.5H17z"/></svg>
+    },
+    {
+        id: 'gestion_operativa', label: 'Gestión Operativa', desc: 'Asignaciones y Monitoreo', statNum: '5', statText: 'Activas', actionTxt: 'Administrar', progreso: '75%', componente: CoordinadorLogisticaDashboard,
+        icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     },
     {
         id: 'academico', label: 'Catál. Acad.', desc: 'Programas y Módulos', statNum: '42', statText: 'Programas', actionTxt: 'Organizar', progreso: '45%', componente: TabAcademico,

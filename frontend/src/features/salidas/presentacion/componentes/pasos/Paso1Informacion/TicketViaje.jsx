@@ -7,6 +7,7 @@ function formatFechaHora(fecha) {
     return { dia: DIAS[d.getDay()], fecha: `${d.getDate()} ${MESES[d.getMonth()]}` };
 }
 
+
 export default function TicketViaje({ form }) {
     const salida  = formatFechaHora(form.fecha_inicio);
     const llegada = formatFechaHora(form.fecha_fin);
@@ -33,9 +34,6 @@ export default function TicketViaje({ form }) {
                 <div className="nsal-ticket-fecha">
                     <span className="nsal-ticket-dia">{llegada.dia}</span>
                     <span className="nsal-ticket-date">{llegada.fecha}</span>
-                </div>
-                <div className="nsal-ticket-sublabel">
-                    {form.hora_fin ? '📍 Calculada por el sistema' : 'Traza la ruta en Paso 3'}
                 </div>
             </div>
         </div>

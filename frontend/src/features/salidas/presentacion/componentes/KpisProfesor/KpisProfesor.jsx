@@ -3,11 +3,18 @@ import { CardKPI } from '@/shared/componentes/generales/Tarjetas/Tarjetas';
 import './KpisProfesor.css';
 
 const KpisProfesor = ({ salidas = [], cargando = false }) => {
-    // Calculando KPIs reales (usando los estados de la base de datos)
-    const countBorradores = salidas.filter(s => s.estado === 'borrador').length;
-    const countAprobadas = salidas.filter(s => s.estado === 'aprobada').length;
-    // Si están listas o ejecutándose (o ya enviándose)
-    const countEnProceso = salidas.filter(s => ['enviada', 'en_revision', 'favorable'].includes(s.estado)).length;
+    // Normalizamos y agrupamos mapeos
+    const gCount = (arr) => salidas.filter(s => {
+        const est = (s.estado || '').toLowerCase();
+        return arr.includes(est);
+    }).length;
+
+    const countBorradores = gCount(['borrador']);
+    const countAprobadas = gCount(['aprobada', 'finalizada', 'cerrada', 'en_ejecucion']);
+    const countEnProceso = gCount([
+        'enviada', 'en_revision', 'rechazada', 'pendiente_ajuste',
+        'favorable', 'ajustada', 'favorable_con_ajustes', 'en_preparacion'
+    ]);
 
     return (
         <div className="tp-kpis">

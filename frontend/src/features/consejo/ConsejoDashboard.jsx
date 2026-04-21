@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { CardKPI } from '../../shared/componentes/generales/Tarjetas/Tarjetas';
 import { WidgetPresupuesto } from './WidgetPresupuesto';
 import { TablaConsejo } from './TablaConsejo';
-import { VistaRevision } from '../coordinacion/VistaRevision';
+import VistaRevision from '../coordinacion/VistaRevision';
 import PanelDecisionConsejo from './PanelDecisionConsejo';
 
 const ConsejoDashboard = () => {
@@ -68,7 +68,7 @@ const ConsejoDashboard = () => {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
                 <CardKPI 
                     label="Pendientes por Decidir" 
-                    value={salidas.filter(s => s.estado === 'favorable').length} 
+                    value={cargando ? '-' : salidas.filter(s => (s.estado || '').toLowerCase() === 'favorable' || (s.estado || '').toLowerCase() === 'ajustada').length} 
                     icon={<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>} 
                     iconBg="#f1f5f9" 
                     iconColor="#0f172a" 

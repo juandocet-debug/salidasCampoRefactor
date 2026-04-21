@@ -41,10 +41,18 @@ export const TablaSistema = ({ salidas = [], cargando = false, titulo = "Sistema
                         const codigo = s.codigo || s.id;
                         const isExpanded = expandidoId === s.id;
 
-                        // Estilos de pills idénticos a los del sistema del cliente (video)
-                        const badgeStyle = esPendiente 
-                            ? { background: '#f1f5f9', color: '#64748b', border: '1px dashed #cbd5e1' }
-                            : { background: '#ecfdf5', color: '#10b981', border: 'none' };
+                        // Estilos dinámicos para los distintos estados de la salida
+                        const getFormatEstado = (estadoRaw) => {
+                            const e = (estadoRaw || '').toLowerCase();
+                            if (e === 'ajustada') return { texto: 'CON AJUSTES (CORREGIDA)', style: { background: '#fef3c7', color: '#d97706', border: 'none' } };
+                            if (e === 'pendiente_ajuste') return { texto: 'CON AJUSTES', style: { background: '#fef3c7', color: '#d97706', border: 'none' } };
+                            if (e === 'favorable') return { texto: 'FAVORABLE', style: { background: '#ecfdf5', color: '#10b981', border: 'none' } };
+                            if (e === 'rechazada') return { texto: 'RECHAZADA', style: { background: '#fee2e2', color: '#ef4444', border: 'none' } };
+                            if (e === 'aprobada') return { texto: 'APROBADA (CONSEJO)', style: { background: '#dbeafe', color: '#2563eb', border: 'none' } };
+                            if (e === 'en_revision' || e === 'enviada') return { texto: 'POR REVISAR', style: { background: '#f1f5f9', color: '#64748b', border: '1px dashed #cbd5e1' } };
+                            return { texto: e.toUpperCase().replace('_', ' '), style: { background: '#f1f5f9', color: '#64748b', border: 'none' } };
+                        };
+                        const formatEstado = getFormatEstado(s.estado);
 
                         return (
                             <React.Fragment key={s.id}>
@@ -76,9 +84,9 @@ export const TablaSistema = ({ salidas = [], cargando = false, titulo = "Sistema
                                             fontSize: '10px', 
                                             fontWeight: '700', 
                                             letterSpacing: '0.5px',
-                                            ...badgeStyle 
+                                            ...formatEstado.style
                                         }}>
-                                            {esPendiente ? 'POR REVISAR' : 'APROBADA'}
+                                            {formatEstado.texto}
                                         </span>
                                     </td>
                                     
@@ -126,7 +134,7 @@ export const TablaSistema = ({ salidas = [], cargando = false, titulo = "Sistema
                                                     <h4 style={{ margin: '0 0 10px 0', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#94a3b8' }}>Resumen Académico</h4>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '8px' }}>
                                                         <span style={{ color: '#64748b', width: '90px' }}>Programa:</span>
-                                                        <span style={{ color: '#1e293b', fontWeight: '500' }}>{s.programa_id ? `Prog. ${s.programa_id}` : 'No definido'}</span>
+                                                        <span style={{ color: '#1e293b', fontWeight: '500' }}>{s.programa || (s.programa_id ? `Prog. ${s.programa_id}` : 'No definido')}</span>
                                                     </div>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '8px' }}>
                                                         <span style={{ color: '#64748b', width: '90px' }}>Estudiantes:</span>

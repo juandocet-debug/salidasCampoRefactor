@@ -37,7 +37,8 @@ export default function Paso3Logistica({ form, setForm }) {
     const [pantallaAbierta, setPantallaAbierta] = useState(false);
     const [paradaEditando,  setParadaEditando]  = useState(null);
     const [modalHospedaje,  setModalHospedaje]  = useState(false);
-    const [routeCoords,     setRouteCoords]     = useState(null);
+    const [routeCoordsIda,     setRouteCoordsIda]     = useState(null);
+    const [routeCoordsRetorno, setRouteCoordsRetorno] = useState(null);
 
     // Ref para evitar race conditions: el closure de handleDistanciaCalculada
     // puede capturar un tabActivo stale; la ref siempre apunta al valor actual.
@@ -62,7 +63,8 @@ export default function Paso3Logistica({ form, setForm }) {
     // ── Handlers de mapa ─────────────────────────────────────────────────────
     const handleDistanciaCalculada = (data) => {
         const { routeCoords: rc, ...info } = data;
-        const setter = tabActivoRef.current === 'retorno' ? setRutaInfoRetorno : setRutaInfoIda;
+        const esRetorno = tabActivoRef.current === 'retorno';
+        const setter = esRetorno ? setRutaInfoRetorno : setRutaInfoIda;
         setter(prev => ({
             ...info,
             duracion_min:      (prev._gemini && prev.duracion_min > 0) ? prev.duracion_min : 0,
@@ -70,7 +72,10 @@ export default function Paso3Logistica({ form, setForm }) {
             _gemini:           prev._gemini      || false,
             _geminiError:      prev._geminiError || false,
         }));
-        if (rc) setRouteCoords(rc);
+        if (rc) {
+            if (esRetorno) setRouteCoordsRetorno(rc);
+            else setRouteCoordsIda(rc);
+        }
     };
 
     // ── Handlers de paradas ──────────────────────────────────────────────────
@@ -186,12 +191,32 @@ export default function Paso3Logistica({ form, setForm }) {
                             <span className="p3l-km-chip-lbl">Total</span>
                         </div>
                     </div>
-                    <ResumenRuta
-                        rutaInfo={tabActivo === 'retorno' ? rutaInfoRetorno : rutaInfoIda}
-                        tiempos={tabActivo === 'retorno' ? tiemposRetorno : tiempos}
-                        maxHoras={MAX_HORAS_CONDUCTOR}
-                        onBuscarHotel={() => setModalHospedaje(true)}
-                    />
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '4px' }}>
+                        {/* Total Ida */}
+                        <div>
+                            <div style={{ fontSize: '10px', fontWeight: '700', color: '#3b82f6', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span>→</span> Total Ida
+                            </div>
+                            <ResumenRuta
+                                rutaInfo={rutaInfoIda}
+                                tiempos={tiempos}
+                                maxHoras={MAX_HORAS_CONDUCTOR}
+                                onBuscarHotel={() => setModalHospedaje(true)}
+                            />
+                        </div>
+                        {/* Total Vuelta */}
+                        <div>
+                            <div style={{ fontSize: '10px', fontWeight: '700', color: '#8b5cf6', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span>↩</span> Total Vuelta
+                            </div>
+                            <ResumenRuta
+                                rutaInfo={rutaInfoRetorno}
+                                tiempos={tiemposRetorno}
+                                maxHoras={MAX_HORAS_CONDUCTOR}
+                                onBuscarHotel={() => setModalHospedaje(true)}
+                            />
+                        </div>
+                    </div>
                 </div>
 
                 {/* Costos Estimados */}
@@ -241,7 +266,7 @@ export default function Paso3Logistica({ form, setForm }) {
                 paradaEditar={paradaEditando?.data || null}
                 puntosRuta={puntosRutaActiva}
                 rutaInfo={tabActivo === 'retorno' ? rutaInfoRetorno : rutaInfoIda}
-                routeCoords={routeCoords}
+                routeCoords={tabActivo === 'retorno' ? routeCoordsRetorno : routeCoordsIda}
                 fechaInicioSalida={form.fecha_inicio || ''}
                 fechaFinSalida={form.fecha_fin || ''}
             />

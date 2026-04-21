@@ -28,8 +28,7 @@ class ListarSalidasPorRevisarCasoUso:
         estados_pendientes = [
             EstadoSalida.ENVIADA,
             EstadoSalida.EN_REVISION,
-            EstadoSalida.PENDIENTE_AJUSTE,
-            EstadoSalida.RECHAZADA,
+            EstadoSalida.AJUSTADA,
         ]
         por_revisar = [s for s in todas if s.estado in estados_pendientes]
 
