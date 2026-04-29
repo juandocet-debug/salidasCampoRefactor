@@ -26,6 +26,7 @@ const CONFIG = {
   aprobada:         { etiqueta: 'Aprobada',           variante: 'aprobada'   },
   rechazada:        { etiqueta: 'Rechazada',          variante: 'rechazada'  },
   en_preparacion:   { etiqueta: 'En Preparación',     variante: 'ejecucion'  },
+  lista_ejecucion:  { etiqueta: 'Agendada en Logística', variante: 'ejecucion' },
   en_ejecucion:     { etiqueta: 'En Ejecución',       variante: 'ejecucion'  },
   finalizada:       { etiqueta: 'Finalizada',         variante: 'finalizada' },
   cerrada:          { etiqueta: 'Cerrada',            variante: 'cerrada'    },

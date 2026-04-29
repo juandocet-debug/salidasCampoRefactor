@@ -50,6 +50,18 @@ export const TablaConsejo = ({ salidas, onDecidir }) => {
                         } else if (s.estado === 'pendiente_ajuste') {
                             badgeStyle = { background: '#e0e7ff', color: '#4338ca', border: 'none' };
                             badgeText = 'EN AJUSTES';
+                        } else if (s.estado === 'en_preparacion' || s.estado === 'lista_ejecucion') {
+                            badgeStyle = { background: '#e0f2fe', color: '#0369a1', border: 'none' };
+                            badgeText = 'AGENDADA LOGÍSTICA';
+                        } else if (s.estado === 'en_ejecucion') {
+                            badgeStyle = { background: '#e0e7ff', color: '#4338ca', border: 'none' };
+                            badgeText = 'EN EJECUCIÓN';
+                        } else if (s.estado === 'finalizada' || s.estado === 'cerrada') {
+                            badgeStyle = { background: '#dcfce7', color: '#166534', border: 'none' };
+                            badgeText = 'FINALIZADA';
+                        } else if (s.estado === 'cancelada') {
+                            badgeStyle = { background: '#fee2e2', color: '#991b1b', border: 'none' };
+                            badgeText = 'CANCELADA';
                         }
 
                         // Variables mapeadas del backend DTO

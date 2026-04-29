@@ -13,6 +13,8 @@ from modulos.Logistica.Vehiculo.infraestructura.VehiculoController import Vehicu
 from modulos.Logistica.Vehiculo.infraestructura.VehiculoIAController import VehiculoIAController
 from modulos.Logistica.Parametro.infraestructura.ParametroController import ParametroController
 from modulos.Logistica.Parametro.infraestructura.ParametroConfiguracionController import ParametroConfiguracionController
+from modulos.Logistica.EmpresaTransporte.infraestructura.EmpresaTransporteController import EmpresaTransporteController
+from modulos.Logistica.ConductorExterno.infraestructura.ConductorExternoController import ConductorExternoController
 from modulos.Salidas.Core.infraestructura.AdminSalidasController import AdminSalidasController, CleanupHuerfanosController
 from modulos.Salidas.Core.infraestructura.OsrmProxyController import OsrmProxyController
 
@@ -55,6 +57,14 @@ urlpatterns = [
     path('api/transporte/vehiculos/', VehiculoController.as_view()),
     path('api/transporte/vehiculos/ia/', VehiculoIAController.as_view()),
     path('api/transporte/vehiculos/<str:pk>/', VehiculoController.as_view()),
+
+    # Rutas para Empresas de Transporte Contratado
+    path('api/transporte/empresas/', EmpresaTransporteController.as_view(), name='empresas-list'),
+    path('api/transporte/empresas/<int:pk>/', EmpresaTransporteController.as_view(), name='empresas-detail'),
+
+    # Rutas para Conductores Externos
+    path('api/transporte/conductores/', ConductorExternoController.as_view(), name='conductores-list'),
+    path('api/transporte/conductores/<int:pk>/', ConductorExternoController.as_view(), name='conductores-detail'),
 
     # Rutas para Salidas Core
     path('api/salidas/core/', include('modulos.Salidas.Core.infraestructura.urls')),

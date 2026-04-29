@@ -10,6 +10,8 @@ const ConsejoDashboard = () => {
     const [cargando, setCargando] = useState(true);
     const [salidaSeleccionada, setSalidaSeleccionada] = useState(null);
     const [busqueda, setBusqueda] = useState('');
+    const [filtroFacultad, setFiltroFacultad] = useState('');
+    const [filtroPrograma, setFiltroPrograma] = useState('');
 
     const cargarSalidas = () => {
         setCargando(true);
@@ -41,12 +43,31 @@ const ConsejoDashboard = () => {
         cargarSalidas();
     };
 
-    const salidasFiltradas = salidas.filter(s =>
-        (s.codigo || '').toLowerCase().includes(busqueda.toLowerCase()) ||
-        (s.asignatura || '').toLowerCase().includes(busqueda.toLowerCase()) ||
-        (s.nombre || '').toLowerCase().includes(busqueda.toLowerCase()) ||
-        (s.destino || '').toLowerCase().includes(busqueda.toLowerCase())
-    );
+    // Listas dinámicas derivadas de los datos
+    const facultades = [...new Set(salidas.map(s => s.facultad).filter(Boolean))].sort();
+    const programasDeFacultad = [...new Set(
+        salidas
+            .filter(s => !filtroFacultad || s.facultad === filtroFacultad)
+            .map(s => s.programa)
+            .filter(Boolean)
+    )].sort();
+
+    const handleFacultadChange = (e) => {
+        setFiltroFacultad(e.target.value);
+        setFiltroPrograma(''); // resetear programa al cambiar facultad
+    };
+
+    const salidasFiltradas = salidas.filter(s => {
+        const matchBusqueda = !busqueda || (
+            (s.codigo || '').toLowerCase().includes(busqueda.toLowerCase()) ||
+            (s.asignatura || '').toLowerCase().includes(busqueda.toLowerCase()) ||
+            (s.nombre || '').toLowerCase().includes(busqueda.toLowerCase()) ||
+            (s.destino || '').toLowerCase().includes(busqueda.toLowerCase())
+        );
+        const matchFacultad = !filtroFacultad || s.facultad === filtroFacultad;
+        const matchPrograma = !filtroPrograma || s.programa === filtroPrograma;
+        return matchBusqueda && matchFacultad && matchPrograma;
+    });
 
     // Hardcoded Budget Data for Wireframe Step 1
     const PRESUPUESTO_TOTAL = 500000000;
@@ -85,23 +106,72 @@ const ConsejoDashboard = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 
                 {/* Filtros Bar */}
-                <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '16px' }}>
-                    <div style={{ position: 'relative', width: '320px' }}>
-                        <svg style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                    {/* Buscador */}
+                    <div style={{ position: 'relative', width: '280px' }}>
+                        <svg style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                         <input 
                             type="text" 
                             placeholder="Buscar por código, programa o asignatura..." 
                             value={busqueda}
                             onChange={(e) => setBusqueda(e.target.value)}
-                            style={{ width: '100%', padding: '10px 16px 10px 40px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                            style={{ width: '100%', padding: '10px 16px 10px 38px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '13px', outline: 'none', boxSizing: 'border-box' }}
                         />
                     </div>
-                    <select style={{ padding: '0 16px', border: '1px solid #e2e8f0', borderRadius: '8px', height: '42px', fontSize: '14px', color: '#0f172a', outline: 'none', background: 'white' }}>
-                        <option>Todos los Programas</option>
-                        <option>Ingeniería Civil</option>
-                        <option>Biología</option>
-                        <option>Geología</option>
+
+                    {/* Dropdown Facultad */}
+                    <select 
+                        value={filtroFacultad}
+                        onChange={handleFacultadChange}
+                        style={{ padding: '0 12px', border: '1px solid #e2e8f0', borderRadius: '8px', height: '40px', fontSize: '13px', color: filtroFacultad ? '#0f172a' : '#94a3b8', outline: 'none', background: 'white', cursor: 'pointer' }}
+                    >
+                        <option value="">Todas las Facultades</option>
+                        {facultades.map(f => (
+                            <option key={f} value={f}>{f}</option>
+                        ))}
                     </select>
+
+                    {/* Dropdown Programa (en cascada con Facultad) */}
+                    <select 
+                        value={filtroPrograma}
+                        onChange={(e) => setFiltroPrograma(e.target.value)}
+                        disabled={programasDeFacultad.length === 0}
+                        style={{ padding: '0 12px', border: '1px solid #e2e8f0', borderRadius: '8px', height: '40px', fontSize: '13px', color: filtroPrograma ? '#0f172a' : '#94a3b8', outline: 'none', background: 'white', cursor: programasDeFacultad.length === 0 ? 'not-allowed' : 'pointer', opacity: programasDeFacultad.length === 0 ? 0.5 : 1 }}
+                    >
+                        <option value="">Todos los Programas</option>
+                        {programasDeFacultad.map(p => (
+                            <option key={p} value={p}>{p}</option>
+                        ))}
+                    </select>
+
+                    {/* Botón limpiar filtros (solo si hay algo activo) */}
+                    {(filtroFacultad || filtroPrograma || busqueda) && (
+                        <button
+                            onClick={() => { setFiltroFacultad(''); setFiltroPrograma(''); setBusqueda(''); }}
+                            title="Limpiar filtros"
+                            style={{ 
+                                height: '40px', 
+                                padding: '0 16px', 
+                                borderRadius: '8px', 
+                                border: '1px solid #e2e8f0', 
+                                background: '#f8fafc', 
+                                color: '#475569', 
+                                fontSize: '13px', 
+                                fontWeight: '500', 
+                                cursor: 'pointer', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '6px', 
+                                whiteSpace: 'nowrap',
+                                transition: 'all 0.2s'
+                            }}
+                            onMouseOver={(e) => { e.currentTarget.style.background = '#f1f5f9'; e.currentTarget.style.color = '#0f172a'; }}
+                            onMouseOut={(e) => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.color = '#475569'; }}
+                        >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            Limpiar filtros
+                        </button>
+                    )}
                 </div>
 
                 {/* Tabla */}

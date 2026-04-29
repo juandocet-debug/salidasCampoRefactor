@@ -17,9 +17,23 @@ class VehiculoController(APIView):
         if pk:
             pass # Para detalle (no obligatorio de momento)
         else:
+            from datetime import date
             filtros = {}
             if 'tipo' in request.GET: filtros['tipo'] = request.GET['tipo']
             if 'propietario' in request.GET: filtros['propietario'] = request.GET['propietario']
+            
+            # ─── Filtro de disponibilidad por fechas ──────────────────────────
+            if 'fecha_inicio' in request.GET and 'fecha_fin' in request.GET:
+                try:
+                    filtros['fecha_inicio'] = date.fromisoformat(request.GET['fecha_inicio'])
+                    filtros['fecha_fin'] = date.fromisoformat(request.GET['fecha_fin'])
+                except ValueError:
+                    pass  # Si el formato es inválido, simplemente no filtramos por fecha
+            if 'salida_id' in request.GET:
+                try:
+                    filtros['salida_id'] = int(request.GET['salida_id'])
+                except ValueError:
+                    pass
             
             caso_uso = VehiculoGetAll(repository=repo)
             return Response(caso_uso.run(filtros))

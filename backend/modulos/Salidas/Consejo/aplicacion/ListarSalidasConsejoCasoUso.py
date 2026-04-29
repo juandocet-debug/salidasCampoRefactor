@@ -37,12 +37,17 @@ class ListarSalidasConsejoCasoUso:
     def ejecutar(self) -> List[SalidaConsejoDTO]:
         todas = self.salida_repo.get_all()
 
-        # El Consejo ve salidas que ya pasaron el filtro del Coordinador
         estados_consejo = [
             EstadoSalida.FAVORABLE,
             EstadoSalida.APROBADA,
             EstadoSalida.RECHAZADA,
             EstadoSalida.PENDIENTE_AJUSTE,
+            EstadoSalida.EN_PREPARACION,
+            EstadoSalida.LISTA_EJECUCION,
+            EstadoSalida.EN_EJECUCION,
+            EstadoSalida.FINALIZADA,
+            EstadoSalida.CERRADA,
+            EstadoSalida.CANCELADA,
         ]
         salidas_consejo = [s for s in todas if s.estado in estados_consejo]
 

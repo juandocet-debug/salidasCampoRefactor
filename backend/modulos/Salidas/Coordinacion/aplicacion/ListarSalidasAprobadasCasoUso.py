@@ -35,6 +35,12 @@ class ListarSalidasAprobadasCasoUso:
             EstadoSalida.APROBADA,
             EstadoSalida.RECHAZADA,
             EstadoSalida.PENDIENTE_AJUSTE,
+            EstadoSalida.EN_PREPARACION,
+            EstadoSalida.LISTA_EJECUCION,
+            EstadoSalida.EN_EJECUCION,
+            EstadoSalida.FINALIZADA,
+            EstadoSalida.CERRADA,
+            EstadoSalida.CANCELADA,
         ]
         aprobadas = [s for s in todas if s.estado in estados_aprobados]
 

@@ -28,21 +28,27 @@ const TABS = [
 const CoordinadorLogisticaDashboard = () => {
     const [vistaActiva, setVistaActiva] = useState('pendientes');
     const [salidaSeleccionada, setSalidaSeleccionada] = useState(null);
+    const [refreshKey, setRefreshKey] = useState(0);
+
+    const volverAlListado = () => {
+        setSalidaSeleccionada(null);
+        setRefreshKey(k => k + 1); // fuerza recarga de la lista
+    };
 
     const renderContenido = () => {
         if (salidaSeleccionada) {
             return (
                 <AsignarTransportePanel
                     salida={salidaSeleccionada}
-                    onVolver={() => setSalidaSeleccionada(null)}
+                    onVolver={volverAlListado}
                 />
             );
         }
         switch (vistaActiva) {
-            case 'pendientes': return <ListaAprobadas onAsignar={setSalidaSeleccionada} />;
+            case 'pendientes': return <ListaAprobadas key={refreshKey} onAsignar={setSalidaSeleccionada} />;
             case 'monitoreo':  return <MonitoreoEjecucionPanel />;
             case 'cierres':    return <CierresOperativosPanel />;
-            default:           return <ListaAprobadas onAsignar={setSalidaSeleccionada} />;
+            default:           return <ListaAprobadas key={refreshKey} onAsignar={setSalidaSeleccionada} />;
         }
     };
 

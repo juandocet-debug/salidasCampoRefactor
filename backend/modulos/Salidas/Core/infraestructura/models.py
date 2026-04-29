@@ -75,6 +75,7 @@ class AsignacionExternaLogistica(models.Model):
     empresa = models.CharField(max_length=200)
     contacto = models.CharField(max_length=200, blank=True, null=True)
     costo_proyectado = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
+    capacidad_asignada = models.IntegerField(default=0)
     
     class Meta:
         db_table = 'salidas_logistica_asignacion_externa'

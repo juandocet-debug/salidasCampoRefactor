@@ -10,6 +10,7 @@ class EstadoSalida(str, Enum):
     APROBADA         = 'aprobada'
     RECHAZADA        = 'rechazada'
     EN_PREPARACION   = 'en_preparacion'
+    LISTA_EJECUCION  = 'lista_ejecucion'  # Estado asignado por coordinador logístico
     EN_EJECUCION     = 'en_ejecucion'
     FINALIZADA       = 'finalizada'
     CERRADA          = 'cerrada'

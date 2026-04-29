@@ -4,6 +4,7 @@ from ....Logistica.Vehiculo.dominio.VehiculoPlaca import VehiculoPlaca
 from ....Logistica.Vehiculo.dominio.VehiculoRepository import VehiculoRepository
 from .models import VehiculoModel
 from typing import List, Optional
+from datetime import date
 
 class DjangoVehiculoRepository(VehiculoRepository):
     
@@ -70,6 +71,48 @@ class DjangoVehiculoRepository(VehiculoRepository):
                 qs = qs.filter(tipo=filtros['tipo'])
             if 'propietario' in filtros:
                 qs = qs.filter(propietario=filtros['propietario'])
+            
+            # ─── Filtro de disponibilidad por fechas ─────────────────────────
+            # Si se pasan fecha_inicio y fecha_fin, excluir vehículos cuyas placas
+            # ya estén en asignaciones de otras salidas que se traslapen en ese período.
+            if 'fecha_inicio' in filtros and 'fecha_fin' in filtros:
+                try:
+                    from modulos.Salidas.Core.infraestructura.models import SalidaModelo, AsignacionExternaLogistica
+                    fi = filtros['fecha_inicio']  # ya es objeto date
+                    ff = filtros['fecha_fin']
+                    salida_excluida_id = filtros.get('salida_id')  # la salida actual (para no excluirla a si misma)
+
+                    # Salidas que se solapan con el rango: inicio <= ff AND fin >= fi
+                    salidas_en_conflicto = SalidaModelo.objects.filter(
+                        fecha_inicio__lte=ff,
+                        fecha_fin__gte=fi
+                    )
+                    if salida_excluida_id:
+                        salidas_en_conflicto = salidas_en_conflicto.exclude(id=salida_excluida_id)
+
+                    ids_en_conflicto = list(salidas_en_conflicto.values_list('id', flat=True))
+
+                    # Asignaciones de esas salidas (empresa almacena la placa como string concatenado)
+                    asignaciones = AsignacionExternaLogistica.objects.filter(
+                        salida_id__in=ids_en_conflicto
+                    ).values_list('empresa', flat=True)
+
+                    # Extraer placas del string de empresa ("Flota UPN (ADFA / GJGJH)")
+                    import re
+                    placas_ocupadas = set()
+                    for emp_str in asignaciones:
+                        # Extraer lo que está dentro del paréntesis de Flota UPN
+                        match_flota = re.search(r'Flota UPN \((.+?)\)', emp_str)
+                        if match_flota:
+                            for p in match_flota.group(1).split(' / '):
+                                placas_ocupadas.add(p.strip())
+
+                    if placas_ocupadas:
+                        qs = qs.exclude(placa__in=placas_ocupadas)
+                        print(f"[LOG] Placas ocupadas en rango {fi} - {ff}: {placas_ocupadas}")
+                except Exception as e:
+                    print(f"[WARN] Error al filtrar por disponibilidad de fechas: {e}")
+
         return [self._to_domain(v) for v in qs]
 
     def get_by_id(self, vehiculo_id: VehiculoId) -> Optional[Vehiculo]:

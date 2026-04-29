@@ -45,6 +45,8 @@ APPS_PROYECTO = [
     'modulos.Catalogos.Materia.infraestructura',
     'modulos.Logistica.Vehiculo.infraestructura',
     'modulos.Logistica.Parametro.infraestructura',
+    'modulos.Logistica.EmpresaTransporte.infraestructura',
+    'modulos.Logistica.ConductorExterno.infraestructura',
     'modulos.Salidas.Core.infraestructura',
     'modulos.Salidas.Planeacion.infraestructura',
     'modulos.Salidas.Itinerario.infraestructura',

@@ -31,6 +31,7 @@ class AsignacionLogisticaResumen:
     codigo: str
     nombre: str
     facultad: str
+    programa: str
     estado_operativo: EstadoOperativoSalida
     categoria: CategoriaLogisticaSalida
     # Datos Operativos y Logísticos
@@ -46,6 +47,9 @@ class AsignacionLogisticaResumen:
     distancia_km: float = 0.0
     duracion_dias: float = 1.0
     horas_viaje: float = 0.0
+    empresa_asignada: Optional[str] = None
+    conductor_asignado: Optional[str] = None
+    capacidad_asignada: int = 0
     
     def to_dict(self):
         return {
@@ -53,6 +57,7 @@ class AsignacionLogisticaResumen:
             "codigo": self.codigo,
             "nombre": self.nombre,
             "facultad": self.facultad,
+            "programa": self.programa,
             "estado": self.estado_operativo.value,
             "categoria": self.categoria.value,
             "fecha_inicio": self.fecha_inicio,
@@ -66,7 +71,10 @@ class AsignacionLogisticaResumen:
             "viaticos_estimados": float(self.viaticos_estimados),
             "distancia_km": float(self.distancia_km),
             "duracion_dias": float(self.duracion_dias),
-            "horas_viaje": float(self.horas_viaje)
+            "horas_viaje": float(self.horas_viaje),
+            "empresa_asignada": self.empresa_asignada,
+            "conductor_asignado": self.conductor_asignado,
+            "capacidad_asignada": self.capacidad_asignada,
         }
 
 @dataclass
@@ -76,6 +84,7 @@ class AsignacionVehiculoDTO:
     placa_o_empresa: str
     conductor_o_contacto: str
     costo_proyectado: float
+    capacidad_asignada: int = 0
     
 @dataclass
 class NovedadOperativaDTO:

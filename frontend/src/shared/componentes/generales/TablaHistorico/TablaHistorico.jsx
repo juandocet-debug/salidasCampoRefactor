@@ -46,7 +46,11 @@ const ESTADO_CONFIG = {
     en_revision: { label: 'En Revisión', clase: 'proceso' },
     favorable:   { label: 'Favorable',   clase: 'aprobada' },
     aprobada:    { label: 'Aprobada',    clase: 'aprobada' },
+    en_preparacion: { label: 'En Logística', clase: 'proceso' },
+    lista_ejecucion: { label: 'Agendada', clase: 'proceso' },
+    en_ejecucion:  { label: 'En Ejecución', clase: 'aprobada' },
     finalizada:  { label: 'Finalizada',  clase: 'finalizada' },
+    cerrada:     { label: 'Cerrada',     clase: 'finalizada' },
     pendiente_ajuste: { label: 'Pendiente Ajuste', clase: 'riesgo' },
     rechazada:   { label: 'Rechazada',   clase: 'peligro' }
 };
@@ -139,7 +143,7 @@ const TablaHistorico = ({
                                                 { id: 3, name: 'Consolidado', states: tieneConsejo
                                                     ? ['favorable', 'ajustada', 'favorable_con_ajustes', 'pendiente_ajuste']
                                                     : ['favorable', 'ajustada', 'favorable_con_ajustes'] },
-                                                { id: 4, name: 'Logística', states: ['aprobada', 'en_preparacion'] },
+                                                { id: 4, name: 'Logística', states: ['aprobada', 'en_preparacion', 'lista_ejecucion'] },
                                                 { id: 5, name: 'Ejecución', states: ['en_ejecucion', 'finalizada', 'cerrada'] },
                                             ];
                                             return etapas;
@@ -190,6 +194,9 @@ const TablaHistorico = ({
                                         else if (est === 'rechazada') { b_text = 'Improcedente'; b_actor = 'Coordinación'; b_emoji = '🚫'; }
                                         else if (est === 'en_revision') { b_text = 'Evaluando'; b_actor = 'Coordinador'; b_emoji = '⏳'; }
                                         else if (est === 'aprobada') { b_text = 'Aprobada'; b_actor = 'Logística'; b_emoji = '🎯'; }
+                                        else if (est === 'en_preparacion' || est === 'lista_ejecucion') { b_text = 'Agendada'; b_actor = 'Logística'; b_emoji = '🚚'; }
+                                        else if (est === 'en_ejecucion') { b_text = 'En Ruta'; b_actor = 'Sistema'; b_emoji = '📍'; }
+                                        else if (est === 'finalizada' || est === 'cerrada') { b_text = 'Finalizada'; b_actor = 'Sistema'; b_emoji = '🏁'; }
                                         else if (est === 'borrador') { b_text = 'Borrador'; b_actor = 'Profesor'; b_emoji = '📝'; }
                                         else if (est === 'enviada') { b_text = 'Enviada'; b_actor = 'Sistema'; b_emoji = '📨'; }
 

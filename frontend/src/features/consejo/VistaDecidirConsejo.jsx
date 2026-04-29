@@ -127,46 +127,59 @@ const VistaDecidirConsejo = ({ salida, onVolver }) => {
                     </div>
                 </div>
 
-                {/* Decision Form */}
-                <form onSubmit={handleSubmit}>
-                    <span style={{ fontSize: '12px', textTransform: 'uppercase', color: '#64748b', fontWeight: 'bold', letterSpacing: '0.05em', display: 'block', marginBottom: '12px' }}>Decisión del Consejo</span>
-                    
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
-                        {[
-                            { value: 'approved', label: 'APROBAR' },
-                            { value: 'rejected', label: 'RECHAZAR' },
-                            { value: 'changes', label: 'SOLICITAR CAMBIOS' }
-                        ].map(opt => (
-                            <label key={opt.value} style={{ border: decision === opt.value ? '2px solid #0f172a' : '1px solid #cbd5e1', background: decision === opt.value ? '#f8fafc' : 'white', padding: '12px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px', transition: 'all 0.2s', fontWeight: decision === opt.value ? '600' : '400' }}>
-                                <input type="radio" name="decision" checked={decision === opt.value} onChange={() => setDecision(opt.value)} style={{ accentColor: '#0f172a', transform: 'scale(1.2)' }} />
-                                {opt.label}
-                            </label>
-                        ))}
-                    </div>
-
-                    <div style={{ marginBottom: '16px' }}>
-                        <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', marginBottom: '8px', color: '#0f172a' }}>Motivo / Observaciones</label>
-                        <textarea value={motivo} onChange={(e) => setMotivo(e.target.value)} style={{ width: '100%', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '12px', minHeight: '80px', fontSize: '14px', fontFamily: 'inherit', boxSizing: 'border-box' }} placeholder="Ingrese el motivo de la decisión..." />
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
-                        <div>
-                            <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', marginBottom: '8px', color: '#0f172a' }}>No. Acta *</label>
-                            <input type="text" required value={acta} onChange={(e) => setActa(e.target.value)} style={{ width: '100%', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '10px 12px', fontSize: '14px', boxSizing: 'border-box' }} placeholder="Ej: 004-2026" />
+                {/* Decision Form o Vista de Solo Lectura */}
+                {salida.estado === 'favorable' ? (
+                    <form onSubmit={handleSubmit}>
+                        <span style={{ fontSize: '12px', textTransform: 'uppercase', color: '#64748b', fontWeight: 'bold', letterSpacing: '0.05em', display: 'block', marginBottom: '12px' }}>Decisión del Consejo</span>
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+                            {[
+                                { value: 'approved', label: 'APROBAR' },
+                                { value: 'rejected', label: 'RECHAZAR' },
+                                { value: 'changes', label: 'SOLICITAR CAMBIOS' }
+                            ].map(opt => (
+                                <label key={opt.value} style={{ border: decision === opt.value ? '2px solid #0f172a' : '1px solid #cbd5e1', background: decision === opt.value ? '#f8fafc' : 'white', padding: '12px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px', transition: 'all 0.2s', fontWeight: decision === opt.value ? '600' : '400' }}>
+                                    <input type="radio" name="decision" checked={decision === opt.value} onChange={() => setDecision(opt.value)} style={{ accentColor: '#0f172a', transform: 'scale(1.2)' }} />
+                                    {opt.label}
+                                </label>
+                            ))}
                         </div>
-                        <div>
-                            <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', marginBottom: '8px', color: '#0f172a' }}>Fecha *</label>
-                            <input type="date" required value={fechaActa} onChange={(e) => setFechaActa(e.target.value)} style={{ width: '100%', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '10px 12px', fontSize: '14px', boxSizing: 'border-box' }} />
+
+                        <div style={{ marginBottom: '16px' }}>
+                            <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', marginBottom: '8px', color: '#0f172a' }}>Motivo / Observaciones</label>
+                            <textarea value={motivo} onChange={(e) => setMotivo(e.target.value)} style={{ width: '100%', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '12px', minHeight: '80px', fontSize: '14px', fontFamily: 'inherit', boxSizing: 'border-box' }} placeholder="Ingrese el motivo de la decisión..." />
                         </div>
-                    </div>
 
-                    <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', alignItems: 'start' }}>
-                        <input type="checkbox" required id="budgetCheck" checked={presupuestoConfirmado} onChange={(e) => setPresupuestoConfirmado(e.target.checked)} style={{ marginTop: '4px', accentColor: '#0f172a' }} />
-                        <label htmlFor="budgetCheck" style={{ fontSize: '13px', color: '#475569', lineHeight: '1.4' }}>Confirmo que he verificado el impacto presupuestal y autorizo el compromiso de fondos.</label>
-                    </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', marginBottom: '8px', color: '#0f172a' }}>No. Acta *</label>
+                                <input type="text" required value={acta} onChange={(e) => setActa(e.target.value)} style={{ width: '100%', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '10px 12px', fontSize: '14px', boxSizing: 'border-box' }} placeholder="Ej: 004-2026" />
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', marginBottom: '8px', color: '#0f172a' }}>Fecha *</label>
+                                <input type="date" required value={fechaActa} onChange={(e) => setFechaActa(e.target.value)} style={{ width: '100%', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '10px 12px', fontSize: '14px', boxSizing: 'border-box' }} />
+                            </div>
+                        </div>
 
-                    <button type="submit" style={{ width: '100%', background: '#0f172a', color: 'white', padding: '14px', fontWeight: 'bold', borderRadius: '8px', border: 'none', fontSize: '14px', textTransform: 'uppercase', cursor: 'pointer', letterSpacing: '0.05em' }}>REGISTRAR DECISIÓN OFICIAL</button>
-                </form>
+                        <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', alignItems: 'start' }}>
+                            <input type="checkbox" required id="budgetCheck" checked={presupuestoConfirmado} onChange={(e) => setPresupuestoConfirmado(e.target.checked)} style={{ marginTop: '4px', accentColor: '#0f172a' }} />
+                            <label htmlFor="budgetCheck" style={{ fontSize: '13px', color: '#475569', lineHeight: '1.4' }}>Confirmo que he verificado el impacto presupuestal y autorizo el compromiso de fondos.</label>
+                        </div>
+
+                        <button type="submit" style={{ width: '100%', background: '#0f172a', color: 'white', padding: '14px', fontWeight: 'bold', borderRadius: '8px', border: 'none', fontSize: '14px', textTransform: 'uppercase', cursor: 'pointer', letterSpacing: '0.05em' }}>REGISTRAR DECISIÓN OFICIAL</button>
+                    </form>
+                ) : (
+                    <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '20px', textAlign: 'center' }}>
+                        <div style={{ background: '#e0e7ff', width: '48px', height: '48px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px auto', color: '#4338ca' }}>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        </div>
+                        <h4 style={{ margin: '0 0 8px 0', color: '#0f172a', fontSize: '16px' }}>Decisión Ya Emitida</h4>
+                        <p style={{ margin: '0 0 16px 0', color: '#64748b', fontSize: '13px', lineHeight: '1.5' }}>
+                            Esta salida ya cuenta con una decisión oficial del Consejo de Facultad y no puede ser alterada. Su estado actual es: <strong>{salida.estado.toUpperCase().replace('_', ' ')}</strong>.
+                        </p>
+                        <button onClick={onVolver} style={{ background: '#fff', border: '1px solid #cbd5e1', padding: '8px 16px', borderRadius: '6px', color: '#475569', fontWeight: 'bold', fontSize: '13px', cursor: 'pointer' }}>Volver al Historial</button>
+                    </div>
+                )}
 
             </div>
         </div>
