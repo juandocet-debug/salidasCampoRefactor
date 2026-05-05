@@ -44,6 +44,7 @@ class ListarSalidasConsejoCasoUso:
             EstadoSalida.PENDIENTE_AJUSTE,
             EstadoSalida.EN_PREPARACION,
             EstadoSalida.LISTA_EJECUCION,
+            EstadoSalida.PREEMBARQUE,
             EstadoSalida.EN_EJECUCION,
             EstadoSalida.FINALIZADA,
             EstadoSalida.CERRADA,

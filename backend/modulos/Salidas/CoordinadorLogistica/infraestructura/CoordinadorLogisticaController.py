@@ -98,3 +98,19 @@ class CerrarOperacionController(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+from ..aplicacion.OperacionesLogisticaUseCases import CambiarEstadoPreembarqueUseCase
+
+class CambiarPreembarqueController(APIView):
+    def post(self, request):
+        try:
+            salida_id = request.data.get('salida_id')
+            if not salida_id:
+                return Response({"error": "salida_id requerido"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            exito = CambiarEstadoPreembarqueUseCase(DjangoLogisticaRepository()).ejecutar(salida_id)
+            if exito:
+                return Response({"success": True, "mensaje": "Estado cambiado a Pre-embarque"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": "No se pudo cambiar el estado"}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

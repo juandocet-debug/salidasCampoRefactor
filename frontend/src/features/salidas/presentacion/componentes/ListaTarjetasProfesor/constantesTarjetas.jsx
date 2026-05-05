@@ -24,8 +24,8 @@ export const PORTADAS = {
 export const ETAPAS_STEPPER = [
     { id: 1, label: 'Borr.', estados: ['borrador'] },
     { id: 2, label: 'Coord.', estados: ['enviada', 'en_revision', 'rechazada', 'pendiente_ajuste'] },
-    { id: 3, label: 'Cons.', estados: ['favorable', 'ajustada', 'favorable_con_ajustes'] },
-    { id: 4, label: 'Log.', estados: ['aprobada', 'en_preparacion', 'lista_ejecucion'] },
+    { id: 3, label: 'Cons.', estados: ['favorable', 'ajustada', 'favorable_con_ajustes', 'aprobada'] },
+    { id: 4, label: 'Log.', estados: ['en_preparacion', 'lista_ejecucion', 'preembarque'] },
     { id: 5, label: 'Ejec.', estados: ['en_ejecucion', 'finalizada', 'cerrada'] },
 ];
 

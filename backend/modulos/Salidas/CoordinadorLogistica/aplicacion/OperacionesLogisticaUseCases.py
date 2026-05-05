@@ -28,3 +28,11 @@ class RegistrarCierreOperativoUseCase:
         if dto.km_final <= 0:
             raise ValueError("El kilometraje final debe ser válido.")
         return self.repository.guardar_cierre_operativo(dto)
+
+class CambiarEstadoPreembarqueUseCase:
+    def __init__(self, repository: ILogisticaRepository):
+        self.repository = repository
+
+    def ejecutar(self, salida_id: str) -> bool:
+        from ..dominio.ValueObjectsLogistica import EstadoOperativoSalida
+        return self.repository.actualizar_estado_operativo(salida_id, EstadoOperativoSalida.PREEMBARQUE.value)

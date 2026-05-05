@@ -117,7 +117,7 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 1280px;
+    max-width: 1600px; /* Aumentado a petición del usuario para que la tabla se expanda más */
     margin: 0 auto;
     padding: 2.5rem;
 }

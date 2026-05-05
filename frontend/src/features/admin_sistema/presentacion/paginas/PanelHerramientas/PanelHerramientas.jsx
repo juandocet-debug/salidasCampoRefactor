@@ -10,6 +10,7 @@ import TabCalendario from '../../componentes/TabCalendario/TabCalendario';
 import TabFlota      from '../../componentes/TabFlota/TabFlota';
 import TabComponentes from '../../componentes/TabComponentes/TabComponentes';
 import TabSalidas from '../../componentes/TabSalidas/TabSalidas';
+import TabDirectorio from '../../componentes/TabDirectorio/TabDirectorio';
 import CoordinadorLogisticaDashboard from '@/features/coordinadorLogistica/CoordinadorLogisticaDashboard';
 import './PanelHerramientas.css';
 
@@ -31,8 +32,8 @@ const TABS = [
         icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7v-5z"/></svg>
     },
     {
-        id: 'componentes', label: 'Librería UI', desc: 'Componentes y Cards', statNum: '03', statText: 'Modelos', actionTxt: 'Ver UI', progreso: '100%', componente: TabComponentes,
-        icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        id: 'directorio', label: 'Estudiantes', desc: 'Directorio CSV', statNum: '01', statText: 'Padrones', actionTxt: 'Cargar', progreso: '100%', componente: TabDirectorio,
+        icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
     },
     {
         id: 'salidas', label: 'Salidas', desc: 'Gestión de todas las salidas', statNum: '—', statText: 'Registros', actionTxt: 'Gestionar', progreso: '100%', componente: TabSalidas,

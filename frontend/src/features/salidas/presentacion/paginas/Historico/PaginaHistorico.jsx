@@ -4,6 +4,7 @@ import { useSalidas } from '@/features/salidas/presentacion/hooks/useSalidas';
 import useAlertas from '@/shared/estado/useAlertas';
 import TablaHistorico from '@/shared/componentes/generales/TablaHistorico/TablaHistorico';
 import ModalConfirmar from '@/shared/componentes/generales/ModalConfirmar/ModalConfirmar';
+import QrEstudiantesModal from '@/features/salidas/presentacion/componentes/ListaTarjetasProfesor/QrEstudiantesModal';
 
 const PaginaHistorico = () => {
     const navigate = useNavigate();
@@ -14,6 +15,7 @@ const PaginaHistorico = () => {
     const [salidaAEnviar,  setSalidaAEnviar]  = useState(null);
     const [salidaABorrar,  setSalidaABorrar]  = useState(null);
     const [salidaFeedback, setSalidaFeedback] = useState(null);
+    const [salidaParaQr,   setSalidaParaQr]   = useState(null);
     const [procesando,     setProcesando]      = useState(false);
 
     // ── Handlers ───────────────────────────────────────────────────────────
@@ -192,6 +194,7 @@ const PaginaHistorico = () => {
                     onEditar={handleEditar}
                     onEliminar={(s) => setSalidaABorrar(s)}
                     onVerDictamen={(s) => setSalidaFeedback(s)}
+                    onMostrarQr={(s) => setSalidaParaQr(s)}
                 />
             </div>
 
@@ -233,6 +236,14 @@ const PaginaHistorico = () => {
             {/* ── Modal: Concepto (se auto-selecciona según el origen del ajuste) */}
             {renderModalCoordinacion()}
             {renderModalConsejo()}
+
+            {/* ── Modal: Mostrar QR Estudiantes ── */}
+            {salidaParaQr && (
+                <QrEstudiantesModal
+                    salida={salidaParaQr}
+                    onCerrar={() => setSalidaParaQr(null)}
+                />
+            )}
         </div>
     );
 };

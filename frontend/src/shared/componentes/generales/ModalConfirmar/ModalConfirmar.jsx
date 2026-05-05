@@ -17,6 +17,12 @@ const IcoEnviar = () => (
     </svg>
 );
 
+const IcoExito = () => (
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+);
+
 /**
  * ModalConfirmar — modal de confirmación de acción destructiva.
  * @param {string}   titulo      - Título del modal (ej: "¿Eliminar salida?")
@@ -42,7 +48,7 @@ export default function ModalConfirmar({
         <div className="otm-confirmar-overlay" onClick={onCancelar}>
             <div className="otm-confirmar" style={estiloContenedor} onClick={e => e.stopPropagation()}>
                 <div className={`otm-confirmar__icono otm-confirmar__icono--${tipo}`}>
-                    {tipo === 'accion' ? <IcoEnviar /> : <IcoBorrar />}
+                    {tipo === 'accion' ? <IcoEnviar /> : tipo === 'exito' ? <IcoExito /> : <IcoBorrar />}
                 </div>
                 <h3 className="otm-confirmar__titulo">{titulo}</h3>
                 {descripcion && (

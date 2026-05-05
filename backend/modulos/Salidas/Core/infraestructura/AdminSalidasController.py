@@ -29,7 +29,7 @@ class AdminSalidasController(APIView):
             # El controlador (infraestructura) puede enriquecer con campos de presentación
             # que no pertenecen al dominio base pero sí al modelo de persistencia.
             # Esto NO viola hexagonal: estamos dentro de la capa de infraestructura.
-            from modulos.Salidas.Core.infraestructura.models import SalidaModelo
+            from modulos.Salidas.Core.infraestructura.models import SalidaModelo, AsignacionExternaLogistica
             from modulos.Salidas.Itinerario.Parada.infraestructura.models import ParadaModelo
 
             try:
@@ -51,6 +51,17 @@ class AdminSalidasController(APIView):
                     p['fecha_programada'] = str(extra.fecha_programada) if extra.fecha_programada else None
                     p['hora_programada']  = str(extra.hora_programada)  if extra.hora_programada  else None
                     p['notas_itinerario'] = extra.notas_itinerario or ''
+
+            # Buscar si hay asignación logística
+            asignacion = AsignacionExternaLogistica.objects.filter(salida_id=pk).first()
+            logistica_data = None
+            if asignacion:
+                logistica_data = {
+                    'empresa': asignacion.empresa,
+                    'contacto': asignacion.contacto,
+                    'costo_proyectado': str(asignacion.costo_proyectado),
+                    'capacidad_asignada': asignacion.capacidad_asignada
+                }
 
             return Response({
                 # Identidad
@@ -82,6 +93,8 @@ class AdminSalidasController(APIView):
                 'tipo_vehiculo_calculo':  getattr(m, 'tipo_vehiculo_calculo', None) or '',
                 # Itinerario
                 'puntos_ruta': puntos_base,
+                # Logística Externa
+                'asignacion_logistica': logistica_data,
             }, status=status.HTTP_200_OK)
 
         # ── LISTA: GET /api/admin/salidas/ ───────────────────────────────────

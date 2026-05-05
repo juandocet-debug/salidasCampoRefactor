@@ -39,6 +39,11 @@ export async function limpiarAsignacionLogistica(salidaId) {
     return res.data;
 }
 
+export async function cambiarEstadoPreembarque(salidaId) {
+    const res = await clienteHttp.post('/api/salidas/logistica/preembarque/', { salida_id: salidaId });
+    return res.data;
+}
+
 /**
  * Servicio para registrar una novedad en la evaluación de una salida.
  * @param {Object} payload Nivel y mensaje de la novedad

@@ -89,6 +89,13 @@ export const RevisionPedagogicaPanel = ({ salida, onCerrar, isStatic = false, is
     const handleSubmit = async () => {
         if (!conceptoFinal) return agregarAlerta("Debes seleccionar un concepto final.", "advertencia");
 
+        if (conceptoFinal === 'FAVORABLE') {
+            const tieneNoCumple = Object.values(criterios).some(c => c.estado === 'NO_CUMPLE');
+            if (tieneNoCumple) {
+                return agregarAlerta("Para aprobar esta salida como 'FAVORABLE', ningún criterio puede estar marcado con la X roja (NO). Por favor, ajusta tu evaluación o cambia el concepto oficial.", "advertencia");
+            }
+        }
+
         const payload = {
             coordinador_id: 1, // Usuario logueado estático por ahora
             concepto_final: conceptoFinal,

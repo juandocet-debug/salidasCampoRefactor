@@ -3,7 +3,8 @@ from .CoordinadorLogisticaController import (
     PendientesLogisticaController,
     AsignarTransporteController,
     MonitorNovedadesController,
-    CerrarOperacionController
+    CerrarOperacionController,
+    CambiarPreembarqueController
 )
 
 urlpatterns = [
@@ -13,6 +14,9 @@ urlpatterns = [
     # POST /api/salidas/logistica/asignar/
     path('asignar/', AsignarTransporteController.as_view(), name='logistica-asignar'),
     
+    # POST /api/salidas/logistica/preembarque/
+    path('preembarque/', CambiarPreembarqueController.as_view(), name='logistica-preembarque'),
+
     # POST /api/salidas/logistica/novedad/
     path('novedad/', MonitorNovedadesController.as_view(), name='logistica-novedad'),
     

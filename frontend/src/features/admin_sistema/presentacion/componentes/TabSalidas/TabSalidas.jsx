@@ -59,14 +59,117 @@ function SeccionParadas({ titulo, paradas = [], color = '#3b82f6' }) {
     );
 }
 
+// ── Componente de Renderizado de Detalle Acordeón ────────────────────────────
+function RenderDetalleAcordeon({ s, cargandoDetalle }) {
+    const puntos        = s.puntos_ruta || [];
+    const puntosIda     = puntos.filter(p => !p.es_retorno && p.motivo !== 'retorno');
+    const puntosRetorno = puntos.filter(p =>  p.es_retorno || p.motivo === 'retorno');
+    const logistica     = s.asignacion_logistica;
+
+    return (
+        <div style={{ background: '#f8fafc', padding: '24px 32px', borderBottom: '1px solid #cbd5e1', boxShadow: 'inset 0 4px 6px -4px rgba(0,0,0,0.05)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                <h3 style={{ margin: 0, color: '#0f172a', fontSize: 18, display: 'flex', alignItems: 'center', gap: 10 }}>
+                    Detalles de la Salida
+                    {cargandoDetalle && <span style={{ fontSize: 12, color: '#64748b', fontWeight: 500 }}>⏳ Cargando información completa...</span>}
+                </h3>
+            </div>
+
+            {/* ── KPIs básicos ─────────────────────────────────────── */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 16, marginBottom: 24, background: '#ffffff', padding: 18, borderRadius: 10, border: '1px solid #e2e8f0' }}>
+                <Dato label="Asignatura"    value={s.asignatura} />
+                <Dato label="Semestre"      value={s.semestre} />
+                <Dato label="Fecha Inicio"  value={s.fecha_inicio} />
+                <Dato label="Fecha Fin"     value={s.fecha_fin} />
+                <Dato label="Hora Salida"   value={s.hora_inicio} />
+                <Dato label="Hora Fin"      value={s.hora_fin} />
+                <Dato label="Estudiantes"   value={s.num_estudiantes ? `${s.num_estudiantes} personas` : null} />
+                <Dato label="Distancia"     value={s.distancia_total_km ? `${s.distancia_total_km} km` : null} />
+                <Dato label="Duración"      value={s.duracion_dias ? `${s.duracion_dias} día(s)` : null} />
+                <Dato label="Horas Viaje"   value={s.horas_viaje ? `${s.horas_viaje} h` : null} />
+                <Dato label="Costo Estimado" value={s.costo_estimado ? `$${Number(s.costo_estimado).toLocaleString('es-CO')}` : null} />
+            </div>
+
+            {/* ── 2 Columnas: Académica + Logística ───────────────── */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
+                <div style={{ background: '#ffffff', padding: 20, borderRadius: 10, border: '1px solid #e2e8f0' }}>
+                    <h4 style={{ margin: '0 0 16px', fontSize: 12, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Información Académica</h4>
+                    <Dato label="Facultad"             value={s.facultad} />
+                    <Dato label="Programa"             value={s.programa} />
+                    <Dato label="Resumen"              value={s.resumen} />
+                    <Dato label="Justificación"        value={s.justificacion} />
+                    <Dato label="Relación al Syllabus" value={s.relacion_syllabus} />
+                    <Dato label="Objetivo General"     value={s.objetivo_general || s?.planeacion?.obj_general} />
+                    <Dato label="Obj. Específicos"     value={s.objetivos_especificos} />
+                    <Dato label="Metodología"          value={s.estrategia_metodologica || s?.planeacion?.metodologia} />
+                    <Dato label="Productos Esperados"  value={typeof s.productos_esperados === 'string' ? s.productos_esperados : null} />
+                    {Array.isArray(s.criterios_evaluacion) && s.criterios_evaluacion.length > 0 && (
+                        <div style={{ marginBottom: 14 }}>
+                            <p style={{ margin: '0 0 4px', fontSize: 11, color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Criterios de Evaluación</p>
+                            {s.criterios_evaluacion.map((c, i) => (
+                                <p key={i} style={{ margin: '2px 0', color: '#334155', fontSize: 13 }}>• {typeof c === 'string' ? c : c.descripcion || c.criterio || JSON.stringify(c)}</p>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                <div style={{ background: '#ffffff', padding: 20, borderRadius: 10, border: '1px solid #e2e8f0' }}>
+                    <h4 style={{ margin: '0 0 16px', fontSize: 12, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Logística y Operación</h4>
+                    <Dato label="Punto de Partida"       value={s.punto_partida} />
+                    <Dato label="Destino / Punto Lejano" value={s.parada_max} />
+                    <Dato label="Tipo Vehículo Cálculo"  value={s.tipo_vehiculo_calculo} />
+                    
+                    {logistica ? (
+                        <div style={{ marginTop: 24, paddingTop: 20, borderTop: '1px dashed #cbd5e1' }}>
+                            <h4 style={{ margin: '0 0 16px', fontSize: 12, color: '#0ea5e9', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Transporte Asignado</h4>
+                            <Dato label="Empresa Transportadora" value={logistica.empresa} />
+                            <Dato label="Contacto"               value={logistica.contacto} />
+                            <Dato label="Capacidad Asignada"     value={`${logistica.capacidad_asignada} pasajeros`} />
+                            <Dato label="Costo Proyectado"       value={`$${Number(logistica.costo_proyectado).toLocaleString('es-CO')}`} />
+                        </div>
+                    ) : (
+                        <div style={{ marginTop: 24, paddingTop: 20, borderTop: '1px dashed #cbd5e1' }}>
+                            <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', fontStyle: 'italic' }}>Aún no hay transporte asignado a esta salida.</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* ── Itinerario Completo ──────────────────────────────── */}
+            <div style={{ background: '#ffffff', borderRadius: 10, border: '1px solid #e2e8f0', padding: 20 }}>
+                <h4 style={{ margin: '0 0 20px', fontSize: 12, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                    Itinerario Completo
+                    <span style={{ fontSize: 11, fontWeight: 400, color: '#94a3b8' }}>({puntos.length} puntos en total)</span>
+                </h4>
+
+                {!puntos.length ? (
+                    <p style={{ color: '#94a3b8', fontSize: 14, margin: 0 }}>
+                        {cargandoDetalle ? 'Cargando paradas...' : 'Esta salida no tiene paradas registradas en el itinerario todavía.'}
+                    </p>
+                ) : (
+                    <>
+                        <SeccionParadas titulo="Ruta de IDA" paradas={puntosIda} color="#3b82f6" />
+                        <SeccionParadas titulo="Ruta de RETORNO" paradas={puntosRetorno} color="#8b5cf6" />
+                    </>
+                )}
+            </div>
+        </div>
+    );
+}
+
 // ── Componente Principal ─────────────────────────────────────────────────────
 export default function TabSalidas({ token }) {
     const [salidas, setSalidas]         = useState([]);
     const [cargando, setCargando]       = useState(true);
     const [confirmId, setConfirmId]     = useState(null);
     const [eliminando, setEliminando]   = useState(false);
-    const [vistaConsultar, setVistaConsultar]       = useState(null);
+    
+    // Estados para el acordeón
+    const [expandidoId, setExpandidoId] = useState(null);
+    const [detallesCacheados, setDetallesCacheados] = useState({});
     const [cargandoDetalle, setCargandoDetalle]     = useState(false);
+    
     const agregarAlerta = useAlertas(s => s.agregarAlerta);
 
     // ── Cargar lista ─────────────────────────────────────────────────────────
@@ -84,17 +187,26 @@ export default function TabSalidas({ token }) {
 
     useEffect(() => { cargar(); }, []);
 
-    // ── Abrir detalle completo ───────────────────────────────────────────────
-    const abrirConsulta = async (s) => {
-        setVistaConsultar(s);
-        setCargandoDetalle(true);
-        try {
-            const res     = await fetch(`${DETAIL_URL}${s.id}/`, { headers: { Authorization: token ? `Bearer ${token}` : '' } });
-            const detalle = await res.json();
-            setVistaConsultar(prev => ({ ...prev, ...detalle }));
-        } catch {
-            // fallback: muestra lo que ya tenía de la lista
-        } finally { setCargandoDetalle(false); }
+    // ── Alternar Acordeón ───────────────────────────────────────────────
+    const toggleAcordeon = async (s) => {
+        if (expandidoId === s.id) {
+            setExpandidoId(null);
+            return;
+        }
+        setExpandidoId(s.id);
+        
+        if (!detallesCacheados[s.id]) {
+            setCargandoDetalle(true);
+            try {
+                const res     = await fetch(`${DETAIL_URL}${s.id}/`, { headers: { Authorization: token ? `Bearer ${token}` : '' } });
+                if (!res.ok) throw new Error('Error de red');
+                const detalle = await res.json();
+                setDetallesCacheados(prev => ({ ...prev, [s.id]: detalle }));
+            } catch (error) {
+                agregarAlerta('Error al cargar los detalles completos de la salida', 'error');
+                console.error(error);
+            } finally { setCargandoDetalle(false); }
+        }
     };
 
     // ── Eliminar ─────────────────────────────────────────────────────────────
@@ -110,112 +222,6 @@ export default function TabSalidas({ token }) {
         finally { setEliminando(false); setConfirmId(null); }
     };
 
-    // ────────────────────────────────────────────────────────────────────────
-    //  VISTA DETALLE (cuando se abre una salida)
-    // ────────────────────────────────────────────────────────────────────────
-    if (vistaConsultar) {
-        const s = vistaConsultar;
-        const puntos        = s.puntos_ruta || [];
-        const puntosIda     = puntos.filter(p => !p.es_retorno && p.motivo !== 'retorno');
-        const puntosRetorno = puntos.filter(p =>  p.es_retorno || p.motivo === 'retorno');
-
-        return (
-            <div style={{ background: '#fff', padding: 28, borderRadius: 12, border: '1px solid #e2e8f0' }}>
-
-                {/* ── Header ─────────────────────────────────────────────── */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24, borderBottom: '1px solid #e2e8f0', paddingBottom: 20 }}>
-                    <div>
-                        <button onClick={() => setVistaConsultar(null)}
-                            style={{ background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#64748b', marginBottom: 14 }}>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-                            Volver al listado
-                        </button>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-                            <h2 style={{ margin: 0, color: '#0f172a', fontSize: 22 }}>{s.nombre}</h2>
-                            <code style={{ background: '#f1f5f9', padding: '3px 10px', borderRadius: 6, fontSize: 12, color: '#475569', border: '1px solid #cbd5e1' }}>{s.codigo}</code>
-                        </div>
-                    </div>
-                    <span style={{ ...(ESTADO_STYLE[s.estado?.toLowerCase()] || { background: '#f1f5f9', color: '#64748b' }), padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700, letterSpacing: '0.5px' }}>
-                        {s.estado?.toUpperCase()}
-                    </span>
-                </div>
-
-                {cargandoDetalle && (
-                    <div style={{ textAlign: 'center', padding: 20, color: '#94a3b8', fontSize: 13 }}>⏳ Cargando detalle completo desde la base de datos...</div>
-                )}
-
-                {/* ── KPIs básicos ─────────────────────────────────────── */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 16, marginBottom: 24, background: '#f8fafc', padding: 18, borderRadius: 10, border: '1px solid #e2e8f0' }}>
-                    <Dato label="Asignatura"    value={s.asignatura} />
-                    <Dato label="Semestre"      value={s.semestre} />
-                    <Dato label="Fecha Inicio"  value={s.fecha_inicio} />
-                    <Dato label="Fecha Fin"     value={s.fecha_fin} />
-                    <Dato label="Hora Salida"   value={s.hora_inicio} />
-                    <Dato label="Hora Fin"      value={s.hora_fin} />
-                    <Dato label="Estudiantes"   value={s.num_estudiantes ? `${s.num_estudiantes} personas` : null} />
-                    <Dato label="Distancia"     value={s.distancia_total_km ? `${s.distancia_total_km} km` : null} />
-                    <Dato label="Duración"      value={s.duracion_dias ? `${s.duracion_dias} día(s)` : null} />
-                    <Dato label="Horas Viaje"   value={s.horas_viaje ? `${s.horas_viaje} h` : null} />
-                    <Dato label="Costo Estimado" value={s.costo_estimado ? `$${Number(s.costo_estimado).toLocaleString('es-CO')}` : null} />
-                </div>
-
-                {/* ── 2 Columnas: Académica + Logística ───────────────── */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
-                    <div style={{ background: '#f8fafc', padding: 20, borderRadius: 10, border: '1px solid #e2e8f0' }}>
-                        <h4 style={{ margin: '0 0 16px', fontSize: 12, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Información Académica</h4>
-                        <Dato label="Facultad"             value={s.facultad} />
-                        <Dato label="Programa"             value={s.programa} />
-                        <Dato label="Resumen"              value={s.resumen} />
-                        <Dato label="Justificación"        value={s.justificacion} />
-                        <Dato label="Relación al Syllabus" value={s.relacion_syllabus} />
-                        <Dato label="Objetivo General"     value={s.objetivo_general || s.planeacion?.obj_general} />
-                        <Dato label="Obj. Específicos"     value={s.objetivos_especificos} />
-                        <Dato label="Metodología"          value={s.estrategia_metodologica || s.planeacion?.metodologia} />
-                        <Dato label="Productos Esperados"  value={typeof s.productos_esperados === 'string' ? s.productos_esperados : null} />
-                        {Array.isArray(s.criterios_evaluacion) && s.criterios_evaluacion.length > 0 && (
-                            <div style={{ marginBottom: 14 }}>
-                                <p style={{ margin: '0 0 4px', fontSize: 11, color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Criterios de Evaluación</p>
-                                {s.criterios_evaluacion.map((c, i) => (
-                                    <p key={i} style={{ margin: '2px 0', color: '#334155', fontSize: 13 }}>• {typeof c === 'string' ? c : c.descripcion || c.criterio || JSON.stringify(c)}</p>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-
-                    <div style={{ background: '#f8fafc', padding: 20, borderRadius: 10, border: '1px solid #e2e8f0' }}>
-                        <h4 style={{ margin: '0 0 16px', fontSize: 12, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Logística</h4>
-                        <Dato label="Punto de Partida"       value={s.punto_partida} />
-                        <Dato label="Destino / Punto Lejano" value={s.parada_max} />
-                        <Dato label="Tipo Vehículo Cálculo"  value={s.tipo_vehiculo_calculo} />
-                    </div>
-                </div>
-
-                {/* ── Itinerario Completo ──────────────────────────────── */}
-                <div style={{ background: '#fff', borderRadius: 10, border: '1px solid #e2e8f0', padding: 20 }}>
-                    <h4 style={{ margin: '0 0 20px', fontSize: 12, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
-                        Itinerario Completo
-                        <span style={{ fontSize: 11, fontWeight: 400, color: '#94a3b8' }}>({puntos.length} puntos en total)</span>
-                    </h4>
-
-                    {!puntos.length ? (
-                        <p style={{ color: '#94a3b8', fontSize: 14, margin: 0 }}>
-                            {cargandoDetalle ? 'Cargando paradas...' : 'Esta salida no tiene paradas registradas en el itinerario todavía.'}
-                        </p>
-                    ) : (
-                        <>
-                            <SeccionParadas titulo="Ruta de IDA" paradas={puntosIda} color="#3b82f6" />
-                            <SeccionParadas titulo="Ruta de RETORNO" paradas={puntosRetorno} color="#8b5cf6" />
-                        </>
-                    )}
-                </div>
-            </div>
-        );
-    }
-
-    // ────────────────────────────────────────────────────────────────────────
-    //  VISTA TABLA (listado principal)
-    // ────────────────────────────────────────────────────────────────────────
     return (
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
@@ -242,37 +248,54 @@ export default function TabSalidas({ token }) {
                         </thead>
                         <tbody>
                             {salidas.map(s => (
-                                <tr key={s.id}>
-                                    <td><code style={{ background: '#f1f5f9', padding: '2px 7px', borderRadius: 4, fontSize: 12 }}>{s.codigo}</code></td>
-                                    <td>
-                                        <div style={{ fontWeight: 600 }}>{s.nombre}</div>
-                                        {s.asignatura && <div style={{ fontSize: 12, color: '#94a3b8' }}>{s.asignatura}</div>}
-                                    </td>
-                                    <td>
-                                        <span style={{ ...(ESTADO_STYLE[s.estado] || { background: '#f1f5f9', color: '#64748b' }), padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
-                                            {s.estado?.toUpperCase()}
-                                        </span>
-                                    </td>
-                                    <td>{s.semestre || '—'}</td>
-                                    <td>{s.fecha_inicio || '—'}</td>
-                                    <td>
-                                        <div className="herr-acciones">
-                                            <button className="herr-action-circle" title="Consultar salida (Solo lectura)"
-                                                onClick={() => abrirConsulta(s)}
-                                                style={{ color: '#0ea5e9', borderColor: '#e0f2fe', background: '#f0f9ff' }}>
-                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-                                                </svg>
-                                            </button>
-                                            <button className="herr-action-circle herr-action-circle--delete" title="Eliminar salida"
-                                                onClick={() => setConfirmId(s.id)}>
-                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-                                                    <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                <React.Fragment key={s.id}>
+                                    <tr 
+                                        onClick={() => toggleAcordeon(s)} 
+                                        style={{ cursor: 'pointer', background: expandidoId === s.id ? '#f8fafc' : 'transparent' }}
+                                    >
+                                        <td><code style={{ background: '#f1f5f9', padding: '2px 7px', borderRadius: 4, fontSize: 12 }}>{s.codigo}</code></td>
+                                        <td>
+                                            <div style={{ fontWeight: 600 }}>{s.nombre}</div>
+                                            {s.asignatura && <div style={{ fontSize: 12, color: '#94a3b8' }}>{s.asignatura}</div>}
+                                        </td>
+                                        <td>
+                                            <span style={{ ...(ESTADO_STYLE[s.estado] || { background: '#f1f5f9', color: '#64748b' }), padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
+                                                {s.estado?.toUpperCase()}
+                                            </span>
+                                        </td>
+                                        <td>{s.semestre || '—'}</td>
+                                        <td>{s.fecha_inicio || '—'}</td>
+                                        <td>
+                                            <div className="herr-acciones" onClick={(e) => e.stopPropagation()}>
+                                                <button className="herr-action-circle" title="Ver Detalles"
+                                                    onClick={() => toggleAcordeon(s)}
+                                                    style={{ color: expandidoId === s.id ? '#fff' : '#0ea5e9', borderColor: expandidoId === s.id ? '#0ea5e9' : '#e0f2fe', background: expandidoId === s.id ? '#0ea5e9' : '#f0f9ff' }}>
+                                                    {expandidoId === s.id ? (
+                                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                                                    ) : (
+                                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                                    )}
+                                                </button>
+                                                <button className="herr-action-circle herr-action-circle--delete" title="Eliminar salida"
+                                                    onClick={() => setConfirmId(s.id)}>
+                                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                                                        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {expandidoId === s.id && (
+                                        <tr>
+                                            <td colSpan="6" style={{ padding: 0, borderBottom: '2px solid #e2e8f0' }}>
+                                                <RenderDetalleAcordeon 
+                                                    s={detallesCacheados[s.id] || s} 
+                                                    cargandoDetalle={cargandoDetalle && !detallesCacheados[s.id]} 
+                                                />
+                                            </td>
+                                        </tr>
+                                    )}
+                                </React.Fragment>
                             ))}
                         </tbody>
                     </table>

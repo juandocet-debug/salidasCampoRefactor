@@ -18,15 +18,13 @@ class DjangoLogisticaRepository(ILogisticaRepository):
         Retorna salidas en gestión logística: aprobadas por consejo y ya asignadas.
         """
         estados_visibles = [
-            EstadoOperativoSalida.APROBADA_CONSEJO.value,   # 'aprobada_consejo_facultad'
+            EstadoOperativoSalida.APROBADA_CONSEJO.value,   # 'aprobada'
+            'en_preparacion',                               # 'en_preparacion' (Incompleta)
             EstadoOperativoSalida.LISTA_EJECUCION.value,    # 'lista_ejecucion'
+            EstadoOperativoSalida.PREEMBARQUE.value,        # 'preembarque'
         ]
-        # Traemos todas las salidas con código (seguridad) — en producción filtrar por estado
-        salidas_orm = SalidaModelo.objects.exclude(codigo='').order_by('-id')
-
-        print(f"[LOG] obtener_salidas_por_estado: encontradas {salidas_orm.count()} salidas con código")
-        for s in salidas_orm:
-            print(f"  → id={s.id} codigo={s.codigo} estado='{s.estado}'")
+        # Solo salidas que han pasado por el proceso completo (aprobadas por consejo o ya en ejecución)
+        salidas_orm = SalidaModelo.objects.filter(estado__in=estados_visibles).order_by('-id')
 
         # Obtener nombres de facultades
         facultad_ids = [s.facultad_id for s in salidas_orm if s.facultad_id]
@@ -141,7 +139,21 @@ class DjangoLogisticaRepository(ILogisticaRepository):
         except Exception as e:
             print(f"[WARN] No se pudo persistir asignación externa: {e}")
 
-        self.actualizar_estado_operativo(dto.salida_id, EstadoOperativoSalida.LISTA_EJECUCION.value)
+        try:
+            from modulos.Salidas.Core.infraestructura.models import SalidaModelo
+            s_orm = SalidaModelo.objects.get(id=int(dto.salida_id))
+            total_pax = (s_orm.num_estudiantes or 0) + 1  # 1 docente responsable
+            if total_pax == 0: total_pax = 1
+            
+            if (dto.capacidad_asignada or 0) >= total_pax:
+                self.actualizar_estado_operativo(dto.salida_id, EstadoOperativoSalida.LISTA_EJECUCION.value)
+            else:
+                # Si está incompleta, se mantiene en preparación
+                self.actualizar_estado_operativo(dto.salida_id, 'en_preparacion')
+        except Exception as e:
+            print(f"[ERROR] Verificando pax vs cap: {e}")
+            self.actualizar_estado_operativo(dto.salida_id, EstadoOperativoSalida.LISTA_EJECUCION.value)
+
         return True
 
     def guardar_novedad_operativa(self, dto) -> bool:

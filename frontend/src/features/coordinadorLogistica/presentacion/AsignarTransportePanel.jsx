@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { CardMatcha } from '../../../shared/componentes/generales/Tarjetas/Tarjetas';
 import { EtiquetaPill, BotonAccion } from '../../../shared/componentes/generales/ElementosUX/ElementosUX';
 import ModalConfirmar from '../../../shared/componentes/generales/ModalConfirmar/ModalConfirmar';
-import { obtenerVehiculosDisponibles, asignarTransporteLogistica, limpiarAsignacionLogistica, obtenerEmpresasContratadas, obtenerConductoresPorEmpresa } from '../aplicacion/servicios';
+import { obtenerVehiculosDisponibles, asignarTransporteLogistica, limpiarAsignacionLogistica, obtenerEmpresasContratadas, obtenerConductoresPorEmpresa, cambiarEstadoPreembarque } from '../aplicacion/servicios';
 import useAlertas from '../../../shared/estado/useAlertas';
 import GestionEmpresasModal from './GestionEmpresas/GestionEmpresasModal';
 
@@ -101,6 +101,8 @@ const AsignarTransportePanel = ({ salida, onVolver }) => {
     const [modalGestion, setModalGestion] = useState(false);
     const [confirmarBorrar, setConfirmarBorrar] = useState(false);
     const [limpiando, setLimpiando] = useState(false);
+    const [confirmarPreembarque, setConfirmarPreembarque] = useState(false);
+    const [pasandoPreembarque, setPasandoPreembarque] = useState(false);
     
     const tieneAsignacionPrevia = salida?.estado === 'lista_ejecucion' && (salida?.empresa_asignada || salida?.conductor_asignado);
     const [modoEdicion, setModoEdicion] = useState(!tieneAsignacionPrevia);
@@ -172,6 +174,24 @@ const AsignarTransportePanel = ({ salida, onVolver }) => {
                     finalPlacaOEmpresa = externoInfo;
                     finalConductor = conductorExternoInfo;
                 }
+            } else if (tipo_transporte === 'flota_propia') {
+                if (placa_o_empresa && placa_o_empresa !== 'Sin Asignar') {
+                    finalPlacaOEmpresa = `Flota UPN (${placa_o_empresa})`;
+                }
+                
+                // Si la BD ya tenía un contratado previo (y estamos actualizando la flota propia)
+                if (salida && salida.empresa_asignada) {
+                    const partesEmp = salida.empresa_asignada.split(' + ');
+                    const partesCond = (salida.conductor_asignado || '').split(' + ');
+                    
+                    const infoContratada = partesEmp.filter((p, i) => !p.startsWith('Flota UPN') && !partesCond[i]?.includes('Institucional')).join(' + ');
+                    const condContratado = partesCond.filter((c, i) => !partesEmp[i].startsWith('Flota UPN') && !c.includes('Institucional')).join(' + ');
+                    
+                    if (infoContratada) {
+                        finalPlacaOEmpresa = finalPlacaOEmpresa ? `${finalPlacaOEmpresa} + ${infoContratada}` : infoContratada;
+                        finalConductor = finalPlacaOEmpresa ? `${finalConductor} + ${condContratado}` : condContratado;
+                    }
+                }
             }
 
             const payload = {
@@ -185,8 +205,7 @@ const AsignarTransportePanel = ({ salida, onVolver }) => {
             await asignarTransporteLogistica(payload);
             
             if(volverAlListado) {
-                agregarAlerta("¡Transporte asignado correctamente!", 'exito');
-                if(onVolver) onVolver();
+                setConfirmarPreembarque(true);
             }
         } catch (error) {
             console.error("Error al asignar transporte:", error);
@@ -448,6 +467,18 @@ const AsignarTransportePanel = ({ salida, onVolver }) => {
                         </div>
                     </div>
                     <div style={{ display: 'flex', gap: '8px', flexShrink: 0, alignItems: 'center', alignSelf: 'flex-start' }}>
+                        {salida?.estado !== 'preembarque' && (
+                            <button
+                                onClick={() => setConfirmarPreembarque(true)}
+                                style={{ background: '#0f172a', color: '#fff', padding: '8px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', transition: 'background 0.2s' }}
+                                onMouseOver={(e) => e.currentTarget.style.background = '#334155'}
+                                onMouseOut={(e) => e.currentTarget.style.background = '#0f172a'}
+                                title="Habilitar generación de QR para el profesor"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                                Pasar a Pre-embarque
+                            </button>
+                        )}
                         {!modoEdicion && (
                             <BotonAccion
                                 tipo="editar"
@@ -792,7 +823,6 @@ const AsignarTransportePanel = ({ salida, onVolver }) => {
             {/* Modal Gestión de Empresas y Conductores */}
             {modalGestion && <GestionEmpresasModal onCerrar={() => setModalGestion(false)} />}
 
-            {/* Modal confirmación borrar asignación */}
             {confirmarBorrar && (
                 <ModalConfirmar
                     titulo="Borrar asignación de transporte"
@@ -801,6 +831,36 @@ const AsignarTransportePanel = ({ salida, onVolver }) => {
                     cargando={limpiando}
                     onConfirmar={handleLimpiar}
                     onCancelar={() => setConfirmarBorrar(false)}
+                />
+            )}
+
+            {confirmarPreembarque && (
+                <ModalConfirmar
+                    tipo="exito"
+                    titulo="Transporte Asignado"
+                    descripcion={<span>El transporte ha sido asignado correctamente. ¿Deseas pasar la salida a estado de <strong>Pre-embarque</strong> para que el profesor pueda generar el QR de abordaje para los estudiantes?</span>}
+                    labelConfirmar="Sí, pasar a Pre-embarque"
+                    labelCancelar="Mantener en Ejecución"
+                    estiloContenedor={{ maxWidth: '460px' }}
+                    cargando={pasandoPreembarque}
+                    onConfirmar={async () => {
+                        try {
+                            setPasandoPreembarque(true);
+                            await cambiarEstadoPreembarque(salida.id);
+                            agregarAlerta("¡Salida pasada a Pre-embarque exitosamente!", 'exito');
+                            if(onVolver) onVolver();
+                        } catch (e) {
+                            agregarAlerta("Error al cambiar a Pre-embarque.", 'error');
+                        } finally {
+                            setPasandoPreembarque(false);
+                            setConfirmarPreembarque(false);
+                        }
+                    }}
+                    onCancelar={() => {
+                        setConfirmarPreembarque(false);
+                        agregarAlerta("¡Transporte asignado correctamente!", 'exito');
+                        if(onVolver) onVolver();
+                    }}
                 />
             )}
         </div>

@@ -37,7 +37,8 @@ export default function PaginaNuevaSalida() {
     const { token } = useAutenticacion();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const editarId = searchParams.get('editar');
+    const isReadOnly = searchParams.has('ver');
+    const editarId = searchParams.get('editar') || searchParams.get('ver');
     const { agregarAlerta } = useAlertas();
     const [cargando, setCargando] = useState(false);
     const [pasoActivo, setPasoActivo] = useState(1);
@@ -116,16 +117,17 @@ export default function PaginaNuevaSalida() {
 
             <div className="nsal-form-body" onKeyDown={handleKeyDown}>
 
-
-                {pasoActivo === 1 && <Paso1Informacion
-                    form={form} setForm={setForm}
-                    esGrupal={esGrupal} setEsGrupal={setEsGrupal}
-                    profesoresAsociados={profesoresAsociados}
-                    setProfesoresAsociados={setProfesoresAsociados}
-                />}
-                {pasoActivo === 2 && <Paso2Planeacion form={form} setForm={setForm} />}
-                {pasoActivo === 3 && <Paso3Logistica form={form} setForm={setForm} />}
-                {pasoActivo === 4 && <Paso4Evaluacion form={form} setForm={setForm} />}
+                <fieldset disabled={isReadOnly} style={{ border: 'none', padding: 0, margin: 0, minWidth: 0 }}>
+                    {pasoActivo === 1 && <Paso1Informacion
+                        form={form} setForm={setForm}
+                        esGrupal={esGrupal} setEsGrupal={setEsGrupal}
+                        profesoresAsociados={profesoresAsociados}
+                        setProfesoresAsociados={setProfesoresAsociados}
+                    />}
+                    {pasoActivo === 2 && <Paso2Planeacion form={form} setForm={setForm} />}
+                    {pasoActivo === 3 && <Paso3Logistica form={form} setForm={setForm} />}
+                    {pasoActivo === 4 && <Paso4Evaluacion form={form} setForm={setForm} />}
+                </fieldset>
 
                 <div className="nsal-footer">
                     {pasoActivo > 1 ? (
@@ -135,9 +137,11 @@ export default function PaginaNuevaSalida() {
                     {pasoActivo < 4 ? (
                         <button type="button" className="nsal-btn-primario" onClick={handleSiguiente}>Siguiente →</button>
                     ) : (
-                        <button type="button" className="nsal-btn-final" disabled={cargando} onClick={handleSubmit}>
-                            {cargando ? 'Guardando...' : 'Finalizar y Guardar ✔'}
-                        </button>
+                        !isReadOnly && (
+                            <button type="button" className="nsal-btn-final" disabled={cargando} onClick={handleSubmit}>
+                                {cargando ? 'Guardando...' : 'Finalizar y Guardar ✔'}
+                            </button>
+                        )
                     )}
                 </div>
             </div>

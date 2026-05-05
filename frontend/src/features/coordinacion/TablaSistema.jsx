@@ -49,7 +49,7 @@ export const TablaSistema = ({ salidas = [], cargando = false, titulo = "Sistema
                             if (e === 'favorable') return { texto: 'FAVORABLE', style: { background: '#ecfdf5', color: '#10b981', border: 'none' } };
                             if (e === 'rechazada') return { texto: 'RECHAZADA', style: { background: '#fee2e2', color: '#ef4444', border: 'none' } };
                             if (e === 'aprobada') return { texto: 'APROBADA (CONSEJO)', style: { background: '#dbeafe', color: '#2563eb', border: 'none' } };
-                            if (e === 'en_preparacion' || e === 'lista_ejecucion') return { texto: 'AGENDADA EN LOGÍSTICA', style: { background: '#e0f2fe', color: '#0369a1', border: 'none' } };
+                            if (e === 'en_preparacion' || e === 'lista_ejecucion' || e === 'preembarque') return { texto: 'AGENDADA EN LOGÍSTICA', style: { background: '#e0f2fe', color: '#0369a1', border: 'none' } };
                             if (e === 'en_ejecucion') return { texto: 'EN EJECUCIÓN', style: { background: '#e0e7ff', color: '#4338ca', border: 'none' } };
                             if (e === 'finalizada' || e === 'cerrada') return { texto: 'FINALIZADA', style: { background: '#dcfce7', color: '#166534', border: 'none' } };
                             if (e === 'en_revision' || e === 'enviada') return { texto: 'POR REVISAR', style: { background: '#f1f5f9', color: '#64748b', border: '1px dashed #cbd5e1' } };

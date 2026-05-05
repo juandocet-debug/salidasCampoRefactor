@@ -48,6 +48,7 @@ const ESTADO_CONFIG = {
     aprobada:    { label: 'Aprobada',    clase: 'aprobada' },
     en_preparacion: { label: 'En Logística', clase: 'proceso' },
     lista_ejecucion: { label: 'Agendada', clase: 'proceso' },
+    preembarque: { label: 'Pre-embarque', clase: 'proceso' },
     en_ejecucion:  { label: 'En Ejecución', clase: 'aprobada' },
     finalizada:  { label: 'Finalizada',  clase: 'finalizada' },
     cerrada:     { label: 'Cerrada',     clase: 'finalizada' },
@@ -73,6 +74,7 @@ const TablaHistorico = ({
     onEditar,
     onEliminar,
     onVerDictamen,
+    onMostrarQr,
 }) => {
     const [expandidoId, setExpandidoId] = useState(null);
     const toggleFila = (id) => setExpandidoId(expandidoId === id ? null : id);
@@ -143,7 +145,7 @@ const TablaHistorico = ({
                                                 { id: 3, name: 'Consolidado', states: tieneConsejo
                                                     ? ['favorable', 'ajustada', 'favorable_con_ajustes', 'pendiente_ajuste']
                                                     : ['favorable', 'ajustada', 'favorable_con_ajustes'] },
-                                                { id: 4, name: 'Logística', states: ['aprobada', 'en_preparacion', 'lista_ejecucion'] },
+                                                { id: 4, name: 'Logística', states: ['aprobada', 'en_preparacion', 'lista_ejecucion', 'preembarque'] },
                                                 { id: 5, name: 'Ejecución', states: ['en_ejecucion', 'finalizada', 'cerrada'] },
                                             ];
                                             return etapas;
@@ -155,7 +157,7 @@ const TablaHistorico = ({
                                             
                                             return (
                                                 <React.Fragment key={etapa.id}>
-                                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                                                    <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
                                                         <div style={{ 
                                                             width: isActive ? '12px' : '8px', 
                                                             height: isActive ? '12px' : '8px', 
@@ -174,7 +176,7 @@ const TablaHistorico = ({
                                         })}
                                     </div>
 
-                                    <span className="th-item__fecha" style={{ minWidth: '80px', textAlign: 'right' }}>{fmtFecha(item.fecha_inicio)}</span>
+                                    <span className="th-item__fecha" style={{ width: '90px', textAlign: 'right' }}>{fmtFecha(item.fecha_inicio)}</span>
                                     
                                     {/* ── Smart Badge Contextual ── */}
                                     {(() => {
@@ -195,13 +197,14 @@ const TablaHistorico = ({
                                         else if (est === 'en_revision') { b_text = 'Evaluando'; b_actor = 'Coordinador'; b_emoji = '⏳'; }
                                         else if (est === 'aprobada') { b_text = 'Aprobada'; b_actor = 'Logística'; b_emoji = '🎯'; }
                                         else if (est === 'en_preparacion' || est === 'lista_ejecucion') { b_text = 'Agendada'; b_actor = 'Logística'; b_emoji = '🚚'; }
+                                        else if (est === 'preembarque') { b_text = 'Pre-embarque'; b_actor = 'Logística'; b_emoji = '🎟️'; }
                                         else if (est === 'en_ejecucion') { b_text = 'En Ruta'; b_actor = 'Sistema'; b_emoji = '📍'; }
                                         else if (est === 'finalizada' || est === 'cerrada') { b_text = 'Finalizada'; b_actor = 'Sistema'; b_emoji = '🏁'; }
                                         else if (est === 'borrador') { b_text = 'Borrador'; b_actor = 'Profesor'; b_emoji = '📝'; }
                                         else if (est === 'enviada') { b_text = 'Enviada'; b_actor = 'Sistema'; b_emoji = '📨'; }
 
                                         return (
-                                            <div className={`th-item__badge th-item__badge--${cfg.clase}`} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px' }}>
+                                            <div className={`th-item__badge th-item__badge--${cfg.clase}`} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px', width: '140px', boxSizing: 'border-box' }}>
                                                 {b_emoji && <span style={{ fontSize: '12px' }}>{b_emoji}</span>}
                                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: '1.2' }}>
                                                     <span style={{ fontSize: '11px', fontWeight: '800' }}>{b_text}</span>
@@ -225,32 +228,34 @@ const TablaHistorico = ({
                                     )}
 
 
-                                    {/* ── Acciones (editar/borrar si no ha escalado irremediablemente) ── */}
-                                    {(est === 'borrador' || est === 'pendiente_ajuste' || est === 'rechazada') && (
-                                        <div className="th-item__acciones">
+                                    {/* ── Acciones unificadas ── */}
+                                    <div className="th-item__acciones" style={{ width: '95px', display: 'flex', justifyContent: 'flex-end' }}>
+                                        {(est === 'borrador' || est === 'pendiente_ajuste' || est === 'rechazada') && (
+                                            <>
+                                                <button className="th-btn-accion th-btn-accion--enviar" title="Enviar a revisión" onClick={(e) => { e.stopPropagation(); onEnviar?.(item); }}>
+                                                    <IcoEnviar />
+                                                </button>
+                                                <button className="th-btn-accion th-btn-accion--editar" title="Editar" onClick={(e) => { e.stopPropagation(); onEditar?.(item); }}>
+                                                    <IcoEditar />
+                                                </button>
+                                                <button className="th-btn-accion th-btn-accion--borrar" title="Eliminar" onClick={(e) => { e.stopPropagation(); onEliminar?.(item); }}>
+                                                    <IcoBorrar />
+                                                </button>
+                                            </>
+                                        )}
+
+                                        {(est === 'lista_ejecucion' || est === 'preembarque') && (
                                             <button
-                                                className="th-btn-accion th-btn-accion--enviar"
-                                                title="Enviar a revisión"
-                                                onClick={(e) => { e.stopPropagation(); onEnviar?.(item); }}
+                                                className="th-btn-accion"
+                                                style={{ color: '#0f172a', background: '#f8fafc', width: 'auto', padding: '0 12px', gap: '6px', fontSize: '11px', fontWeight: 'bold', border: '1px solid #e2e8f0', borderRadius: '6px' }}
+                                                title="Mostrar QR de Abordaje"
+                                                onClick={(e) => { e.stopPropagation(); onMostrarQr?.(item); }}
                                             >
-                                                <IcoEnviar />
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><rect x="7" y="7" width="3" height="3"></rect><rect x="14" y="7" width="3" height="3"></rect><rect x="7" y="14" width="3" height="3"></rect><rect x="14" y="14" width="3" height="3"></rect></svg>
+                                                Ver QR
                                             </button>
-                                            <button
-                                                className="th-btn-accion th-btn-accion--editar"
-                                                title="Editar"
-                                                onClick={(e) => { e.stopPropagation(); onEditar?.(item); }}
-                                            >
-                                                <IcoEditar />
-                                            </button>
-                                            <button
-                                                className="th-btn-accion th-btn-accion--borrar"
-                                                title="Eliminar"
-                                                onClick={(e) => { e.stopPropagation(); onEliminar?.(item); }}
-                                            >
-                                                <IcoBorrar />
-                                            </button>
-                                        </div>
-                                    )}
+                                        )}
+                                    </div>
 
                                     <button className="th-btn-acordeon" style={{ marginLeft: '6px' }}>
                                         <IcoChevron abierto={esAbierto} />

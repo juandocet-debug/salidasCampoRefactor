@@ -36,7 +36,7 @@ class SalidaCreate:
         horas_viaje = data.get('horas_viaje') if data.get('horas_viaje') is not None else 0.0
         costo_estimado = data.get('costo_estimado') if data.get('costo_estimado') is not None else 0.0
         salida_temp = Salida(
-            id=SalidaId(1),
+            id=SalidaId(None),
             codigo=SalidaCodigo(codigo),
             nombre=SalidaNombre(data.get('nombre')),
             asignatura=SalidaAsignatura(data.get('asignatura')),

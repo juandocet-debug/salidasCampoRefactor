@@ -52,6 +52,11 @@
     color: #0284c7;
 }
 
+.otm-confirmar__icono--exito {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
 .otm-confirmar__titulo {
     font-size: 1.15rem;
     font-weight: 800;
@@ -78,7 +83,8 @@
 .otm-confirmar__cancelar,
 .otm-confirmar__boton {
     flex: 1;
-    height: 42px;
+    min-height: 44px;
+    padding: 8px 12px;
     border-radius: 10px;
     font-size: 0.9rem;
     font-weight: 700;
@@ -86,6 +92,11 @@
     border: none;
     cursor: pointer;
     transition: transform 0.15s, background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.2;
 }
 
 .otm-confirmar__cancelar {
@@ -109,6 +120,15 @@
 }
 .otm-confirmar__boton--accion:hover:not(:disabled) {
     background: #0369a1;
+    transform: scale(1.03);
+}
+
+.otm-confirmar__boton--exito {
+    background: #16a34a;
+    color: #ffffff;
+}
+.otm-confirmar__boton--exito:hover:not(:disabled) {
+    background: #15803d;
     transform: scale(1.03);
 }
 

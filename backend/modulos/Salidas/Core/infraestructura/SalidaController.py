@@ -57,7 +57,10 @@ def _resolver_ids_a_nombres(facultad_id, programa_id):
         programa_nombre = prog.nombre if prog else ''
     return facultad_nombre, programa_nombre
 
+from rest_framework.permissions import AllowAny
+
 class SalidaController(APIView):
+    permission_classes = [AllowAny]
     def get(self, request, pk=None):
         repo = DjangoSalidaRepository()
         if pk:

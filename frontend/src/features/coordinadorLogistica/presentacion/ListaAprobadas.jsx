@@ -12,6 +12,7 @@ const ListaAprobadas = ({ onAsignar }) => {
     const [busqueda, setBusqueda] = useState('');
     const [filtroFacultad, setFiltroFacultad] = useState('');
     const [filtroPrograma, setFiltroPrograma] = useState('');
+    const [filtroEstado, setFiltroEstado] = useState('');
     const [expandidoId, setExpandidoId] = useState(null);
     const [recursoABorrar, setRecursoABorrar] = useState(null);
 
@@ -24,8 +25,29 @@ const ListaAprobadas = ({ onAsignar }) => {
             const empresas = salida.empresa_asignada.split(' + ');
             const conductores = salida.conductor_asignado.split(' + ');
 
-            empresas.splice(index, 1);
-            conductores.splice(index, 1);
+            const empresaStr = empresas[recursoABorrar.indexEmpresa];
+            const condStr = conductores[recursoABorrar.indexEmpresa];
+            
+            let matchFlota = empresaStr.match(/^Flota UPN \((.+)\)$/);
+            let rawPlacasStr = '';
+            if (matchFlota) rawPlacasStr = matchFlota[1];
+            else if (condStr?.includes('Institucional')) rawPlacasStr = empresaStr;
+            
+            if (rawPlacasStr && rawPlacasStr.includes(' / ')) {
+                // Contiene múltiples placas, eliminar solo la seleccionada
+                let placas = rawPlacasStr.split(' / ').map(p => p.trim());
+                placas.splice(recursoABorrar.indexPlaca, 1);
+                
+                if (matchFlota) {
+                    empresas[recursoABorrar.indexEmpresa] = `Flota UPN (${placas.join(' / ')})`;
+                } else {
+                    empresas[recursoABorrar.indexEmpresa] = placas.join(' / ');
+                }
+            } else {
+                // Eliminar el bloque entero
+                empresas.splice(recursoABorrar.indexEmpresa, 1);
+                conductores.splice(recursoABorrar.indexEmpresa, 1);
+            }
 
             if (empresas.length === 0) {
                 await limpiarAsignacionLogistica(salida.id);
@@ -112,12 +134,13 @@ const ListaAprobadas = ({ onAsignar }) => {
     const salidasFiltradas = salidas.filter(s => {
         const matchFacultad = !filtroFacultad || s.facultad === filtroFacultad;
         const matchPrograma = !filtroPrograma || s.programa === filtroPrograma;
+        const matchEstado   = !filtroEstado   || s.estado === filtroEstado;
         const matchBusqueda = !busqueda || (
             (s.codigo || '').toLowerCase().includes(busqueda.toLowerCase()) ||
             (s.nombre || '').toLowerCase().includes(busqueda.toLowerCase()) ||
             (s.asignatura || '').toLowerCase().includes(busqueda.toLowerCase())
         );
-        return matchFacultad && matchPrograma && matchBusqueda;
+        return matchFacultad && matchPrograma && matchEstado && matchBusqueda;
     });
 
     return (
@@ -164,6 +187,18 @@ const ListaAprobadas = ({ onAsignar }) => {
                     />
                 </div>
 
+                {/* Dropdown Estado */}
+                <select 
+                    value={filtroEstado}
+                    onChange={(e) => setFiltroEstado(e.target.value)}
+                    style={{ padding: '0 12px', border: '1px solid #e2e8f0', borderRadius: '8px', height: '40px', fontSize: '13px', color: filtroEstado ? '#0f172a' : '#94a3b8', outline: 'none', background: 'white', cursor: 'pointer' }}
+                >
+                    <option value="">Todos los Estados</option>
+                    <option value="en_preparacion">Pendientes / Incompletas</option>
+                    <option value="lista_ejecucion">Agendadas Logística</option>
+                    <option value="preembarque">Pre-embarque</option>
+                </select>
+
                 {/* Dropdown Facultad */}
                 <select 
                     value={filtroFacultad}
@@ -190,9 +225,9 @@ const ListaAprobadas = ({ onAsignar }) => {
                 </select>
 
                 {/* Botón limpiar filtros */}
-                {(filtroFacultad || filtroPrograma || busqueda) && (
+                {(filtroFacultad || filtroPrograma || filtroEstado || busqueda) && (
                     <button
-                        onClick={() => { setFiltroFacultad(''); setFiltroPrograma(''); setBusqueda(''); }}
+                        onClick={() => { setFiltroFacultad(''); setFiltroPrograma(''); setFiltroEstado(''); setBusqueda(''); }}
                         title="Limpiar filtros"
                         style={{ 
                             height: '40px', 
@@ -273,7 +308,12 @@ const ListaAprobadas = ({ onAsignar }) => {
                                                 </span>
                                             </td>
                                             <td>
-                                                {esIncompleta ? (
+                                                {s.estado === 'preembarque' ? (
+                                                    <span style={{ background: '#f3e8ff', color: '#7e22ce', padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                                                        Pre-embarque
+                                                    </span>
+                                                ) : esIncompleta ? (
                                                     <span style={{ background: '#fef3c7', color: '#92400e', padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                                                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                                                         Incompleto
@@ -292,7 +332,7 @@ const ListaAprobadas = ({ onAsignar }) => {
                                                 <div className="herr-acciones">
                                                     <button 
                                                         className="herr-action-circle" 
-                                                        title={yaAsignada ? 'Ver / Reasignar' : 'Asignar Recursos'}
+                                                        title={s.estado === 'preembarque' ? 'Ver Pre-embarque' : yaAsignada ? 'Ver / Reasignar' : 'Asignar Recursos'}
                                                         onClick={(e) => { e.stopPropagation(); onAsignar?.(s); }}
                                                         style={{ 
                                                             color: esIncompleta ? '#d97706' : yaAsignada ? '#10b981' : '#0ea5e9', 
@@ -429,23 +469,27 @@ const ListaAprobadas = ({ onAsignar }) => {
                                                                             {s.empresa_asignada?.split(' + ').flatMap((emp, i) => {
                                                                                 const conds = s.conductor_asignado?.split(' + ') || [];
                                                                                 const empTrimmed = emp.trim();
+                                                                                const conductorBase = conds[i]?.trim() || '—';
                                                                                 
                                                                                 // Parsear nombre y placa del string guardado
                                                                                 let nombreEmpresa = empTrimmed;
                                                                                 let placaVehiculoRaw = '—';
                                                                                 const matchFlota = empTrimmed.match(/^Flota UPN \((.+)\)$/);
                                                                                 const matchContratado = empTrimmed.match(/^(.+?)\s*\(Placa:\s*(.+)\)$/);
+                                                                                
                                                                                 if (matchFlota) {
                                                                                     nombreEmpresa = 'Flota UPN';
                                                                                     placaVehiculoRaw = matchFlota[1]; // "ADFA / GJGJH"
                                                                                 } else if (matchContratado) {
                                                                                     nombreEmpresa = matchContratado[1].trim();
                                                                                     placaVehiculoRaw = matchContratado[2].trim();
+                                                                                } else if (conductorBase.includes('Institucional')) {
+                                                                                    nombreEmpresa = 'Flota UPN';
+                                                                                    placaVehiculoRaw = empTrimmed; // El string guardado son directamente las placas separadas por " / "
                                                                                 }
 
                                                                                 // Separar si hay múltiples placas (" / ")
                                                                                 const placas = placaVehiculoRaw.split(' / ').map(p => p.trim());
-                                                                                const conductorBase = conds[i]?.trim() || '—';
 
                                                                                 return placas.map((placaIndiv, indexPlaca) => (
                                                                                     <div key={`${i}-${indexPlaca}`} style={{ 
@@ -476,7 +520,7 @@ const ListaAprobadas = ({ onAsignar }) => {
                                                                                         {/* Botón eliminar */}
                                                                                         <button 
                                                                                             title="Quitar recurso"
-                                                                                            onClick={() => setRecursoABorrar({ salida: s, index: i, nombre: emp.trim() })}
+                                                                                            onClick={() => setRecursoABorrar({ salida: s, indexEmpresa: i, indexPlaca: indexPlaca, nombre: placaIndiv })}
                                                                                             style={{ 
                                                                                                 background: '#fee2e2', border: 'none', cursor: 'pointer', color: '#ef4444', 
                                                                                                 width: '26px', height: '26px', borderRadius: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center',

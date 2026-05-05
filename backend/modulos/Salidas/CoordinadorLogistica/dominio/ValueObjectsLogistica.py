@@ -3,9 +3,11 @@ from dataclasses import dataclass
 from typing import Optional
 
 class EstadoOperativoSalida(Enum):
-    APROBADA_CONSEJO = "aprobada_consejo_facultad"
+    APROBADA_CONSEJO = "aprobada"
+    EN_PREPARACION = "en_preparacion"
     ASIGNACION_RECURSOS = "asignacion_recursos"
     LISTA_EJECUCION = "lista_ejecucion"
+    PREEMBARQUE = "preembarque"
     EJECUTANDOSE = "ejecutandose"
     EJECUTADA = "ejecutada"
 

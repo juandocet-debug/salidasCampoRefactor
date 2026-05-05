@@ -5,6 +5,7 @@ import useAutenticacion from '@/shared/hooks/useAutenticacion';
 import useAlertas from '@/shared/estado/useAlertas';
 import ModalConfirmar from '@/shared/componentes/generales/ModalConfirmar/ModalConfirmar';
 import { ICONOS, PORTADAS, ETAPAS_STEPPER, colorEsClaro } from './constantesTarjetas';
+import QrEstudiantesModal from './QrEstudiantesModal';
 import { API_URL } from '@/shared/api/config';
 import './ListaTarjetasProfesor.css';
 
@@ -71,6 +72,7 @@ const ListaTarjetasProfesor = ({ salidas = [], cargando = false, onSalidaElimina
     const { agregarAlerta } = useAlertas();
     const [salidaABorrar, setSalidaABorrar] = useState(null);
     const [borrando, setBorrando] = useState(false);
+    const [salidaParaQr, setSalidaParaQr] = useState(null);
 
     const handleEditar = (salida) => navigate(`/nueva-salida?editar=${salida.id}`);
 
@@ -144,6 +146,13 @@ const ListaTarjetasProfesor = ({ salidas = [], cargando = false, onSalidaElimina
 
                                 {/* Botones Fijos de Acción Rápida (Arriba) */}
                                 <div className="card-new__actions-top">
+                                    {(est === 'preembarque' || est === 'lista_ejecucion') && (
+                                        <button className="c-btn-action top-btn c-btn-action--qr" onClick={(e) => { e.stopPropagation(); setSalidaParaQr(salida); }} title="Mostrar QR de Abordaje">
+                                            <span className="action-circle">
+                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><rect x="7" y="7" width="3" height="3"></rect><rect x="14" y="7" width="3" height="3"></rect><rect x="7" y="14" width="3" height="3"></rect><rect x="14" y="14" width="3" height="3"></rect></svg>
+                                            </span>
+                                        </button>
+                                    )}
                                     {puedeEditar ? (
                                         <>
                                             <button className="c-btn-action top-btn c-btn-action--enviar" onClick={(e) => { e.stopPropagation(); if(onSalidaEnviada) onSalidaEnviada(salida); }} title="Enviar a revisión">
@@ -163,7 +172,7 @@ const ListaTarjetasProfesor = ({ salidas = [], cargando = false, onSalidaElimina
                                             </button>
                                         </>
                                     ) : (
-                                        <button className="c-btn-action top-btn c-btn-action--ver" title="Ver Detalles">
+                                        <button className="c-btn-action top-btn c-btn-action--ver" title="Ver Detalles (Solo Lectura)" onClick={(e) => { e.stopPropagation(); navigate(`/nueva-salida?ver=${salida.id}`); }}>
                                             <span className="action-circle">
                                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                             </span>
@@ -203,6 +212,7 @@ const ListaTarjetasProfesor = ({ salidas = [], cargando = false, onSalidaElimina
                                 })()}
 
 
+
                                 {/* Área Inferior: Solo Stepper (Todo el ancho) */}
                                 <div className="card-new__footer">
                                     {/* Progreso visual y status textual */}
@@ -225,6 +235,13 @@ const ListaTarjetasProfesor = ({ salidas = [], cargando = false, onSalidaElimina
                     cargando={borrando}
                     onConfirmar={handleConfirmarBorrar}
                     onCancelar={() => setSalidaABorrar(null)}
+                />
+            )}
+
+            {salidaParaQr && (
+                <QrEstudiantesModal 
+                    salida={salidaParaQr} 
+                    onCerrar={() => setSalidaParaQr(null)} 
                 />
             )}
         </>
