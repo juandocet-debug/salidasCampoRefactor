@@ -83,6 +83,13 @@ export const TablaConsejo = ({ salidas, onDecidir }) => {
                                     
                                     <td style={{ padding: '16px 20px', color: '#334155' }}>
                                         <div style={{ fontWeight: '600' }}>{s.asignatura || 'Sin Asignatura'}</div>
+                                        <div style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', marginTop: '2px' }}>{s.nombre}</div>
+                                        {s.nota_cambio && (
+                                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginTop: '6px', padding: '4px 10px', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '6px', fontSize: '10px', fontWeight: '600', color: '#1d4ed8' }}>
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                                {s.nota_cambio}
+                                            </div>
+                                        )}
                                     </td>
                                     
                                     <td style={{ padding: '16px 20px', color: '#64748b' }}>

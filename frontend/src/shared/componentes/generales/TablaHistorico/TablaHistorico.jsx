@@ -130,6 +130,12 @@ const TablaHistorico = ({
                                         {item.asignatura || 'Sin asignatura'}
                                         {item.num_estudiantes ? ` · ${item.num_estudiantes} estudiantes` : ''}
                                     </span>
+                                    {item.nota_cambio && (
+                                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '4px', padding: '2px 8px', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '4px', fontSize: '10px', fontWeight: '600', color: '#1d4ed8' }}>
+                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                            {item.nota_cambio}
+                                        </span>
+                                    )}
                                 </div>
                                 <div className="th-item__meta" style={{ display: 'flex', alignItems: 'center', gap: '20px', flex: 1, justifyContent: 'flex-end' }}>
                                     
@@ -230,11 +236,13 @@ const TablaHistorico = ({
 
                                     {/* ── Acciones unificadas ── */}
                                     <div className="th-item__acciones" style={{ width: '95px', display: 'flex', justifyContent: 'flex-end' }}>
-                                        {(est === 'borrador' || est === 'pendiente_ajuste' || est === 'rechazada') && (
+                                        {['borrador', 'pendiente_ajuste', 'rechazada', 'enviada', 'en_revision', 'favorable', 'ajustada', 'favorable_con_ajustes', 'aprobada'].includes(est) && (
                                             <>
-                                                <button className="th-btn-accion th-btn-accion--enviar" title="Enviar a revisión" onClick={(e) => { e.stopPropagation(); onEnviar?.(item); }}>
-                                                    <IcoEnviar />
-                                                </button>
+                                                {['borrador', 'pendiente_ajuste', 'rechazada'].includes(est) && (
+                                                    <button className="th-btn-accion th-btn-accion--enviar" title="Enviar a revisión" onClick={(e) => { e.stopPropagation(); onEnviar?.(item); }}>
+                                                        <IcoEnviar />
+                                                    </button>
+                                                )}
                                                 <button className="th-btn-accion th-btn-accion--editar" title="Editar" onClick={(e) => { e.stopPropagation(); onEditar?.(item); }}>
                                                     <IcoEditar />
                                                 </button>

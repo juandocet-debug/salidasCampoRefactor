@@ -13,6 +13,8 @@ class SalidaModelo(models.Model):
     num_estudiantes = models.IntegerField(default=0)
     justificacion = models.TextField(blank=True, null=True)
     estado = models.CharField(max_length=50, default='BORRADOR')
+    nota_cambio = models.CharField(max_length=200, blank=True, null=True)  # Alerta de cambio del profesor
+    pin_acceso = models.CharField(max_length=10, blank=True, null=True, unique=True)  # PIN alfanumérico para estudiantes
     
     # UI Customization
     icono = models.CharField(max_length=50, default='IcoMountain')

@@ -104,7 +104,7 @@ export const RevisionPedagogicaPanel = ({ salida, onCerrar, isStatic = false, is
         
         setLoading(true);
         try {
-            const resp = await fetch(`http://localhost:8000/api/salidas/coordinacion/revision/${salida.id}/`, {
+            const resp = await fetch(`/api/salidas/coordinacion/revision/${salida.id}/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)

@@ -16,10 +16,14 @@ class InscribirEstudianteCasoUso:
         self.repo = repo
 
     def ejecutar(self, salida_id: int, usuario_id: int, foto_path: str, firma_path: str) -> dict:
-        # Regla: no puede inscribirse dos veces
+        # Regla: no puede inscribirse dos veces (primero para dar mensaje claro)
         existente = self.repo.buscar_inscripcion(salida_id, usuario_id)
         if existente:
             raise ValueError("Ya estás inscrito en esta salida.")
+
+        # Regla: validar pertenencia a facultad y programa
+        if hasattr(self.repo, 'validar_pertenencia'):
+            self.repo.validar_pertenencia(salida_id, usuario_id)
 
         inscripcion = EstudianteInscripcion(
             id=EstudianteInscripcionId(None),

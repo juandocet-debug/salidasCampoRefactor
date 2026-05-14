@@ -158,6 +158,7 @@ class SalidaController(APIView):
                     if line.strip()
                 ] if salida_db else [],
                 'productos_esperados': salida_db.productos_esperados or '' if salida_db else '',
+                'nota_cambio': salida_db.nota_cambio or None if salida_db else None,
             })
         else:
             uso = SalidaGetAll(repository=repo)
@@ -226,6 +227,8 @@ class SalidaController(APIView):
                     'fecha_acta': str(d.fecha_acta) if d.fecha_acta else None,
                     'fecha_decision': str(d.fecha_decision),
                 })(decisiones_consejo_dict[s.id.value]) if s.id.value in decisiones_consejo_dict else None,
+                'nota_cambio': modelos_dict[s.id.value].nota_cambio or None if s.id.value in modelos_dict else None,
+                'pin_acceso': modelos_dict[s.id.value].pin_acceso or '' if s.id.value in modelos_dict else '',
             } for s in resultados]
             return Response({'ok': True, 'datos': data}, status=status.HTTP_200_OK)
 
@@ -335,6 +338,7 @@ class SalidaController(APIView):
                 parada_max=request.data.get('parada_max', ''),
                 criterios_evaluacion=request.data.get('criterio_evaluacion_texto', ''),
                 productos_esperados=request.data.get('productos_esperados', ''),
+                nota_cambio=request.data.get('nota_cambio') or None,
             )
 
             # ── Actualizar Paradas del Itinerario ──────────────────────────

@@ -39,6 +39,17 @@ const QrEstudiantesModal = ({ salida, onCerrar }) => {
                     />
                 </div>
 
+                {salida.pin_acceso && (
+                    <div style={{ marginTop: '20px', padding: '16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', marginBottom: '24px' }}>
+                        <p style={{ margin: 0, fontSize: '0.9rem', color: '#64748b' }}>
+                            Si algún estudiante no puede escanear el QR, pídele que ingrese con este PIN:
+                        </p>
+                        <div style={{ fontSize: '1.8rem', fontWeight: '800', letterSpacing: '4px', color: '#0f172a', marginTop: '8px' }}>
+                            {salida.pin_acceso}
+                        </div>
+                    </div>
+                )}
+
                 <div style={{ marginBottom: '24px', padding: '12px', background: '#f1f5f9', borderRadius: '8px', fontSize: '12px', color: '#475569', wordBreak: 'break-all' }}>
                     <strong>Enlace alternativo:</strong><br/>
                     <a href={urlAbordaje} target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'none' }}>

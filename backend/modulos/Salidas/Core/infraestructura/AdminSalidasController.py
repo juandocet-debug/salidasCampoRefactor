@@ -91,6 +91,7 @@ class AdminSalidasController(APIView):
                 'punto_partida':          m.punto_partida                or '',
                 'parada_max':             m.parada_max                   or '',
                 'tipo_vehiculo_calculo':  getattr(m, 'tipo_vehiculo_calculo', None) or '',
+                'pin_acceso':             m.pin_acceso                   or '',
                 # Itinerario
                 'puntos_ruta': puntos_base,
                 # Logística Externa
@@ -120,6 +121,7 @@ class AdminSalidasController(APIView):
             'punto_partida':   modelos_dict[s.id.value].punto_partida if s.id.value in modelos_dict else '',
             'objetivo_general':      modelos_dict[s.id.value].objetivo_general      if s.id.value in modelos_dict else '',
             'productos_esperados':   modelos_dict[s.id.value].productos_esperados   if s.id.value in modelos_dict else '',
+            'pin_acceso':            modelos_dict[s.id.value].pin_acceso            if s.id.value in modelos_dict else '',
         } for s in salidas]
         return Response(data, status=status.HTTP_200_OK)
 

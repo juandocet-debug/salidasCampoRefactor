@@ -15,7 +15,7 @@ const ConsejoDashboard = () => {
 
     const cargarSalidas = () => {
         setCargando(true);
-        fetch('http://localhost:8000/api/salidas/consejo/por-revisar/')
+        fetch('/api/salidas/consejo/por-revisar/')
             .then(res => {
                 if (!res.ok) throw new Error('Error al cargar las salidas del Consejo');
                 return res.json();

@@ -35,6 +35,26 @@ export function validarPaso(pasoActivo, form) {
     return null; // OK
 }
 
+/**
+ * Determina si la salida está en un estado válido para mostrar el QR de abordaje/unión a los estudiantes.
+ * El QR debe mostrarse desde que el Consejo aprueba la salida.
+ */
+export function puedeMostrarQR(estado) {
+    if (!estado) return false;
+    const est = estado.toLowerCase();
+    const estadosPermitidos = [
+        'favorable',
+        'favorable_con_ajustes',
+        'ajustada',
+        'aprobada',
+        'aprobada_consejo_facultad',
+        'en_preparacion',
+        'lista_ejecucion',
+        'preembarque'
+    ];
+    return estadosPermitidos.includes(est);
+}
+
 // src/modulos/profesor/componentes/logistica/hotelUtils.js
 // ─────────────────────────────────────────────────────────────────────────────
 // Utilidades para búsqueda de hoteles: distancias, puntos de ruta, etc.

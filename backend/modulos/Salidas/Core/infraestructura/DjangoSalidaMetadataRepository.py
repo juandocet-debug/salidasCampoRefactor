@@ -25,6 +25,7 @@ class DjangoSalidaMetadataRepository(SalidaMetadataRepository):
             'resumen': '',
             'objetivo_general': '',
             'destino': 'Sin destino definido',
+            'nota_cambio': None,
         }
 
         if SalidaModelo is None:
@@ -37,6 +38,7 @@ class DjangoSalidaMetadataRepository(SalidaMetadataRepository):
                 resultado['color'] = orm.color or '#16a34a'
                 resultado['resumen'] = orm.resumen or ''
                 resultado['objetivo_general'] = orm.objetivo_general or ''
+                resultado['nota_cambio'] = orm.nota_cambio or None
 
                 # Destino: primero leer del itinerario, si no del campo parada_max
                 destino = None

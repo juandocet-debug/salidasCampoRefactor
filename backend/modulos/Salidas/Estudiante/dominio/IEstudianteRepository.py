@@ -42,6 +42,16 @@ class IEstudianteRepository(ABC):
         """Elimina una carga y todos sus estudiantes asociados."""
         pass
 
+    @abstractmethod
+    def listar_directorio_activo(self) -> List[dict]:
+        """Retorna todos los estudiantes pertenecientes a la carga activa más reciente."""
+        pass
+
+    @abstractmethod
+    def actualizar_estudiante_directorio(self, estudiante_id: int, datos: dict) -> DirectorioEstudianteEntidad:
+        """Actualiza la información de un estudiante en el directorio."""
+        pass
+
     # ── Inscripciones ────────────────────────────────────────────────────────
 
     @abstractmethod

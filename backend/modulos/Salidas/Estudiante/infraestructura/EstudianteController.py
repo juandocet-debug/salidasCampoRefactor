@@ -11,10 +11,35 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
+from modulos.Salidas.Core.infraestructura.models import SalidaModelo
+from modulos.Salidas.Estudiante.aplicacion.LoginEstudiante.LoginEstudianteCasoUso import LoginEstudianteCasoUso
+from rest_framework import status
+from rest_framework.permissions import AllowAny
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+
 from modulos.Salidas.Estudiante.aplicacion.LoginEstudiante.LoginEstudianteCasoUso import LoginEstudianteCasoUso
 from modulos.Salidas.Estudiante.aplicacion.InscribirEstudiante.InscribirEstudianteCasoUso import InscribirEstudianteCasoUso
 from .DjangoEstudianteRepository import DjangoEstudianteRepository
 
+
+class EstudianteCodigoController(APIView):
+    """
+    Público. Recibe un PIN y retorna el ID de la salida y su nombre, si existe y está aprobada.
+    """
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def get(self, request, pin):
+        try:
+            # Buscamos por PIN, ignorando mayúsculas/minúsculas
+            salida = SalidaModelo.objects.get(pin_acceso__iexact=pin)
+            return Response({
+                'salida_id': salida.id,
+                'nombre': salida.nombre,
+                'codigo': salida.codigo
+            }, status=200)
+        except SalidaModelo.DoesNotExist:
+            return Response({'error': 'PIN de acceso inválido o salida no encontrada.'}, status=404)
 
 class EstudianteLoginController(APIView):
     """
@@ -70,6 +95,7 @@ class EstudianteLoginController(APIView):
                     'email':    correo,
                     'facultad': datos['facultad'],
                     'programa': datos['programa'],
+                    'foto':     usuario_obj.foto.url if usuario_obj.foto else None,
                     'rol':      'estudiante',
                 },
                 'access': str(token.access_token),
@@ -102,16 +128,35 @@ class EstudianteInscripcionController(APIView):
 
     def post(self, request, salida_id):
         """Inscribir al estudiante con foto y firma."""
-        # El usuario_id viene del token (o del body en modo demo)
         usuario_id = getattr(getattr(request, 'user', None), 'id', None) \
                      or request.data.get('usuario_id')
         if not usuario_id:
             return Response({'error': 'No autenticado.'}, status=401)
 
+        # Resolver salida: acepta PK, codigo o pin_acceso
+        from modulos.Salidas.Core.infraestructura.models import SalidaModelo
+        salida_obj = None
+        try:
+            salida_obj = SalidaModelo.objects.get(pk=int(salida_id))
+        except (SalidaModelo.DoesNotExist, ValueError, TypeError):
+            pass
+        if salida_obj is None:
+            salida_obj = SalidaModelo.objects.filter(codigo=str(salida_id)).first()
+        if salida_obj is None:
+            salida_obj = SalidaModelo.objects.filter(pin_acceso__iexact=str(salida_id)).first()
+        if salida_obj is None:
+            return Response({'error': f'No existe una salida con el código {salida_id}. Verifica con tu profesor.'}, status=404)
+
+        real_salida_id = salida_obj.id
+
+        # Verificar primero si ya está inscrito (antes de cualquier otra validación)
+        repo = DjangoEstudianteRepository()
+        ya_inscrito = repo.buscar_inscripcion(real_salida_id, int(usuario_id))
+        if ya_inscrito:
+            return Response({'error': 'Ya estás inscrito en esta salida.'}, status=400)
+
         foto  = request.FILES.get('foto_ficha')
         firma = request.FILES.get('firma_digital')
-
-        repo = DjangoEstudianteRepository()
 
         # Si no envían archivos, buscar si tienen una inscripción previa con firma y foto
         if not foto or not firma:
@@ -122,16 +167,15 @@ class EstudianteInscripcionController(APIView):
 
             if not prev_inscripcion:
                 return Response({'error': 'Foto y firma son obligatorias para tu primera inscripción.'}, status=400)
-            
-            # Usar los archivos previos
-            foto = prev_inscripcion.foto_ficha
+
+            foto  = prev_inscripcion.foto_ficha
             firma = prev_inscripcion.firma_digital
 
         try:
             resultado = InscribirEstudianteCasoUso(repo).ejecutar(
-                salida_id=int(salida_id),
+                salida_id=real_salida_id,
                 usuario_id=int(usuario_id),
-                foto_path=foto,      # El repositorio lo manejará
+                foto_path=foto,
                 firma_path=firma,
             )
         except ValueError as e:

@@ -1,0 +1,216 @@
+/* ── Modal de Tipo de Cambio ─────────────────────────────────── */
+.mtc-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: mtcFadeIn 0.2s ease;
+}
+
+@keyframes mtcFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.mtc-modal {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 32px;
+    width: min(600px, 95vw);
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05);
+    animation: mtcSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes mtcSlideUp {
+    from { transform: translateY(20px) scale(0.98); opacity: 0; }
+    to   { transform: translateY(0) scale(1);       opacity: 1; }
+}
+
+.mtc-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.mtc-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #eff6ff;
+    color: #3b82f6;
+    flex-shrink: 0;
+}
+
+.mtc-title {
+    margin: 0 0 6px 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.01em;
+}
+
+.mtc-subtitle {
+    margin: 0;
+    font-size: 13.5px;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+.mtc-opciones {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.mtc-opcion {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    outline: none;
+}
+
+.mtc-opcion:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+}
+
+.mtc-opcion--activo {
+    border-color: #3b82f6;
+    background: #eff6ff;
+    box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.mtc-opcion-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #334155;
+}
+
+.mtc-opcion--activo .mtc-opcion-header {
+    color: #2563eb;
+}
+
+.mtc-opcion-label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.mtc-opcion-desc {
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+.mtc-opcion--activo .mtc-opcion-desc {
+    color: #3b82f6;
+    opacity: 0.8;
+}
+
+.mtc-libre {
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mtc-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.mtc-input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+    box-sizing: border-box;
+    background: #fff;
+    color: #0f172a;
+}
+
+.mtc-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.mtc-input::placeholder {
+    color: #94a3b8;
+}
+
+.mtc-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.mtc-btn-cancelar {
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    font-size: 14px;
+    font-weight: 500;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mtc-btn-cancelar:hover {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+.mtc-btn-confirmar {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    background: #3b82f6;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mtc-btn-confirmar:hover:not(:disabled) {
+    background: #2563eb;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.mtc-btn-confirmar:disabled {
+    background: #cbd5e1;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.fade-in {
+    animation: mtcFadeIn 0.3s ease;
+}

@@ -33,7 +33,7 @@ const PanelDecisionConsejo = ({ salida, onVolver }) => {
 
         setLoading(true);
         try {
-            const resp = await fetch(`http://localhost:8000/api/salidas/consejo/decision/${salida.id}/`, {
+            const resp = await fetch(`/api/salidas/consejo/decision/${salida.id}/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

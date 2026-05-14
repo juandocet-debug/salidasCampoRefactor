@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { directorioService } from '../../../api/directorio.service';
+import ModalEstudiantesDirectorio from './ModalEstudiantesDirectorio';
 import './TabDirectorio.css';
 
 export default function TabDirectorio({ token, onToast }) {
@@ -8,6 +9,7 @@ export default function TabDirectorio({ token, onToast }) {
     const [archivoSeleccionado, setArchivoSeleccionado] = useState(null);
     const [subiendo, setSubiendo] = useState(false);
     const [error, setError] = useState('');
+    const [mostrarModalEstudiantes, setMostrarModalEstudiantes] = useState(false);
     const fileInputRef = useRef(null);
 
     const cargarHistorial = async () => {
@@ -172,7 +174,14 @@ export default function TabDirectorio({ token, onToast }) {
                                     </td>
                                     <td>
                                         {carga.activa ? (
-                                            <span className="badge-active">Directorio Activo</span>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
+                                                <span className="badge-active">Directorio Activo</span>
+                                                <button 
+                                                    onClick={() => setMostrarModalEstudiantes(true)} 
+                                                    style={{ background: 'none', border: '1px solid #10b981', color: '#10b981', fontSize: '0.75rem', padding: '2px 8px', borderRadius: '4px', cursor: 'pointer', marginTop: '4px' }}>
+                                                    Ver Estudiantes
+                                                </button>
+                                            </div>
                                         ) : (
                                             <span className="badge-inactive">Inactivo</span>
                                         )}
@@ -192,6 +201,14 @@ export default function TabDirectorio({ token, onToast }) {
                     </tbody>
                 </table>
             </div>
+
+            {mostrarModalEstudiantes && (
+                <ModalEstudiantesDirectorio 
+                    token={token} 
+                    onClose={() => setMostrarModalEstudiantes(false)} 
+                    onToast={onToast} 
+                />
+            )}
         </div>
     );
 }

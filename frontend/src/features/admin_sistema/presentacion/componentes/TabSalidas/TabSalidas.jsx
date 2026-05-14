@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import ModalConfirmar from '@/shared/componentes/generales/ModalConfirmar/ModalConfirmar';
 import useAlertas from '@/shared/estado/useAlertas';
 
-const API_URL    = 'http://localhost:8000/api/admin/salidas/';
-const DETAIL_URL = 'http://localhost:8000/api/admin/salidas/';
+const API_URL    = '/api/admin/salidas/';
+const DETAIL_URL = '/api/admin/salidas/';
 
 
 const ESTADO_STYLE = {

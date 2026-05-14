@@ -604,6 +604,8 @@ export async function cargarSalidaParaEdicion(editarId, token) {
         horas_viaje: data.horas_viaje || 9,
         costo_estimado: data.costo_estimado || 0,
         tipo_vehiculo_calculo: data.tipo_vehiculo_calculo || 'bus',
+        // Estado actual (necesario para activar modal de tipo de cambio al editar)
+        estado: data.estado || 'borrador',
     };
 
     return {
@@ -618,7 +620,7 @@ export async function cargarSalidaParaEdicion(editarId, token) {
  */
 export async function enviarSalida(editarId, payload, token) {
     if (editarId) {
-        await clienteHttp.patch(`/api/salidas/core/${editarId}/`, payload);
+        await clienteHttp.put(`/api/salidas/core/${editarId}/`, payload);
         return '¡Salida actualizada con éxito!';
     } else {
         await clienteHttp.post(`/api/salidas/core/`, payload);

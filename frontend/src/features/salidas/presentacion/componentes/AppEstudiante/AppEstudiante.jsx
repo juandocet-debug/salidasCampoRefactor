@@ -1,6 +1,24 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useSearchParams } from 'react-router-dom';
+import { ICONOS, PORTADAS, ETAPAS_STEPPER, colorEsClaro } from '@/features/salidas/presentacion/componentes/ListaTarjetasProfesor/constantesTarjetas';
+import '@/features/salidas/presentacion/componentes/ListaTarjetasProfesor/ListaTarjetasProfesor.css';
 import './AppEstudiante.css';
+
+const DIAS_CORTOS  = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const MESES_CORTOS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+function fmtFechaHora(fecha, hora) {
+  if (!fecha) return null;
+  const d = new Date(fecha + 'T00:00:00');
+  return { dia: DIAS_CORTOS[d.getDay()], fecha: `${d.getDate()} ${MESES_CORTOS[d.getMonth()]}`, hora: hora ? hora.slice(0,5) : null };
+}
+
+const truncarPalabras = (texto, max = 14) => {
+  if (!texto) return '';
+  const palabras = texto.split(/\s+/);
+  return palabras.length > max ? palabras.slice(0, max).join(' ') + '…' : texto;
+};
 
 const IMG_SALIDA = 'https://i.ibb.co/gM0V53bQ/Gemini-Generated-Image-waibopwaibopwaib.png';
 const IMG_UPN    = 'https://i.ibb.co/HfF3ZTrD/uopn-bklanco.png';
@@ -17,6 +35,8 @@ const IcoHome   = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="no
 const IcoPlus   = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>;
 const IcoDoc    = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>;
 const IcoLogOut = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>;
+const IcoUser   = () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
+const IcoBell   = () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>;
 
 // ── LOGIN COMPONENT ────────────────────────────────────────────────────────
 function PasoLogin({ onLoginOk }) {
@@ -74,48 +94,315 @@ function PasoLogin({ onLoginOk }) {
 
 // Tab 1: Historial de Salidas
 function TabMisSalidas({ usuario, token }) {
-    const [salidas, setSalidas] = useState([]);
-    const [cargando, setCargando] = useState(true);
+    const [salidas,           setSalidas]           = useState([]);
+    const [cargando,          setCargando]          = useState(true);
+    const [salidaSeleccionada, setSalidaSeleccionada] = useState(null);
+    const [busqueda,          setBusqueda]          = useState('');
+    const [filtroAnio,        setFiltroAnio]        = useState('');
 
     useEffect(() => {
         fetch(`/api/estudiante/mis-salidas/?usuario_id=${usuario.id}`, {
             headers: { Authorization: `Bearer ${token}` }
         })
         .then(r => r.json())
-        .then(data => {
-            if (data.ok) setSalidas(data.datos || []);
-        })
+        .then(data => { if (data.ok) setSalidas(data.datos || []); })
         .finally(() => setCargando(false));
     }, [usuario.id, token]);
+
+    // Años disponibles para filtro
+    const anios = [...new Set(salidas.map(s => s.fecha_inicio?.slice(0,4)).filter(Boolean))].sort().reverse();
+
+    // Salidas filtradas
+    const salidaFiltradas = salidas.filter(s => {
+        const texto = busqueda.toLowerCase();
+        const coincideTexto = !busqueda ||
+            s.nombre?.toLowerCase().includes(texto) ||
+            s.asignatura?.toLowerCase().includes(texto) ||
+            s.facultad?.toLowerCase().includes(texto);
+        const coincideAnio = !filtroAnio || s.fecha_inicio?.startsWith(filtroAnio);
+        return coincideTexto && coincideAnio;
+    });
+
+    // ── Renderizado del Bottom Sheet (via Portal) ────────────────────
+    const renderDetalle = () => {
+        const s = salidaSeleccionada;
+        if (!s) return null;
+        const IcoComponent = ICONOS[s.icono] || ICONOS['IcoMap'];
+        const sal = fmtFechaHora(s.fecha_inicio, s.hora_inicio);
+        const lle = fmtFechaHora(s.fecha_fin, s.hora_fin);
+        const STEPS = ['borrador','aprobada','preembarque','ejecucion','finalizada'];
+        const STEP_LABELS = ['Borrador','Coordinación','Pre‑embarque','En curso','Finalizada'];
+        const currentStep = STEPS.indexOf((s.estado_salida || '').toLowerCase());
+
+        const sheet = (
+            <div className="det__overlay" onClick={() => setSalidaSeleccionada(null)}>
+                <div className="det__sheet" onClick={e => e.stopPropagation()}>
+
+                    {/* Hero con handle flotante */}
+                    <div className="det__hero" style={{ background: s.color || '#16a34a' }}>
+                        <div className="det__handle" />
+                        {PORTADAS[s.icono] ? (
+                            <img src={PORTADAS[s.icono]} className="det__hero-img" alt="" />
+                        ) : (
+                            <div className="det__hero-icon">{IcoComponent}</div>
+                        )}
+                        <div className="det__hero-overlay" />
+                        <div className="det__hero-content">
+                            <span className="det__badge">{s.estado_inscripcion}</span>
+                            <h2 className="det__hero-title">{s.nombre}</h2>
+                            {s.codigo && <span className="det__hero-code"># {s.codigo}</span>}
+                        </div>
+                        <button className="det__close" onClick={() => setSalidaSeleccionada(null)}>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                    </div>
+
+                    {/* Scrollable body */}
+                    <div className="det__body">
+
+                        {/* Stepper de estado */}
+                        <div className="det__stepper-section">
+                            <div className="det__stepper">
+                                {STEP_LABELS.map((label, i) => (
+                                    <div key={i} className={`det__step ${
+                                        i < currentStep ? 'det__step--done' : i === currentStep ? 'det__step--active' : ''
+                                    }`}>
+                                        <div className="det__step-dot">
+                                            {i < currentStep
+                                                ? <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                                                : <span style={{fontSize:'8px',fontWeight:800}}>{i+1}</span>
+                                            }
+                                        </div>
+                                        <span className="det__step-label">{label}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Info académica */}
+                        <div className="det__section">
+                            <p className="det__section-title">Información Académica</p>
+                            <div className="det__info-grid">
+                                {s.facultad && <div className="det__info-item"><span className="det__info-label">Facultad</span><span className="det__info-val">{s.facultad}</span></div>}
+                                {s.programa  && <div className="det__info-item"><span className="det__info-label">Programa</span><span className="det__info-val">{s.programa}</span></div>}
+                                {s.asignatura && <div className="det__info-item"><span className="det__info-label">Asignatura</span><span className="det__info-val">{s.asignatura}</span></div>}
+                                {s.semestre  && <div className="det__info-item"><span className="det__info-label">Semestre</span><span className="det__info-val">{s.semestre}</span></div>}
+                            </div>
+                        </div>
+
+                        {/* Ticket de fechas */}
+                        {(sal || lle) && (
+                            <div className="det__section">
+                                <p className="det__section-title">Horario</p>
+                                <div className="det__ticket">
+                                    <div className="det__ticket-col">
+                                        <span className="det__ticket-label">Salida</span>
+                                        {sal && <span className="det__ticket-date">{sal.dia}</span>}
+                                        {sal?.hora && <span className="det__ticket-time">{sal.hora}</span>}
+                                    </div>
+                                    <span className="det__ticket-arrow">→</span>
+                                    <div className="det__ticket-col det__ticket-col--arr">
+                                        <span className="det__ticket-label">Llegada</span>
+                                        {lle && <span className="det__ticket-date">{lle.dia}</span>}
+                                        {lle?.hora && <span className="det__ticket-time det__ticket-time--arr">{lle.hora}</span>}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Métricas */}
+                        {(s.dias_duracion || s.horas_viaje || s.distancia_km || s.cupos_disponibles) && (
+                            <div className="det__section">
+                                <p className="det__section-title">Métricas</p>
+                                <div className="det__metrics">
+                                    {s.dias_duracion   && <div className="det__metric-chip"><span className="det__metric-val">{s.dias_duracion}</span><span className="det__metric-label">Días</span></div>}
+                                    {s.horas_viaje     && <div className="det__metric-chip"><span className="det__metric-val">{s.horas_viaje}</span><span className="det__metric-label">Hrs viaje</span></div>}
+                                    {s.distancia_km    && <div className="det__metric-chip"><span className="det__metric-val">{s.distancia_km}</span><span className="det__metric-label">Km</span></div>}
+                                    {s.cupos_disponibles && <div className="det__metric-chip"><span className="det__metric-val">{s.cupos_disponibles}</span><span className="det__metric-label">Cupos</span></div>}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Itinerario */}
+                        {(s.punto_partida || s.parada_max) && (
+                            <div className="det__section">
+                                <p className="det__section-title">Itinerario</p>
+                                {s.punto_partida && (
+                                    <div className="det__itinerary-row">
+                                        <div className="det__itin-dot det__itin-dot--start" />
+                                        <div className="det__itin-text">
+                                            <span className="det__info-label">Punto de partida</span>
+                                            <span className="det__info-val">{s.punto_partida}</span>
+                                        </div>
+                                    </div>
+                                )}
+                                {s.punto_partida && s.parada_max && <div className="det__itin-line" />}
+                                {s.parada_max && (
+                                    <div className="det__itinerary-row">
+                                        <div className="det__itin-dot det__itin-dot--end" />
+                                        <div className="det__itin-text">
+                                            <span className="det__info-label">Destino / Paradas</span>
+                                            <span className="det__info-val">{s.parada_max}</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Descripción académica */}
+                        {(s.resumen || s.objetivo_general || s.justificacion) && (
+                            <div className="det__section">
+                                <p className="det__section-title">Académico</p>
+                                {s.resumen && <div className="det__text-block"><span className="det__info-label">Resumen</span><p className="det__text-p">{s.resumen}</p></div>}
+                                {s.objetivo_general && <div className="det__text-block"><span className="det__info-label">Objetivo general</span><p className="det__text-p">{s.objetivo_general}</p></div>}
+                                {s.justificacion && <div className="det__text-block"><span className="det__info-label">Justificación</span><p className="det__text-p">{s.justificacion}</p></div>}
+                            </div>
+                        )}
+
+                        {/* Nota del profesor */}
+                        {s.nota_cambio && (
+                            <div className="det__section det__section--alert">
+                                <div className="det__alert">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                    <div>
+                                        <span className="det__alert-title">Nota del profesor</span>
+                                        <p className="det__alert-text">{s.nota_cambio}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        <div style={{ height: '24px' }} />
+                    </div>
+                </div>
+            </div>
+        );
+
+        return createPortal(sheet, document.body);
+    };
 
     return (
         <div className="app-est__tab-content anim-slide-up">
             <h2 className="app-est__section-title">Mis Salidas</h2>
+
+            {/* Buscador */}
+            <div style={{ display:'flex', gap:'8px', marginBottom:'12px', flexWrap:'wrap' }}>
+                <input
+                    className="app-est__input"
+                    placeholder="Buscar salida..."
+                    value={busqueda}
+                    onChange={e => setBusqueda(e.target.value)}
+                    style={{ flex:1, minWidth:'140px', paddingLeft:'12px', fontSize:'0.82rem' }}
+                />
+                {anios.length > 0 && (
+                    <select
+                        className="app-est__input"
+                        value={filtroAnio}
+                        onChange={e => setFiltroAnio(e.target.value)}
+                        style={{ flex:'0 0 90px', paddingLeft:'8px', fontSize:'0.82rem', cursor:'pointer' }}
+                    >
+                        <option value="">Año</option>
+                        {anios.map(a => <option key={a} value={a}>{a}</option>)}
+                    </select>
+                )}
+            </div>
+
             {cargando ? (
                 <p className="app-est__loading">Cargando salidas...</p>
-            ) : salidas.length === 0 ? (
+            ) : salidaFiltradas.length === 0 ? (
                 <div className="app-est__empty-state">
                     <IcoCheck />
-                    <p>No tienes salidas registradas.</p>
+                    <p>{busqueda || filtroAnio ? 'Sin resultados para tu búsqueda.' : 'No tienes salidas registradas.'}</p>
                 </div>
             ) : (
                 <div className="app-est__list">
-                    {salidas.map(salida => (
-                        <div key={salida.salida_id} className="app-est__card-item">
-                            <div className="app-est__card-item-header">
-                                <strong>{salida.nombre}</strong>
-                                <span className={`app-est__badge status-${salida.estado_inscripcion.toLowerCase().replace(' ', '-')}`}>
-                                    {salida.estado_inscripcion}
-                                </span>
+                    {salidaFiltradas.map(salida => {
+                        const IcoComp  = ICONOS[salida.icono] || ICONOS['IcoMap'];
+                        const cardColor = salida.color || '#4A8DAC';
+                        const isLight   = colorEsClaro(cardColor);
+                        const claseTema = isLight ? 'card-new--light' : 'card-new--dark';
+                        const sal = fmtFechaHora(salida.fecha_inicio, salida.hora_inicio);
+                        const lle = fmtFechaHora(salida.fecha_fin,    salida.hora_fin);
+
+                        return (
+                            <div
+                                key={salida.salida_id}
+                                className={`card-new ${claseTema}`}
+                                style={{ background: isLight ? '#ffffff' : cardColor, cursor: 'pointer' }}
+                                onClick={() => setSalidaSeleccionada(salida)}
+                            >
+                                {/* Imagen/Ícono de fondo */}
+                                {PORTADAS[salida.icono] ? (
+                                    <div className="card-new__bg-icon" style={{ opacity:1, width:'220px', height:'220px', right:'-10px', top:'auto', bottom:'-10px', transform:'rotate(-5deg)', zIndex:0 }}>
+                                        <img src={PORTADAS[salida.icono]} alt="" style={{ width:'100%', height:'100%', objectFit:'contain', mixBlendMode:'multiply' }} />
+                                    </div>
+                                ) : (
+                                    <div className="card-new__bg-icon">{IcoComp}</div>
+                                )}
+
+                                <div className="card-new__content" style={{ zIndex:1 }}>
+                                    <div className="card-new__header">
+                                        <h3 className="card-new__title">{salida.nombre || 'Sin Nombre'}</h3>
+                                        <p className="card-new__subtitle">
+                                            {[salida.facultad, salida.programa].filter(Boolean).join(' | ') || truncarPalabras(salida.asignatura)}
+                                        </p>
+                                        {salida.nota_cambio && (
+                                            <div style={{ display:'inline-flex', alignItems:'center', gap:'5px', marginTop:'6px', padding:'4px 10px', background:'rgba(255,255,255,0.8)', border:'1px solid rgba(0,0,0,0.1)', borderRadius:'6px', fontSize:'10px', fontWeight:'700', color:'#1e293b', backdropFilter:'blur(4px)' }}>
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                                {salida.nota_cambio}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Ticket Salida → Llegada */}
+                                    {(sal || lle) && (
+                                        <div className="card-ticket">
+                                            <div className="card-ticket__col">
+                                                <span className="card-ticket__label">✈️ Salida</span>
+                                                <span className="card-ticket__fecha-main">{sal?.dia} {sal?.fecha}</span>
+                                                {sal?.hora && <span className="card-ticket__hora-sub">{sal.hora}</span>}
+                                            </div>
+                                            <div className="card-ticket__sep">→</div>
+                                            <div className="card-ticket__col card-ticket__col--llegada">
+                                                <span className="card-ticket__label">🏁 Llegada</span>
+                                                <span className="card-ticket__fecha-main">{lle?.dia} {lle?.fecha}</span>
+                                                {lle?.hora && <span className="card-ticket__hora-sub card-ticket__hora-sub--llegada">{lle.hora}</span>}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Footer con stepper */}
+                                    <div className="card-new__footer">
+                                        <div className="card-new__stepper-wrapper">
+                                            <div className="c-stepper-full">
+                                                {ETAPAS_STEPPER.map((etapa, index) => {
+                                                    const estadoSistema = salida.estado_salida || salida.estado || '';
+                                                    const uiOrden = ETAPAS_STEPPER.findIndex(e => e.estados.includes(estadoSistema)) + 1 || 1;
+                                                    const isActive = uiOrden === etapa.id;
+                                                    const isPast   = uiOrden > etapa.id;
+                                                    const isLast   = index === ETAPAS_STEPPER.length - 1;
+                                                    return (
+                                                        <div key={etapa.id} className="c-step-item">
+                                                            <div className="c-step-indicator">
+                                                                <div className={`c-stepper-circle ${isActive ? 'active' : ''} ${isPast ? 'past' : ''}`} />
+                                                                {!isLast && <div className={`c-stepper-line ${isPast || isActive ? 'line-past' : ''}`} />}
+                                                            </div>
+                                                            <span className={`c-step-label ${isActive ? 'label-active' : ''} ${index === 0 ? 'text-start' : isLast ? 'text-end' : 'text-center'}`}>{etapa.label}</span>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="app-est__card-item-body">
-                                <p>{salida.asignatura}</p>
-                                <small>{salida.fecha_inicio} al {salida.fecha_fin}</small>
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             )}
+
+            {/* Bottom sheet portal */}
+            {salidaSeleccionada && renderDetalle()}
         </div>
     );
 }
@@ -124,12 +411,65 @@ function TabMisSalidas({ usuario, token }) {
 function TabInscribirse({ usuario, token, paramSalidaId, onExito }) {
     const [salidaId, setSalidaId] = useState(paramSalidaId || '');
     const [paso, setPaso] = useState(1);
-    
+    const [yaInscrito, setYaInscrito] = useState(false);
+
     const [foto, setFoto] = useState(null);
     const [fotoPreview, setFotoPreview] = useState(null);
     const [tieneFirma, setTieneFirma] = useState(false);
     const [error, setError] = useState('');
     const [cargando, setCargando] = useState(false);
+
+    // Escáner QR
+    const [escaneando, setEscaneando] = useState(false);
+    const videoRef  = useRef(null);
+    const streamRef = useRef(null);
+
+    const abrirEscaner = async () => {
+        setEscaneando(true);
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+            streamRef.current = stream;
+            if (videoRef.current) {
+                videoRef.current.srcObject = stream;
+                videoRef.current.play();
+                const scan = () => {
+                    if (!videoRef.current || !escaneando) return;
+                    const canvas = document.createElement('canvas');
+                    canvas.width  = videoRef.current.videoWidth;
+                    canvas.height = videoRef.current.videoHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(videoRef.current, 0, 0);
+                    // Leer QR via API de BarcodeDetector si disponible
+                    if ('BarcodeDetector' in window) {
+                        const detector = new window.BarcodeDetector({ formats: ['qr_code'] });
+                        detector.detect(canvas).then(codes => {
+                            if (codes.length > 0) {
+                                const val = codes[0].rawValue;
+                                setSalidaId(val);
+                                cerrarEscaner();
+                                return;
+                            }
+                            requestAnimationFrame(scan);
+                        }).catch(() => requestAnimationFrame(scan));
+                    } else {
+                        requestAnimationFrame(scan);
+                    }
+                };
+                videoRef.current.onloadedmetadata = () => requestAnimationFrame(scan);
+            }
+        } catch (err) {
+            setError('No se pudo acceder a la cámara.');
+            setEscaneando(false);
+        }
+    };
+
+    const cerrarEscaner = () => {
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach(t => t.stop());
+            streamRef.current = null;
+        }
+        setEscaneando(false);
+    };
 
     const inputFotoRef = useRef(null);
     const canvasRef = useRef(null);
@@ -139,9 +479,10 @@ function TabInscribirse({ usuario, token, paramSalidaId, onExito }) {
     const handleValidarCodigo = async (e) => {
         e.preventDefault();
         if (!salidaId) return;
-        
+
         setCargando(true);
         setError('');
+        setYaInscrito(false);
         try {
             const formData = new FormData();
             formData.append('usuario_id', usuario.id);
@@ -152,10 +493,12 @@ function TabInscribirse({ usuario, token, paramSalidaId, onExito }) {
                 body:    formData,
             });
             const data = await res.json();
-            
+
             if (!res.ok) {
                 if (data.error && data.error.includes('obligatorias para tu primera inscripción')) {
-                    setPaso(2); // Solicitar foto y firma por ser la primera vez
+                    setPaso(2); // Solicitar foto y firma
+                } else if (data.error && data.error.includes('Ya estás inscrito')) {
+                    setYaInscrito(true); // Mostrar mensaje especial
                 } else {
                     throw new Error(data.error || 'Error al validar la inscripción');
                 }
@@ -168,6 +511,7 @@ function TabInscribirse({ usuario, token, paramSalidaId, onExito }) {
             setCargando(false);
         }
     };
+
 
     // Foto
     const handleFoto = (e) => {
@@ -278,21 +622,66 @@ function TabInscribirse({ usuario, token, paramSalidaId, onExito }) {
                 <h2 className="app-est__section-title">Nueva Salida</h2>
                 <p className="app-est__hint">Ingresa el código numérico de la salida a la que te vas a inscribir.</p>
                 {error && <div className="app-est__error">{error}</div>}
-                
-                <form onSubmit={handleValidarCodigo} style={{ marginTop: '20px' }}>
-                    <div className="app-est__input-wrap">
-                        <input 
-                            className="app-est__input" 
-                            type="number" 
-                            placeholder="Código de la salida" 
-                            value={salidaId} 
-                            onChange={e => setSalidaId(e.target.value)} 
-                            required 
-                            style={{ paddingLeft: '20px' }}
-                        />
+
+                {/* Escáner QR activo */}
+                {escaneando && (
+                    <div style={{ position:'relative', borderRadius:'16px', overflow:'hidden', marginBottom:'16px', background:'#000' }}>
+                        <video ref={videoRef} style={{ width:'100%', display:'block', maxHeight:'240px', objectFit:'cover' }} playsInline muted />
+                        <button onClick={cerrarEscaner} style={{ position:'absolute', top:'8px', right:'8px', background:'rgba(0,0,0,0.6)', border:'none', borderRadius:'50%', width:'32px', height:'32px', color:'white', cursor:'pointer', fontSize:'18px' }}>×</button>
+                        <div style={{ position:'absolute', inset:0, border:'2px solid #00bcd4', borderRadius:'16px', pointerEvents:'none' }} />
+                        <p style={{ position:'absolute', bottom:'8px', left:0, right:0, textAlign:'center', color:'white', fontSize:'0.75rem', background:'rgba(0,0,0,0.5)', margin:0, padding:'4px' }}>Apunta la cámara al QR de la salida</p>
+                    </div>
+                )}
+
+                {/* Mensaje ya inscrito */}
+                {yaInscrito && (
+                    <div style={{ background:'rgba(16,185,129,0.12)', border:'1px solid rgba(16,185,129,0.3)', borderRadius:'14px', padding:'16px', textAlign:'center', marginBottom:'16px' }}>
+                        <div style={{ fontSize:'2rem', marginBottom:'8px' }}>✅</div>
+                        <p style={{ color:'#10b981', fontWeight:700, margin:'0 0 4px' }}>¡Ya estás inscrito en esta salida!</p>
+                        <p style={{ color:'rgba(255,255,255,0.6)', fontSize:'0.8rem', margin:0 }}>Puedes ver el estado en la pestaña <strong>Inicio</strong>.</p>
+                    </div>
+                )}
+
+                <form onSubmit={handleValidarCodigo} style={{ marginTop: yaInscrito ? '0' : '20px' }}>
+                    <div style={{ display:'flex', gap:'8px', marginBottom:'12px' }}>
+                        <div className="app-est__input-wrap" style={{ flex:1 }}>
+                            <input
+                                className="app-est__input"
+                                type="number"
+                                placeholder="Código de la salida"
+                                value={salidaId}
+                                onChange={e => setSalidaId(e.target.value)}
+                                required
+                                style={{ paddingLeft: '20px' }}
+                            />
+                        </div>
+                        <button type="button" onClick={escaneando ? cerrarEscaner : abrirEscaner} title="Escanear QR"
+                            style={{ flexShrink:0, background: escaneando ? 'rgba(239,68,68,0.15)' : 'rgba(0,188,212,0.12)', border: `1px solid ${escaneando ? 'rgba(239,68,68,0.4)' : 'rgba(0,188,212,0.35)'}`, borderRadius:'14px', color: escaneando ? '#ef4444' : '#00bcd4', padding:'0 16px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', height:'48px', transition:'all 0.2s' }}>
+                            {escaneando ? (
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            ) : (
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                                    {/* Esquinas del frame QR */}
+                                    <path d="M3 7V4a1 1 0 011-1h3" strokeLinecap="round"/>
+                                    <path d="M17 3h3a1 1 0 011 1v3" strokeLinecap="round"/>
+                                    <path d="M21 17v3a1 1 0 01-1 1h-3" strokeLinecap="round"/>
+                                    <path d="M7 21H4a1 1 0 01-1-1v-3" strokeLinecap="round"/>
+                                    {/* Cuadrado superior izquierdo */}
+                                    <rect x="6" y="6" width="4" height="4" rx="0.5"/>
+                                    {/* Cuadrado superior derecho */}
+                                    <rect x="14" y="6" width="4" height="4" rx="0.5"/>
+                                    {/* Cuadrado inferior izquierdo */}
+                                    <rect x="6" y="14" width="4" height="4" rx="0.5"/>
+                                    {/* Línea de datos */}
+                                    <line x1="14" y1="14" x2="14" y2="14.01" strokeWidth="2.5"/>
+                                    <line x1="14" y1="17" x2="18" y2="17"/>
+                                    <line x1="18" y1="14" x2="18" y2="18"/>
+                                </svg>
+                            )}
+                        </button>
                     </div>
                     <button type="submit" className="app-est__btn" disabled={cargando}>
-                        {cargando ? 'Inscribiendo...' : 'Inscribirme'}
+                        {cargando ? 'Verificando...' : 'Inscribirme'}
                     </button>
                 </form>
             </div>
@@ -449,6 +838,131 @@ function DocumentCard({ titulo, tipo, url, onSubir, subiendo }) {
     );
 }
 
+// Tab 4: Perfil
+function TabPerfil({ usuario, token, onActualizarUsuario }) {
+    const [nombre,   setNombre]   = useState(usuario.nombre   || '');
+    const [apellido, setApellido] = useState(usuario.apellido || '');
+    const [telefono, setTelefono] = useState(usuario.telefono || '');
+    const [guardando, setGuardando] = useState(false);
+    const [msg, setMsg] = useState('');
+    const [foto, setFoto] = useState(null);
+    const [fotoPreview, setFotoPreview] = useState(usuario.foto || null);
+    const inputFotoRef = useRef(null);
+
+    const handleGuardar = async (e) => {
+        e.preventDefault();
+        setGuardando(true); setMsg('');
+        try {
+            const fd = new FormData();
+            fd.append('nombre',   nombre);
+            fd.append('apellido', apellido);
+            fd.append('telefono', telefono);
+            if (foto) fd.append('foto', foto);
+            const res = await fetch(`/api/estudiante/perfil/${usuario.id}/`, {
+                method: 'PATCH',
+                headers: { Authorization: `Bearer ${token}` },
+                body: fd,
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Error al guardar');
+            setMsg('Perfil actualizado correctamente');
+            if (onActualizarUsuario) onActualizarUsuario({ ...usuario, nombre, apellido, telefono, foto: fotoPreview });
+        } catch (err) {
+            setMsg(err.message);
+        } finally {
+            setGuardando(false);
+        }
+    };
+
+    return (
+        <div className="app-est__tab-content anim-slide-up">
+            <h2 className="app-est__section-title">Mi Perfil</h2>
+            <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'16px', padding:'8px 0 20px' }}>
+                <div style={{ position:'relative' }}>
+                    <div className="app-est__avatar" style={{ width:'80px', height:'80px', fontSize:'1.8rem', overflow:'hidden' }}>
+                        {fotoPreview
+                            ? <img src={fotoPreview} alt="Foto" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                            : (usuario.nombre?.charAt(0) || '') + (usuario.apellido?.charAt(0) || '')}
+                    </div>
+                    <button onClick={() => inputFotoRef.current?.click()} style={{ position:'absolute', bottom:0, right:0, background:'#00bcd4', border:'none', borderRadius:'50%', width:'26px', height:'26px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'white' }}>
+                        <IcoCamera />
+                    </button>
+                    <input type="file" ref={inputFotoRef} style={{ display:'none' }} accept="image/*" onChange={e => { const f = e.target.files?.[0]; if(f){ setFoto(f); setFotoPreview(URL.createObjectURL(f)); } }} />
+                </div>
+                <span style={{ fontSize:'0.75rem', color:'#64748b' }}>{usuario.correo}</span>
+            </div>
+            <form onSubmit={handleGuardar} style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
+                {msg && <div className={msg.includes('Error') ? 'app-est__error' : 'app-est__success'}>{msg}</div>}
+                <div className="app-est__input-wrap">
+                    <input className="app-est__input" placeholder="Nombre" value={nombre} onChange={e => setNombre(e.target.value)} style={{ paddingLeft:'16px' }} />
+                </div>
+                <div className="app-est__input-wrap">
+                    <input className="app-est__input" placeholder="Apellido" value={apellido} onChange={e => setApellido(e.target.value)} style={{ paddingLeft:'16px' }} />
+                </div>
+                <div className="app-est__input-wrap">
+                    <input className="app-est__input" placeholder="Teléfono" value={telefono} onChange={e => setTelefono(e.target.value)} style={{ paddingLeft:'16px' }} />
+                </div>
+                <button type="submit" className="app-est__btn" disabled={guardando} style={{ marginTop:'8px' }}>
+                    {guardando ? 'Guardando...' : 'Guardar cambios'}
+                </button>
+            </form>
+        </div>
+    );
+}
+
+// Tab 5: Avisos y Notificaciones
+function TabAvisos({ usuario, token }) {
+    const [avisos,   setAvisos]   = useState([]);
+    const [cargando, setCargando] = useState(true);
+
+    useEffect(() => {
+        fetch(`/api/estudiante/mis-salidas/?usuario_id=${usuario.id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok) {
+                const nuevos = [];
+                (data.datos || []).forEach(s => {
+                    if ((s.estado_salida || '').toLowerCase() === 'cancelada') {
+                        nuevos.push({ id: s.salida_id + '_cancel', tipo: 'alerta', titulo: `Salida cancelada: ${s.nombre}`, mensaje: 'Esta salida ha sido cancelada.', fecha: s.fecha_inicio });
+                    }
+                    if (s.nota_cambio) {
+                        nuevos.push({ id: s.salida_id + '_nota', tipo: 'advertencia', titulo: `Novedad en: ${s.nombre}`, mensaje: s.nota_cambio, fecha: s.fecha_inicio });
+                    }
+                });
+                setAvisos(nuevos);
+            }
+        })
+        .finally(() => setCargando(false));
+    }, [usuario.id, token]);
+
+    return (
+        <div className="app-est__tab-content anim-slide-up">
+            <h2 className="app-est__section-title">Avisos y Notificaciones</h2>
+            {cargando ? (
+                <p className="app-est__loading">Buscando novedades...</p>
+            ) : avisos.length === 0 ? (
+                <div className="app-est__empty-state">
+                    <IcoBell />
+                    <p>No tienes nuevos avisos</p>
+                    <small>Te notificaremos cuando haya novedades en tus salidas.</small>
+                </div>
+            ) : (
+                <div className="app-est__list">
+                    {avisos.map(aviso => (
+                        <div key={aviso.id} className={`app-est__aviso-card ${aviso.tipo === 'advertencia' ? 'warning' : ''}`}>
+                            <h4 className="app-est__aviso-title"><IcoBell /> {aviso.titulo}</h4>
+                            <p className="app-est__aviso-desc">{aviso.mensaje}</p>
+                            <small style={{ color:'rgba(255,255,255,0.5)', marginTop:'8px', display:'block' }}>Ref: {aviso.fecha}</small>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
 // ── COMPONENTE RAÍZ (DASHBOARD) ──────────────────────────────────────────────
 export default function AppEstudiante() {
     const [searchParams] = useSearchParams();
@@ -522,8 +1036,10 @@ export default function AppEstudiante() {
             {/* Top App Bar */}
             <div className="app-est__topbar">
                 <div className="app-est__topbar-user">
-                    <div className="app-est__avatar">
-                        {usuario.nombre.charAt(0)}{usuario.apellido.charAt(0)}
+                    <div className="app-est__avatar" style={{ overflow:'hidden' }}>
+                        {usuario.foto
+                            ? <img src={usuario.foto} alt="Avatar" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                            : (usuario.nombre?.charAt(0) || '') + (usuario.apellido?.charAt(0) || '')}
                     </div>
                     <div className="app-est__user-info">
                         <strong>{usuario.nombre}</strong>
@@ -540,22 +1056,36 @@ export default function AppEstudiante() {
                 {tabActiva === 'mis-salidas' && <TabMisSalidas usuario={usuario} token={token} />}
                 {tabActiva === 'inscribirse' && <TabInscribirse usuario={usuario} token={token} paramSalidaId={urlSalidaId} onExito={() => setTabActiva('mis-salidas')} />}
                 {tabActiva === 'documentos'  && <TabDocumentos usuario={usuario} token={token} />}
+                {tabActiva === 'perfil'      && <TabPerfil usuario={usuario} token={token} onActualizarUsuario={(u) => setUsuario(u)} />}
+                {tabActiva === 'avisos'      && <TabAvisos usuario={usuario} token={token} />}
             </div>
 
-            {/* Bottom Navigation */}
+            {/* Bottom Navigation con FAB central */}
             <div className="app-est__bottom-nav">
-                <button className={`nav-item ${tabActiva === 'mis-salidas' ? 'active' : ''}`} onClick={() => setTabActiva('mis-salidas')}>
-                    <IcoHome />
-                    <span>Inicio</span>
-                </button>
-                <button className={`nav-item ${tabActiva === 'inscribirse' ? 'active' : ''}`} onClick={() => setTabActiva('inscribirse')}>
-                    <div className="nav-fab"><IcoPlus /></div>
-                    <span>Nueva</span>
-                </button>
-                <button className={`nav-item ${tabActiva === 'documentos' ? 'active' : ''}`} onClick={() => setTabActiva('documentos')}>
-                    <IcoDoc />
-                    <span>Documentos</span>
-                </button>
+                <div className="nav-group">
+                    <button className={`nav-item ${tabActiva === 'mis-salidas' ? 'active' : ''}`} onClick={() => setTabActiva('mis-salidas')}>
+                        <IcoHome /><span>Inicio</span>
+                    </button>
+                    <button className={`nav-item ${tabActiva === 'documentos' ? 'active' : ''}`} onClick={() => setTabActiva('documentos')}>
+                        <IcoDoc /><span>Docs</span>
+                    </button>
+                </div>
+
+                <div className="nav-fab-wrapper">
+                    <button className={`nav-fab ${tabActiva === 'inscribirse' ? 'active' : ''}`} onClick={() => setTabActiva('inscribirse')}>
+                        <IcoPlus />
+                    </button>
+                    <span className="nav-fab-label">Nueva</span>
+                </div>
+
+                <div className="nav-group">
+                    <button className={`nav-item ${tabActiva === 'perfil' ? 'active' : ''}`} onClick={() => setTabActiva('perfil')}>
+                        <IcoUser /><span>Perfil</span>
+                    </button>
+                    <button className={`nav-item ${tabActiva === 'avisos' ? 'active' : ''}`} onClick={() => setTabActiva('avisos')}>
+                        <IcoBell /><span>Avisos</span>
+                    </button>
+                </div>
             </div>
         </div>
     );

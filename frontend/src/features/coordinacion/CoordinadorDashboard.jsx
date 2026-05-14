@@ -17,8 +17,8 @@ const CoordinadorDashboard = () => {
         setCargando(true);
         // Cargar ambas para estadísticas
         Promise.all([
-            fetch('http://localhost:8000/api/salidas/coordinacion/pendientes/').then(r => r.json()),
-            fetch('http://localhost:8000/api/salidas/coordinacion/aprobadas/').then(r => r.json())
+            fetch('/api/salidas/coordinacion/pendientes/').then(r => r.json()),
+            fetch('/api/salidas/coordinacion/aprobadas/').then(r => r.json())
         ])
         .then(([pendientes, aprobadas]) => {
             const listPend = Array.isArray(pendientes) ? pendientes : [];

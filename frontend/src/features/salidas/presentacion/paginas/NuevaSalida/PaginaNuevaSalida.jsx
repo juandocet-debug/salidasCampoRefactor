@@ -4,6 +4,7 @@ import useAutenticacion from '@/shared/hooks/useAutenticacion';
 import useAlertas from '@/shared/estado/useAlertas';
 import { validarPaso, construirPayload, parsearErrorDRF } from '@/features/salidas/dominio/reglas';
 import { cargarSalidaParaEdicion, enviarSalida } from '@/features/salidas/aplicacion/servicios';
+import ModalTipoCambio from '@/features/salidas/presentacion/componentes/ModalTipoCambio/ModalTipoCambio';
 import './PaginaNuevaSalida.css';
 
 import Paso1Informacion from '@/features/salidas/presentacion/componentes/pasos/Paso1Informacion/Paso1Informacion';
@@ -43,8 +44,10 @@ export default function PaginaNuevaSalida() {
     const [cargando, setCargando] = useState(false);
     const [pasoActivo, setPasoActivo] = useState(1);
     const [form, setForm] = useState(FORM_INICIAL);
+    const [estadoOriginal, setEstadoOriginal] = useState(null);
     const [esGrupal, setEsGrupal] = useState(false);
     const [profesoresAsociados, setProfesoresAsociados] = useState([]);
+    const [pendingPayload, setPendingPayload] = useState(null); // para modal tipo cambio
 
     // ── Cargar datos para edición ────────────────────────────────────────
     useEffect(() => {
@@ -53,6 +56,7 @@ export default function PaginaNuevaSalida() {
         cargarSalidaParaEdicion(editarId, token)
             .then(({ formData, esGrupal: eg, profesoresAsociados: pa }) => {
                 setForm(prev => ({ ...prev, ...formData }));
+                setEstadoOriginal(formData.estado || null);
                 setEsGrupal(eg);
                 setProfesoresAsociados(pa);
             })
@@ -75,6 +79,8 @@ export default function PaginaNuevaSalida() {
     const handleAnterior = () => setPasoActivo(p => Math.max(p - 1, 1));
 
     // ── Envío del formulario ─────────────────────────────────────────────
+    const ESTADOS_AVANZADOS = ['enviada', 'en_revision', 'favorable', 'ajustada', 'favorable_con_ajustes', 'aprobada'];
+
     const handleSubmit = async (e) => {
         e?.preventDefault?.();
         const errVal = validarPasoActual();
@@ -84,9 +90,21 @@ export default function PaginaNuevaSalida() {
             return;
         }
 
+        const payload = construirPayload(form, esGrupal, profesoresAsociados);
+
+        // Si está en un estado avanzado, mostrar modal para capturar tipo de cambio
+        if (editarId && estadoOriginal && ESTADOS_AVANZADOS.includes(estadoOriginal)) {
+            setPendingPayload(payload);
+            return; // esperar selección del modal
+        }
+
+        await _guardar(payload, null);
+    };
+
+    const _guardar = async (payload, notaCambio) => {
+        if (notaCambio) payload.nota_cambio = notaCambio;
         setCargando(true);
         try {
-            const payload = construirPayload(form, esGrupal, profesoresAsociados);
             console.error("=== PAYLOAD FRONTEND ENVIADO ===", JSON.stringify(payload.puntos_ruta_data));
             const msg = await enviarSalida(editarId, payload, token);
             agregarAlerta(msg, 'exito');
@@ -97,6 +115,14 @@ export default function PaginaNuevaSalida() {
             setCargando(false);
         }
     };
+
+    const handleConfirmarCambio = async (nota) => {
+        const payload = pendingPayload;
+        setPendingPayload(null);
+        await _guardar(payload, nota);
+    };
+
+    const handleCancelarCambio = () => setPendingPayload(null);
 
     const handleKeyDown = (e) => {
         if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
@@ -145,6 +171,13 @@ export default function PaginaNuevaSalida() {
                     )}
                 </div>
             </div>
+
+            {pendingPayload && (
+                <ModalTipoCambio
+                    onConfirmar={handleConfirmarCambio}
+                    onCancelar={handleCancelarCambio}
+                />
+            )}
         </div>
     );
 }

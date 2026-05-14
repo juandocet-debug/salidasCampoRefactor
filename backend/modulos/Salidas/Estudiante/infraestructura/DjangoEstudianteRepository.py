@@ -99,6 +99,35 @@ class DjangoEstudianteRepository(IEstudianteRepository):
     def eliminar_carga(self, carga_id: int) -> None:
         CargaDirectorio.objects.filter(id=carga_id).delete()
 
+    def listar_directorio_activo(self) -> List[dict]:
+        try:
+            carga_activa = CargaDirectorio.objects.filter(activa=True).latest('fecha_carga')
+            estudiantes = DirectorioEstudiante.objects.filter(carga=carga_activa)
+            return list(estudiantes.values('id', 'correo', 'nombre', 'apellido', 'facultad', 'programa', 'activo'))
+        except CargaDirectorio.DoesNotExist:
+            return []
+
+    def actualizar_estudiante_directorio(self, estudiante_id: int, datos: dict) -> DirectorioEstudianteEntidad:
+        try:
+            obj = DirectorioEstudiante.objects.get(id=estudiante_id)
+            if 'correo' in datos: obj.correo = datos['correo']
+            if 'nombre' in datos: obj.nombre = datos['nombre']
+            if 'apellido' in datos: obj.apellido = datos['apellido']
+            if 'facultad' in datos: obj.facultad = datos['facultad']
+            if 'programa' in datos: obj.programa = datos['programa']
+            if 'activo' in datos: obj.activo = datos['activo']
+            if 'password_hash' in datos: obj.password_hash = datos['password_hash']
+            obj.save()
+            
+            return DirectorioEstudianteEntidad(
+                id=obj.id, correo=obj.correo, password_hash=obj.password_hash,
+                nombre=obj.nombre, apellido=obj.apellido,
+                facultad=obj.facultad, programa=obj.programa,
+                activo=obj.activo, carga_id=obj.carga_id
+            )
+        except DirectorioEstudiante.DoesNotExist:
+            raise ValueError("Estudiante no encontrado en el directorio.")
+
     # ── Inscripciones ────────────────────────────────────────────────────────
 
     def guardar_inscripcion(self, inscripcion: EstudianteInscripcion) -> EstudianteInscripcion:
@@ -117,6 +146,45 @@ class DjangoEstudianteRepository(IEstudianteRepository):
             return self._to_domain(obj)
         except EstudianteSalida.DoesNotExist:
             return None
+
+    def validar_pertenencia(self, salida_id: int, usuario_id: int) -> None:
+        from modulos.Salidas.Core.infraestructura.models import SalidaModelo
+        from modulos.Usuarios.infraestructura.models import UsuarioModel
+        from modulos.Catalogos.Facultad.infraestructura.models import FacultadModel
+        from modulos.Catalogos.Programa.infraestructura.models import ProgramaModel
+        
+        try:
+            salida = SalidaModelo.objects.get(pk=salida_id)
+            usuario = UsuarioModel.objects.get(pk=usuario_id)
+        except Exception:
+            raise ValueError(f"Salida #{salida_id} no encontrada. Verifica el código e inténtalo de nuevo.")
+
+        # Buscar los datos del estudiante en el CSV activo
+        dir_estudiante = self.buscar_en_directorio(usuario.email)
+        if not dir_estudiante:
+            raise ValueError("El estudiante no está en el directorio institucional activo.")
+
+        # Validar Facultad
+        if salida.facultad_id:
+            try:
+                facultad_sys = FacultadModel.objects.get(pk=salida.facultad_id)
+                fac_sys_name = (facultad_sys.nombre or "").strip().lower()
+                fac_csv_name = (dir_estudiante.facultad or "").strip().lower()
+                if fac_sys_name != fac_csv_name:
+                    raise ValueError(f"No perteneces a la facultad de la salida ({fac_sys_name.title()}). Tu facultad es {fac_csv_name.title()}.")
+            except FacultadModel.DoesNotExist:
+                pass
+
+        # Validar Programa
+        if salida.programa_id:
+            try:
+                prog_sys = ProgramaModel.objects.get(pk=salida.programa_id)
+                prog_sys_name = (prog_sys.nombre or "").strip().lower()
+                prog_csv_name = (dir_estudiante.programa or "").strip().lower()
+                if prog_sys_name != prog_csv_name:
+                    raise ValueError(f"No perteneces al programa de la salida ({prog_sys_name.title()}). Tu programa es {prog_csv_name.title()}.")
+            except ProgramaModel.DoesNotExist:
+                pass
 
     def listar_inscritos(self, salida_id: int) -> List[dict]:
         from modulos.Usuarios.infraestructura.models import UsuarioModel
@@ -170,19 +238,64 @@ class DjangoEstudianteRepository(IEstudianteRepository):
 
     def listar_salidas_estudiante(self, usuario_id: int) -> List[dict]:
         from modulos.Salidas.Core.infraestructura.models import SalidaModelo
+        from modulos.Catalogos.Facultad.infraestructura.models import FacultadModel
+        from modulos.Catalogos.Programa.infraestructura.models import ProgramaModel
+        
         inscripciones = EstudianteSalida.objects.filter(usuario_id=usuario_id).order_by('-fecha_inscripcion')
         resultado = []
+        
+        # Cache para no consultar en cada iteración
+        facultades_cache = {}
+        programas_cache = {}
+        
         for ins in inscripciones:
             try:
                 salida = SalidaModelo.objects.get(pk=ins.salida_id)
+                
+                fac_nombre = ""
+                if salida.facultad_id:
+                    if salida.facultad_id not in facultades_cache:
+                        fac_obj = FacultadModel.objects.filter(id=salida.facultad_id).first()
+                        facultades_cache[salida.facultad_id] = fac_obj.nombre if fac_obj else ""
+                    fac_nombre = facultades_cache.get(salida.facultad_id, "")
+                    
+                prog_nombre = ""
+                if salida.programa_id:
+                    if salida.programa_id not in programas_cache:
+                        prog_obj = ProgramaModel.objects.filter(id=salida.programa_id).first()
+                        programas_cache[salida.programa_id] = prog_obj.nombre if prog_obj else ""
+                    prog_nombre = programas_cache.get(salida.programa_id, "")
+                    
                 resultado.append({
                     'salida_id': salida.id,
                     'codigo': salida.codigo,
                     'nombre': salida.nombre,
                     'asignatura': salida.asignatura,
+                    'semestre': salida.semestre,
+                    'facultad': fac_nombre,
+                    'programa': prog_nombre,
                     'fecha_inicio': str(salida.fecha_inicio) if salida.fecha_inicio else None,
                     'fecha_fin': str(salida.fecha_fin) if salida.fecha_fin else None,
+                    'hora_inicio': str(salida.hora_inicio) if salida.hora_inicio else None,
+                    'hora_fin': str(salida.hora_fin) if salida.hora_fin else None,
+                    'punto_partida': salida.punto_partida,
+                    'parada_max': salida.parada_max,
+                    'num_estudiantes': salida.num_estudiantes,
+                    'justificacion': salida.justificacion,
+                    'objetivo_general': salida.objetivo_general,
+                    'objetivos_especificos': salida.objetivos_especificos,
+                    'estrategia_metodologica': salida.estrategia_metodologica,
+                    'criterios_evaluacion': salida.criterios_evaluacion,
+                    'productos_esperados': salida.productos_esperados,
+                    'resumen': salida.resumen,
+                    'relacion_syllabus': salida.relacion_syllabus,
+                    'distancia_total_km': str(salida.distancia_total_km),
+                    'duracion_dias': str(salida.duracion_dias),
+                    'horas_viaje': str(salida.horas_viaje),
+                    'costo_estimado': str(salida.costo_estimado),
                     'estado_inscripcion': 'Pre embarque' if ins.estado == 'pendiente' else ins.estado.capitalize(),
+                    'estado_salida': salida.estado,
+                    'nota_cambio': salida.nota_cambio,
                     'fecha_inscripcion': str(ins.fecha_inscripcion),
                     'icono': salida.icono or 'IcoMountain',
                     'color': salida.color or '#16a34a'

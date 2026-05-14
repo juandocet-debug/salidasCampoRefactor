@@ -103,6 +103,7 @@ class ListarSalidasConsejoCasoUso:
                 objetivo_general=meta.get('objetivo_general', ''),
                 revision_coordinador=revision_dto,
                 decision_consejo=decision_dto,
+                nota_cambio=meta.get('nota_cambio', None),
             ))
 
         return resultado

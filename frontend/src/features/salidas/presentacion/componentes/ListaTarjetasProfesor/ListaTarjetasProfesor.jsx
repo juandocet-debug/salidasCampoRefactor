@@ -7,6 +7,7 @@ import ModalConfirmar from '@/shared/componentes/generales/ModalConfirmar/ModalC
 import { ICONOS, PORTADAS, ETAPAS_STEPPER, colorEsClaro } from './constantesTarjetas';
 import QrEstudiantesModal from './QrEstudiantesModal';
 import { API_URL } from '@/shared/api/config';
+import { puedeMostrarQR } from '@/features/salidas/dominio/reglas.js';
 import './ListaTarjetasProfesor.css';
 
 
@@ -111,7 +112,8 @@ const ListaTarjetasProfesor = ({ salidas = [], cargando = false, onSalidaElimina
                     const IcoComponent = ICONOS[salida.icono] || ICONOS['IcoMap'];
                     const cardColor = salida.color || '#4A8DAC';
                     const est = (salida.estado || '').toLowerCase();
-                    const puedeEditar = ['borrador', 'pendiente_ajuste', 'rechazada'].includes(est);
+                    const puedeEditar = ['borrador', 'pendiente_ajuste', 'rechazada', 'enviada', 'en_revision', 'favorable', 'ajustada', 'favorable_con_ajustes', 'aprobada'].includes(est);
+                    const puedeEnviar = ['borrador', 'pendiente_ajuste', 'rechazada'].includes(est);
                     const isLight = colorEsClaro(cardColor);
 
                     const claseTema = isLight ? 'card-new--light' : 'card-new--dark';
@@ -142,24 +144,32 @@ const ListaTarjetasProfesor = ({ salidas = [], cargando = false, onSalidaElimina
                                     )}
                                     <h3 className="card-new__title">{salida.nombre || 'Sin Nombre'}</h3>
                                     <p className="card-new__subtitle">{truncarPalabras(salida.resumen || salida.asignatura)}</p>
+                                    {salida.nota_cambio && (
+                                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', marginTop: '6px', padding: '4px 10px', background: 'rgba(255,255,255,0.8)', border: '1px solid rgba(0,0,0,0.1)', borderRadius: '6px', fontSize: '10px', fontWeight: '700', color: '#1e293b', backdropFilter: 'blur(4px)' }}>
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                            {salida.nota_cambio}
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Botones Fijos de Acción Rápida (Arriba) */}
                                 <div className="card-new__actions-top">
-                                    {(est === 'preembarque' || est === 'lista_ejecucion') && (
+                                    {puedeMostrarQR(salida.estado) && (
                                         <button className="c-btn-action top-btn c-btn-action--qr" onClick={(e) => { e.stopPropagation(); setSalidaParaQr(salida); }} title="Mostrar QR de Abordaje">
                                             <span className="action-circle">
                                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><rect x="7" y="7" width="3" height="3"></rect><rect x="14" y="7" width="3" height="3"></rect><rect x="7" y="14" width="3" height="3"></rect><rect x="14" y="14" width="3" height="3"></rect></svg>
                                             </span>
                                         </button>
                                     )}
-                                    {puedeEditar ? (
+                                    {puedeEnviar && (
+                                        <button className="c-btn-action top-btn c-btn-action--enviar" onClick={(e) => { e.stopPropagation(); if(onSalidaEnviada) onSalidaEnviada(salida); }} title="Enviar a revisión">
+                                            <span className="action-circle">
+                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                                            </span>
+                                        </button>
+                                    )}
+                                    {puedeEditar && (
                                         <>
-                                            <button className="c-btn-action top-btn c-btn-action--enviar" onClick={(e) => { e.stopPropagation(); if(onSalidaEnviada) onSalidaEnviada(salida); }} title="Enviar a revisión">
-                                                <span className="action-circle">
-                                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                                                </span>
-                                            </button>
                                             <button className="c-btn-action top-btn c-btn-action--editar" onClick={(e) => { e.stopPropagation(); handleEditar(salida); }} title="Editar Salida">
                                                 <span className="action-circle">
                                                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
@@ -171,7 +181,8 @@ const ListaTarjetasProfesor = ({ salidas = [], cargando = false, onSalidaElimina
                                                 </span>
                                             </button>
                                         </>
-                                    ) : (
+                                    )}
+                                    {!puedeEditar && (
                                         <button className="c-btn-action top-btn c-btn-action--ver" title="Ver Detalles (Solo Lectura)" onClick={(e) => { e.stopPropagation(); navigate(`/nueva-salida?ver=${salida.id}`); }}>
                                             <span className="action-circle">
                                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>

@@ -1,7 +1,8 @@
 from django.urls import path
-from .EstudianteController import EstudianteLoginController, EstudianteInscripcionController, EstudianteMisSalidasController, EstudianteDocumentosController
+from .EstudianteController import EstudianteLoginController, EstudianteInscripcionController, EstudianteMisSalidasController, EstudianteDocumentosController, EstudianteCodigoController
 from .ProfesorInscritosController import ProfesorInscritosController
 from .CargaDirectorioController import CargaDirectorioController, CargaDirectorioDetalleController
+from .DirectorioActivoController import DirectorioActivoController, DirectorioEstudianteEditController
 
 urlpatterns = [
     # ── Autenticación del Estudiante (público) ─────────────────────────────
@@ -10,6 +11,7 @@ urlpatterns = [
     # ── Inscripción del Estudiante ─────────────────────────────────────────
     path('estudiante/salidas/<int:salida_id>/inscribirse/',
          EstudianteInscripcionController.as_view(), name='estudiante-inscribirse'),
+    path('estudiante/salidas/pin/<str:pin>/', EstudianteCodigoController.as_view(), name='estudiante-salida-pin'),
 
     # ── Dashboard del Estudiante ───────────────────────────────────────────
     path('estudiante/mis-salidas/', EstudianteMisSalidasController.as_view(), name='estudiante-mis-salidas'),
@@ -26,4 +28,8 @@ urlpatterns = [
     # ── Admin: cargar directorio CSV ───────────────────────────────────────
     path('admin/directorio/', CargaDirectorioController.as_view(), name='admin-directorio'),
     path('admin/directorio/<int:pk>/', CargaDirectorioDetalleController.as_view(), name='admin-directorio-detalle'),
+
+    # ── Admin: Ver y editar directorio activo ──────────────────────────────
+    path('admin/directorio/activos/', DirectorioActivoController.as_view(), name='admin-directorio-activos'),
+    path('admin/directorio/estudiantes/<int:pk>/', DirectorioEstudianteEditController.as_view(), name='admin-directorio-estudiantes-edit'),
 ]

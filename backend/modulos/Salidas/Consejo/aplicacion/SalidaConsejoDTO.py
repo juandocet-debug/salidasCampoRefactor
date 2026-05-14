@@ -78,6 +78,7 @@ class SalidaConsejoDTO:
     objetivo_general: str
     revision_coordinador: Optional[RevisionCoordinadorDTO] = None
     decision_consejo: Optional[DecisionConsejoDTO] = None
+    nota_cambio: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -98,4 +99,5 @@ class SalidaConsejoDTO:
             'objetivo_general': self.objetivo_general,
             'revision_coordinador': self.revision_coordinador.to_dict() if self.revision_coordinador else None,
             'decision_consejo': self.decision_consejo.to_dict() if self.decision_consejo else None,
+            'nota_cambio': self.nota_cambio,
         }

@@ -14,7 +14,7 @@ const VistaRevision = ({ salida: salidaList, onVolver, PanelDerecho }) => {
   useEffect(() => {
     if (!salidaList?.id) return;
     setIsLoadingDetail(true);
-    fetch(`http://127.0.0.1:8000/api/admin/salidas/${salidaList.id}/`)
+    fetch(`/api/admin/salidas/${salidaList.id}/`)
       .then((r) => r.json())
       .then((data) => {
         setSalidaDetail(data);

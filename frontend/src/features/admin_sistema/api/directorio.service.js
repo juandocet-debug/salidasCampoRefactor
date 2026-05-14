@@ -66,5 +66,38 @@ export const directorioService = {
             }
             throw new Error('Error al intentar eliminar la carga.');
         }
+    },
+
+    /**
+     * Lista los estudiantes del directorio activo.
+     */
+    listarActivos: async (token) => {
+        try {
+            const res = await axios.get(`${API_URL}/api/admin/directorio/activos/`, {
+                headers: getHeaders(token),
+            });
+            return res.data;
+        } catch (error) {
+            console.error('Error al listar directorio activo:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Actualiza la información de un estudiante en el directorio activo.
+     */
+    actualizarEstudiante: async (estudianteId, datos, token) => {
+        try {
+            const res = await axios.put(`${API_URL}/api/admin/directorio/estudiantes/${estudianteId}/`, datos, {
+                headers: getHeaders(token),
+            });
+            return res.data;
+        } catch (error) {
+            console.error('Error al actualizar estudiante:', error);
+            if (error.response && error.response.data && error.response.data.error) {
+                throw new Error(error.response.data.error);
+            }
+            throw new Error('Error al actualizar los datos del estudiante.');
+        }
     }
 };

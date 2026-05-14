@@ -88,6 +88,15 @@ class DjangoSalidaRepository(SalidaRepository):
         if hasattr(salida.id, 'value') and salida.id.value is not None:
             obj, created = SalidaModelo.objects.update_or_create(id=salida.id.value, defaults=defaults)
         else:
+            import random
+            import string
+            
+            # Generar PIN unico
+            pin = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+            while SalidaModelo.objects.filter(pin_acceso=pin).exists():
+                pin = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+                
+            defaults['pin_acceso'] = pin
             obj = SalidaModelo.objects.create(**defaults)
 
         # Actualizar Vehiculos Asignados

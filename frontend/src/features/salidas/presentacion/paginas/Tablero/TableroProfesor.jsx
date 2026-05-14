@@ -73,7 +73,7 @@ const TableroProfesor = () => {
                     descripcion={
                         <>
                             Se enviará <strong>"{salidaAEnviar.nombre}"</strong> al coordinador.
-                            Una vez enviada, <strong>no podrás editarla ni eliminarla</strong>.
+                            Podrás seguir editándola hasta que inicie su revisión.
                         </>
                     }
                     labelConfirmar="Sí, enviar"

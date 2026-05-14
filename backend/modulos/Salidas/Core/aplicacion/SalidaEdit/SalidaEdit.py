@@ -35,6 +35,10 @@ class SalidaEdit:
             v = data.get(key)
             return v if v is not None else fallback
 
+        # El estado NUNCA cambia al editar. Solo se guarda la nota de cambio.
+        # La nota la aporta el frontend para notificar al coordinador/consejo.
+        estado_actual = salida_existente.estado.value
+
         salida_actualizada = Salida(
             id=salida_existente.id,
             codigo=SalidaCodigo(_get('codigo', salida_existente.codigo.value)),
@@ -45,7 +49,7 @@ class SalidaEdit:
             programa_id=ProgramaId(_get('programa_id', salida_existente.programa_id.value)),
             num_estudiantes=SalidaNumEstudiantes(_get('num_estudiantes', salida_existente.num_estudiantes.value)),
             justificacion=SalidaJustificacion(_get('justificacion', salida_existente.justificacion.value)),
-            estado=EstadoSalida(_get('estado', salida_existente.estado.value)),
+            estado=EstadoSalida(estado_actual),
             profesor_id=ProfesorId(_get('profesor_id', salida_existente.profesor_id.value)),
             fecha_inicio=SalidaFechaInicio(_get('fecha_inicio', salida_existente.fecha_inicio.value)),
             fecha_fin=SalidaFechaFin(_get('fecha_fin', salida_existente.fecha_fin.value)),

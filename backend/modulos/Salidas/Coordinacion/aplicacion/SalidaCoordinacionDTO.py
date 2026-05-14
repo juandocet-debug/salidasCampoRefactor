@@ -59,6 +59,7 @@ class SalidaCoordinacionDTO:
     resumen: str
     objetivo_general: str
     ultima_revision: Optional[RevisionDTO] = None
+    nota_cambio: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -80,4 +81,5 @@ class SalidaCoordinacionDTO:
             'resumen': self.resumen,
             'objetivo_general': self.objetivo_general,
             'ultima_revision': self.ultima_revision.to_dict() if self.ultima_revision else None,
+            'nota_cambio': self.nota_cambio,
         }

@@ -9,6 +9,7 @@ from modulos.Salidas.Core.infraestructura.models import SalidaModelo, Asignacion
 from modulos.Catalogos.Facultad.infraestructura.models import FacultadModel
 from modulos.Catalogos.Programa.infraestructura.models import ProgramaModel
 from modulos.Logistica.Vehiculo.infraestructura.models import VehiculoModel
+from modulos.Salidas.Core.infraestructura.DjangoSalidaMetadataRepository import DjangoSalidaMetadataRepository
 
 
 class DjangoLogisticaRepository(ILogisticaRepository):
@@ -45,6 +46,8 @@ class DjangoLogisticaRepository(ILogisticaRepository):
             print(f"[LOG] AsignacionExternaLogistica: {len(mapa_asignaciones)} registros encontrados")
         except Exception as e:
             print(f"[WARN] No se pudo leer AsignacionExternaLogistica: {e}")
+
+        metadata_repo = DjangoSalidaMetadataRepository()
 
         resultado = []
         for s_orm in salidas_orm:
@@ -110,6 +113,7 @@ class DjangoLogisticaRepository(ILogisticaRepository):
                 empresa_asignada=asig.empresa if asig else None,
                 conductor_asignado=asig.contacto if asig else None,
                 capacidad_asignada=cap_calculada,
+                nota_cambio=metadata_repo.obtener_metadata(s_orm.id).get('nota_cambio', None),
             )
             resultado.append(resumen)
 

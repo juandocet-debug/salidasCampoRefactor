@@ -92,6 +92,7 @@ class ListarSalidasAprobadasCasoUso:
                 resumen=meta.get('resumen', ''),
                 objetivo_general=meta.get('objetivo_general', ''),
                 ultima_revision=revision_dto,
+                nota_cambio=meta.get('nota_cambio', None),
             ))
 
         return resultado

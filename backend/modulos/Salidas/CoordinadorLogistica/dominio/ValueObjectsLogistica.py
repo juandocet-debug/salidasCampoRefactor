@@ -52,6 +52,7 @@ class AsignacionLogisticaResumen:
     empresa_asignada: Optional[str] = None
     conductor_asignado: Optional[str] = None
     capacidad_asignada: int = 0
+    nota_cambio: Optional[str] = None
     
     def to_dict(self):
         return {
@@ -77,6 +78,7 @@ class AsignacionLogisticaResumen:
             "empresa_asignada": self.empresa_asignada,
             "conductor_asignado": self.conductor_asignado,
             "capacidad_asignada": self.capacidad_asignada,
+            "nota_cambio": self.nota_cambio,
         }
 
 @dataclass
