@@ -79,8 +79,9 @@ class AdminSalidasController(APIView):
                 'distancia_total_km': float(s.distancia_total_km.value or 0) if hasattr(s, 'distancia_total_km') and s.distancia_total_km else None,
                 'duracion_dias': s.duracion_dias.value if hasattr(s, 'duracion_dias') and s.duracion_dias else None,
                 'horas_viaje':   s.horas_viaje.value   if hasattr(s, 'horas_viaje')   and s.horas_viaje   else None,
-                # Campos de presentación (model-only, enriquecidos desde infraestructura propia)
+                # Campos de presentación (model-only)
                 'hora_inicio':            str(m.hora_inicio)            if m.hora_inicio            else None,
+                'hora_fin':               str(m.hora_fin)               if m.hora_fin               else None,
                 'resumen':                m.resumen                     or '',
                 'relacion_syllabus':      m.relacion_syllabus           or '',
                 'objetivo_general':       m.objetivo_general            or '',
@@ -92,6 +93,10 @@ class AdminSalidasController(APIView):
                 'parada_max':             m.parada_max                   or '',
                 'tipo_vehiculo_calculo':  getattr(m, 'tipo_vehiculo_calculo', None) or '',
                 'pin_acceso':             m.pin_acceso                   or '',
+                # Campos visuales de tarjetas (FALTABAN en detalle)
+                'icono':          m.icono       or 'IcoMountain',
+                'color':          m.color       or '#4A8DAC',
+                'nota_cambio':    m.nota_cambio or '',
                 # Itinerario
                 'puntos_ruta': puntos_base,
                 # Logística Externa
@@ -99,9 +104,27 @@ class AdminSalidasController(APIView):
             }, status=status.HTTP_200_OK)
 
         # ── LISTA: GET /api/admin/salidas/ ───────────────────────────────────
-        from modulos.Salidas.Core.infraestructura.models import SalidaModelo
+        from modulos.Salidas.Core.infraestructura.models import SalidaModelo, AsignacionExternaLogistica
+        from modulos.Usuarios.infraestructura.models import UsuarioModel
+        from modulos.Catalogos.Facultad.infraestructura.models import FacultadModel
+        from modulos.Catalogos.Programa.infraestructura.models import ProgramaModel
+
         salidas      = salida_repo.get_all()
         modelos_dict = {m.id: m for m in SalidaModelo.objects.all()}
+
+        # Enriquecer con asignaciones logísticas (empresa / conductor)
+        try:
+            asignaciones_dict = {a.salida_id: a for a in AsignacionExternaLogistica.objects.all()}
+        except Exception:
+            asignaciones_dict = {}
+
+        # Resolver nombres de usuarios, facultades y programas
+        try:
+            usuarios_dict   = {u.id: f"{u.nombre} {u.apellido}".strip() for u in UsuarioModel.objects.all()}
+            facultades_dict = {f.id: f.nombre for f in FacultadModel.objects.all()}
+            programas_dict  = {p.id: p.nombre for p in ProgramaModel.objects.all()}
+        except Exception:
+            usuarios_dict = facultades_dict = programas_dict = {}
 
         data = [{
             'id':              s.id.value,
@@ -116,12 +139,28 @@ class AdminSalidasController(APIView):
             'num_estudiantes': s.num_estudiantes.value   if s.num_estudiantes  else 0,
             'costo_estimado':  float(s.costo_estimado.value or 0) if hasattr(s, 'costo_estimado') and s.costo_estimado else 0,
             'justificacion':   s.justificacion.value if s.justificacion else '',
-            'resumen':         modelos_dict[s.id.value].resumen       if s.id.value in modelos_dict else '',
-            'parada_max':      modelos_dict[s.id.value].parada_max    if s.id.value in modelos_dict else '',
-            'punto_partida':   modelos_dict[s.id.value].punto_partida if s.id.value in modelos_dict else '',
-            'objetivo_general':      modelos_dict[s.id.value].objetivo_general      if s.id.value in modelos_dict else '',
-            'productos_esperados':   modelos_dict[s.id.value].productos_esperados   if s.id.value in modelos_dict else '',
-            'pin_acceso':            modelos_dict[s.id.value].pin_acceso            if s.id.value in modelos_dict else '',
+            # Campos de presentación necesarios para renderizar tarjetas en el tablero
+            'resumen':         modelos_dict[s.id.value].resumen        if s.id.value in modelos_dict else '',
+            'parada_max':      modelos_dict[s.id.value].parada_max     if s.id.value in modelos_dict else '',
+            'punto_partida':   modelos_dict[s.id.value].punto_partida  if s.id.value in modelos_dict else '',
+            'objetivo_general':      modelos_dict[s.id.value].objetivo_general     if s.id.value in modelos_dict else '',
+            'productos_esperados':   modelos_dict[s.id.value].productos_esperados  if s.id.value in modelos_dict else '',
+            'pin_acceso':            modelos_dict[s.id.value].pin_acceso           if s.id.value in modelos_dict else '',
+            # Campos visuales de las tarjetas (icono, color, nota) — FALTABAN
+            'icono':           modelos_dict[s.id.value].icono          if s.id.value in modelos_dict else 'IcoMap',
+            'color':           modelos_dict[s.id.value].color          if s.id.value in modelos_dict else '#4A8DAC',
+            'nota_cambio':     modelos_dict[s.id.value].nota_cambio    if s.id.value in modelos_dict else '',
+            'hora_inicio':     str(modelos_dict[s.id.value].hora_inicio) if s.id.value in modelos_dict and modelos_dict[s.id.value].hora_inicio else None,
+            'hora_fin':        str(modelos_dict[s.id.value].hora_fin)    if s.id.value in modelos_dict and modelos_dict[s.id.value].hora_fin    else None,
+            'horas_viaje':     float(s.horas_viaje.value or 0) if hasattr(s, 'horas_viaje') and s.horas_viaje else None,
+            'decision_consejo': getattr(modelos_dict.get(s.id.value), 'decision_consejo', None),
+            # Datos de transporte asignado (para Monitoreo en Ejecución)
+            'empresa_asignada':   asignaciones_dict[s.id.value].empresa if s.id.value in asignaciones_dict else None,
+            'conductor_asignado': asignaciones_dict[s.id.value].contacto if s.id.value in asignaciones_dict else None,
+            # Datos académicos resueltos
+            'profesor_nombre': usuarios_dict.get(s.profesor_id.value, 'Docente') if s.profesor_id else 'Docente',
+            'facultad':  facultades_dict.get(s.facultad_id.value, '') if hasattr(s, 'facultad_id') and s.facultad_id else '',
+            'programa':  programas_dict.get(s.programa_id.value, '')  if hasattr(s, 'programa_id') and s.programa_id else '',
         } for s in salidas]
         return Response(data, status=status.HTTP_200_OK)
 

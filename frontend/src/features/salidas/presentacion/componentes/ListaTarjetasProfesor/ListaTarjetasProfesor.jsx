@@ -112,7 +112,7 @@ const ListaTarjetasProfesor = ({ salidas = [], cargando = false, onSalidaElimina
                     const IcoComponent = ICONOS[salida.icono] || ICONOS['IcoMap'];
                     const cardColor = salida.color || '#4A8DAC';
                     const est = (salida.estado || '').toLowerCase();
-                    const puedeEditar = ['borrador', 'pendiente_ajuste', 'rechazada', 'enviada', 'en_revision', 'favorable', 'ajustada', 'favorable_con_ajustes', 'aprobada'].includes(est);
+                    const puedeEditar = ['borrador', 'pendiente_ajuste', 'rechazada', 'enviada', 'en_revision', 'favorable', 'ajustada', 'favorable_con_ajustes', 'aprobada', 'en_preparacion', 'lista_ejecucion', 'preembarque'].includes(est);
                     const puedeEnviar = ['borrador', 'pendiente_ajuste', 'rechazada'].includes(est);
                     const isLight = colorEsClaro(cardColor);
 
@@ -145,8 +145,16 @@ const ListaTarjetasProfesor = ({ salidas = [], cargando = false, onSalidaElimina
                                     <h3 className="card-new__title">{salida.nombre || 'Sin Nombre'}</h3>
                                     <p className="card-new__subtitle">{truncarPalabras(salida.resumen || salida.asignatura)}</p>
                                     {salida.nota_cambio && (
-                                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', marginTop: '6px', padding: '4px 10px', background: 'rgba(255,255,255,0.8)', border: '1px solid rgba(0,0,0,0.1)', borderRadius: '6px', fontSize: '10px', fontWeight: '700', color: '#1e293b', backdropFilter: 'blur(4px)' }}>
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                        <div style={{ 
+                                            display: 'inline-flex', alignItems: 'center', gap: '5px', marginTop: '6px', 
+                                            padding: '4px 10px', 
+                                            background: (salida.color === '#ef4444' || salida.nota_cambio.includes('URGENTE')) ? '#fef2f2' : 'rgba(255,255,255,0.8)', 
+                                            border: `1px solid ${(salida.color === '#ef4444' || salida.nota_cambio.includes('URGENTE')) ? '#fca5a5' : 'rgba(0,0,0,0.1)'}`, 
+                                            borderRadius: '6px', fontSize: '10px', fontWeight: '700', 
+                                            color: (salida.color === '#ef4444' || salida.nota_cambio.includes('URGENTE')) ? '#b91c1c' : '#1e293b', 
+                                            backdropFilter: 'blur(4px)' 
+                                        }}>
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={(salida.color === '#ef4444' || salida.nota_cambio.includes('URGENTE')) ? '#ef4444' : '#3b82f6'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                                             {salida.nota_cambio}
                                         </div>
                                     )}

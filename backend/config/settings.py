@@ -47,6 +47,7 @@ APPS_PROYECTO = [
     'modulos.Logistica.Parametro.infraestructura',
     'modulos.Logistica.EmpresaTransporte.infraestructura',
     'modulos.Logistica.ConductorExterno.infraestructura',
+    'modulos.Logistica.ConductorInstitucional.infraestructura',
     'modulos.Salidas.Core.infraestructura',
     'modulos.Salidas.Planeacion.infraestructura',
     'modulos.Salidas.Itinerario.infraestructura',
@@ -99,12 +100,14 @@ DATABASES = {
 }
 
 # ── DRF ───────────────────────────────────────────────────────────────────────
+# IMPORTANTE: DEFAULT_AUTHENTICATION_CLASSES vacío para que las vistas con
+# AllowAny funcionen sin intentar validar JWT globalmente.
+# Las vistas que requieren autenticación lo declaran explícitamente con
+# authentication_classes = [JWTAuthentication].
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': [],   # Sin autenticación global
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',  # Por defecto: abierto
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',

@@ -84,8 +84,12 @@ export default function TabDirectorio({ token, onToast }) {
             {/* Encabezado y Acción de Subida */}
             <div className="tab-dir-header-card">
                 <div className="tab-dir-title-area">
-                    <h3>Directorio de Estudiantes (CSV)</h3>
-                    <p>Sube el padrón de estudiantes matriculados para permitirles el acceso.</p>
+                    <h3>Directorio Activo (Usuarios Institucionales CSV)</h3>
+                    <p>Sube el padrón de usuarios (estudiantes, profesores, coordinadores) para permitirles el acceso.</p>
+                    <p style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '8px' }}>
+                        <strong>Importante:</strong> El CSV debe contener las 9 cabeceras: <code>correo, password, nombre, apellido, cedula, telefono, facultad, programa, rol</code>.<br/>
+                        En la columna <code>rol</code> puedes colocar: <code>estudiante</code>, <code>profesor</code>, <code>coordinador_logistica</code>, etc.
+                    </p>
                 </div>
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>

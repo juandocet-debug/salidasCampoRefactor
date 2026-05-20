@@ -14,5 +14,8 @@ class DirectorioEstudianteEntidad:
     apellido:       str
     facultad:       str
     programa:       str
+    cedula:         str | None = None
+    telefono:       str | None = None
+    rol:            str = 'estudiante'
     activo:         bool = True
     carga_id:       int | None = None  # ID de la CargaDirectorio que lo creó

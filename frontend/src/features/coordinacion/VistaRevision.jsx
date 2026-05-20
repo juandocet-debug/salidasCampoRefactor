@@ -48,6 +48,31 @@ const VistaRevision = ({ salida: salidaList, onVolver, PanelDerecho }) => {
     if (arr[idx]) setParadaVer(arr[idx]);
   };
 
+  const [isAlerting, setIsAlerting] = useState(false);
+  const handleAlertarProfesor = async () => {
+    if(!window.confirm("¿Estás seguro de enviar la alerta urgente al profesor? Esto enviará una notificación inmediata.")) return;
+    setIsAlerting(true);
+    try {
+      const res = await fetch(`/api/salidas/coordinacion/alerta-itinerario/${salida.id}/`, {
+        method: 'POST',
+      });
+      if (res.ok) {
+        alert("Alerta enviada exitosamente al profesor.");
+        // refresh data
+        const r = await fetch(`/api/admin/salidas/${salida.id}/`);
+        const data = await r.json();
+        setSalidaDetail(data);
+      } else {
+        alert("Error al enviar la alerta.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Error en la conexión al enviar la alerta.");
+    } finally {
+      setIsAlerting(false);
+    }
+  };
+
   // Layout de vista compartida (Pantalla completa o renderizado condicional en dashboard)
   return (
     <div style={{ background: "#f8fafc", minHeight: "100vh", padding: "30px" }}>
@@ -144,6 +169,27 @@ const VistaRevision = ({ salida: salidaList, onVolver, PanelDerecho }) => {
           PENDIENTE CONCEPTO
         </div>
       </div>
+
+      {salida?.color === '#ef4444' && (
+          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '12px', padding: '20px', marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <div style={{ background: '#fee2e2', color: '#ef4444', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+              </div>
+              <div>
+                <h3 style={{ margin: 0, color: '#991b1b', fontSize: '18px' }}>Alerta Urgente de Logística</h3>
+                <p style={{ margin: '4px 0 0 0', color: '#b91c1c', fontSize: '14px' }}>El conductor ha reportado falta de itinerario o {salida?.nota_cambio}. Requiere atención inmediata.</p>
+              </div>
+            </div>
+            <button 
+              onClick={handleAlertarProfesor}
+              disabled={isAlerting}
+              style={{ background: '#ef4444', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: isAlerting ? 'not-allowed' : 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}
+            >
+              {isAlerting ? 'Enviando...' : 'Emitir Alerta a Profesor y Cadena'}
+            </button>
+          </div>
+        )}
 
       {/* Contenedor Dividido */}
       <div style={{ display: "flex", gap: "30px", alignItems: "flex-start" }}>

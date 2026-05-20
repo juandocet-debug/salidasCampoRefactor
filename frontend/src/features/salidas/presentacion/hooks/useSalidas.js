@@ -44,10 +44,17 @@ export function useSalidas() {
     setError(null);
     try {
       const data = await obtenerSalidasServicio();
-      // Guard: asegurar siempre arreglo aunque el backend devuelva algo inesperado
-      setSalidas(Array.isArray(data) ? data : (data?.datos ?? data?.results ?? data?.salidas ?? []));
+      // El backend devuelve { ok, datos: [...] } o directamente un array
+      let lista = data;
+      if (data && !Array.isArray(data)) {
+        lista = data.datos ?? data.results ?? data.salidas ?? data.data ?? [];
+      }
+      setSalidas(Array.isArray(lista) ? lista : []);
     } catch (e) {
+      // No propagar el error de red a nivel de sesión — solo mostrar lista vacía
+      // El interceptor de clienteHttp ya maneja el 401 si aplica
       setError(e.message);
+      setSalidas([]);
     } finally {
       setCargando(false);
     }

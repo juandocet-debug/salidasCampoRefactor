@@ -112,7 +112,8 @@ class UsuarioLoginController(APIView):
                         "first_name": data["nombre"],
                         "last_name": data["apellido"],
                         "email": data["email"],
-                        "foto": data["foto"]
+                        "foto": data["foto"],
+                        "rol": data.get("rol", "estudiante")
                     },
                     "access": str(token.access_token)
                 }

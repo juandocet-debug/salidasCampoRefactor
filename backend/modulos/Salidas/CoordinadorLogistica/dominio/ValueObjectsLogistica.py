@@ -43,6 +43,8 @@ class AsignacionLogisticaResumen:
     hora_fin: str = None
     destino_principal: str = None
     num_estudiantes: int = 0
+    estudiantes_inscritos: int = 0
+    porcentaje_ocupacion: float = 0.0
     num_docentes: int = 0
     costo_estimado: float = 0.0
     viaticos_estimados: float = 0.0
@@ -69,6 +71,8 @@ class AsignacionLogisticaResumen:
             "hora_fin": self.hora_fin,
             "destino": self.destino_principal,
             "num_estudiantes": self.num_estudiantes,
+            "estudiantes_inscritos": self.estudiantes_inscritos,
+            "porcentaje_ocupacion": float(self.porcentaje_ocupacion),
             "num_docentes": self.num_docentes,
             "costo_estimado": float(self.costo_estimado),
             "viaticos_estimados": float(self.viaticos_estimados),

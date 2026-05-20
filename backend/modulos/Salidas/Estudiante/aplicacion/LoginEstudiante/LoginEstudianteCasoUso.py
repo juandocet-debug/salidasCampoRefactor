@@ -33,6 +33,9 @@ class LoginEstudianteCasoUso:
             "correo":   entrada.correo,
             "nombre":   entrada.nombre,
             "apellido": entrada.apellido,
+            "cedula":   getattr(entrada, 'cedula', None),
+            "telefono": getattr(entrada, 'telefono', None),
             "facultad": entrada.facultad,
             "programa": entrada.programa,
+            "rol":      getattr(entrada, 'rol', 'estudiante'),
         }

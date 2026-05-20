@@ -10,8 +10,10 @@ class ConductorExternoModel(models.Model):
     )
     nombre   = models.CharField(max_length=100)
     cedula   = models.CharField(max_length=20, unique=True)
+    email    = models.EmailField(unique=True, null=True, blank=True)
     telefono = models.CharField(max_length=20, blank=True, null=True)
     licencia = models.CharField(max_length=30, blank=True, null=True)
+    foto     = models.ImageField(upload_to='conductores_externos/', blank=True, null=True)
     activo   = models.BooleanField(default=True)
 
     class Meta:

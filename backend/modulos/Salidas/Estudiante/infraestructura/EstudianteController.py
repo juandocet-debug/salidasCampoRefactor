@@ -55,52 +55,122 @@ class EstudianteLoginController(APIView):
         if not correo or not password_raw:
             return Response({'error': 'Correo y contraseña son requeridos.'}, status=400)
 
-        repo = DjangoEstudianteRepository()
-        try:
-            datos = LoginEstudianteCasoUso(repo).ejecutar(correo, password_raw)
-        except ValueError as e:
-            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
-
-        # Crear/obtener UsuarioModel local con rol='estudiante'
         from modulos.Usuarios.infraestructura.models import UsuarioModel
-        from django.contrib.auth.hashers import make_password
-
-        usuario_obj, _ = UsuarioModel.objects.get_or_create(
-            email=correo,
-            defaults={
-                'nombre':   datos['nombre'],
-                'apellido': datos['apellido'],
-                'password_hash': make_password(''),  # no se usa para login
+        from django.contrib.auth.hashers import check_password, make_password
+        
+        # 1. Intentar Login local (UsuarioModel) primero (para Conductores y Estudiantes ya cacheados)
+        usuario_local = UsuarioModel.objects.filter(email=correo).first()
+        if usuario_local and check_password(password_raw, usuario_local.password_hash):
+            datos = {
+                'nombre': usuario_local.nombre,
+                'apellido': usuario_local.apellido,
+                'facultad': getattr(usuario_local, 'facultad', ''), # Podría no tener facultad
+                'programa': getattr(usuario_local, 'programa', ''),
+                'rol': usuario_local.rol,
+                'debe_cambiar_password': usuario_local.debe_cambiar_password
             }
-        )
-        # Actualizar campos dinámicos si cambiaron
-        UsuarioModel.objects.filter(pk=usuario_obj.pk).update(
-            nombre=datos['nombre'],
-            apellido=datos['apellido'],
-        )
-
-        # Generar JWT
-        from rest_framework_simplejwt.tokens import RefreshToken
-        class _DummyUser:
-            def __init__(self, uid): self.id = uid
-        token = RefreshToken.for_user(_DummyUser(usuario_obj.pk))
-
-        return Response({
-            'ok': True,
-            'datos': {
-                'usuario': {
-                    'id':       usuario_obj.pk,
+            usuario_obj = usuario_local
+        else:
+            # 2. Si falla localmente, intentar en el Directorio Activo (CSV) para estudiantes nuevos
+            repo = DjangoEstudianteRepository()
+            try:
+                datos = LoginEstudianteCasoUso(repo).ejecutar(correo, password_raw)
+            except ValueError as e:
+                return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+            
+            # Crear/obtener UsuarioModel local con rol='estudiante'
+            usuario_obj, created = UsuarioModel.objects.get_or_create(
+                email=correo,
+                defaults={
                     'nombre':   datos['nombre'],
                     'apellido': datos['apellido'],
-                    'email':    correo,
-                    'facultad': datos['facultad'],
-                    'programa': datos['programa'],
-                    'foto':     usuario_obj.foto.url if usuario_obj.foto else None,
-                    'rol':      'estudiante',
+                    'cedula': datos.get('cedula'),
+                    'telefono': datos.get('telefono'),
+                    'password_hash': make_password(password_raw),  # Guardamos la contraseña para futuros logins locales
+                    'rol': datos.get('rol', 'estudiante'),
+                    'debe_cambiar_password': False
+                }
+            )
+            
+            if not created:
+                # Actualizar contraseña y datos si ya existía pero falló el login local (ej: cambio en AD)
+                usuario_obj.nombre = datos['nombre']
+                usuario_obj.apellido = datos['apellido']
+                if 'cedula' in datos and datos['cedula']:
+                    usuario_obj.cedula = datos['cedula']
+                if 'telefono' in datos and datos['telefono']:
+                    usuario_obj.telefono = datos['telefono']
+                usuario_obj.password_hash = make_password(password_raw)
+                if 'rol' in datos:
+                    usuario_obj.rol = datos['rol']
+                usuario_obj.save()
+        # Ya actualizado arriba
+
+        # Estudiantes usan credenciales institucionales, no necesitan cambiar su contraseña
+        if usuario_obj.rol == 'estudiante' and usuario_obj.debe_cambiar_password:
+            usuario_obj.debe_cambiar_password = False
+            usuario_obj.save()
+
+        # Generar Token JWT
+        import jwt
+        from django.conf import settings
+        secret = getattr(settings, 'SECRET_KEY', 'default_secret')
+        token = jwt.encode({
+            'usuario_id': usuario_obj.id,
+            'rol': usuario_obj.rol,
+            'debe_cambiar_password': usuario_obj.debe_cambiar_password
+        }, secret, algorithm='HS256')
+        
+        # Si es conductor, intentar buscar sus datos adicionales
+        licencia = ''
+        cedula = usuario_obj.cedula or ''
+        telefono = usuario_obj.telefono or ''
+        tipo_conductor = 'Conductor'
+        foto = None
+        if usuario_obj.foto:
+            foto = request.build_absolute_uri(usuario_obj.foto.url)
+        
+        if usuario_obj.rol == 'conductor':
+            try:
+                from modulos.Logistica.ConductorExterno.infraestructura.models import ConductorExternoModel
+                cond = ConductorExternoModel.objects.filter(email=usuario_obj.email).first()
+                if not cond:
+                    from modulos.Logistica.ConductorInstitucional.infraestructura.models import ConductorInstitucionalModel
+                    cond = ConductorInstitucionalModel.objects.filter(email=usuario_obj.email).first()
+                    tipo_conductor = 'Conductor Institucional' if cond else 'Conductor'
+                else:
+                    tipo_conductor = 'Conductor Externo'
+                
+                if cond:
+                    licencia = getattr(cond, 'licencia', getattr(cond, 'tipo_licencia', ''))
+                    cedula = cond.cedula or cedula
+                    telefono = cond.telefono or telefono
+                    if getattr(cond, 'foto', None):
+                        foto = request.build_absolute_uri(cond.foto.url)
+            except Exception as e:
+                print("Error buscando datos extra de conductor:", e)
+                
+        # Devolver datos
+        return Response({
+            'datos': {
+                'usuario': {
+                    'id': usuario_obj.id,
+                    'nombre': usuario_obj.nombre,
+                    'apellido': usuario_obj.apellido,
+                    'correo': usuario_obj.email,
+                    'facultad': getattr(usuario_obj, 'facultad', ''),
+                    'programa': getattr(usuario_obj, 'programa', ''),
+                    'rol': usuario_obj.rol,
+                    'cedula': cedula,
+                    'telefono': telefono,
+                    'licencia': licencia,
+                    'foto': foto,
+                    'tipo_conductor': tipo_conductor,
+                    'debe_cambiar_password': usuario_obj.debe_cambiar_password
                 },
-                'access': str(token.access_token),
+                'access': token
             }
-        })
+        }, status=200)
 
 
 class EstudianteInscripcionController(APIView):
@@ -158,18 +228,34 @@ class EstudianteInscripcionController(APIView):
         foto  = request.FILES.get('foto_ficha')
         firma = request.FILES.get('firma_digital')
 
-        # Si no envían archivos, buscar si tienen una inscripción previa con firma y foto
-        if not foto or not firma:
+        # Revisar si faltan documentos obligatorios primero para abortar rápido
+        if hasattr(repo, 'tiene_documentos_obligatorios'):
+            if not repo.tiene_documentos_obligatorios(usuario_id):
+                return Response({'error': 'Debes subir tu Certificado EPS y Documento de Identidad en la pestaña \'Mis Documentos\' antes de inscribirte.'}, status=400)
+
+        # Si no hay firma, exigirla siempre (ya no se recicla)
+        if not firma:
             from .models import EstudianteSalida
             prev_inscripcion = EstudianteSalida.objects.filter(
                 usuario_id=usuario_id
-            ).exclude(foto_ficha='').exclude(firma_digital='').first()
+            ).exclude(foto_ficha='').first()
+            
+            return Response({
+                'error': 'Firma requerida.', 
+                'requiere_foto': not bool(prev_inscripcion)
+            }, status=400)
+
+        # Si no envían foto, reciclar la foto anterior
+        if not foto:
+            from .models import EstudianteSalida
+            prev_inscripcion = EstudianteSalida.objects.filter(
+                usuario_id=usuario_id
+            ).exclude(foto_ficha='').first()
 
             if not prev_inscripcion:
-                return Response({'error': 'Foto y firma son obligatorias para tu primera inscripción.'}, status=400)
+                return Response({'error': 'Foto de identificación requerida.'}, status=400)
 
-            foto  = prev_inscripcion.foto_ficha
-            firma = prev_inscripcion.firma_digital
+            foto = prev_inscripcion.foto_ficha
 
         try:
             resultado = InscribirEstudianteCasoUso(repo).ejecutar(
@@ -231,5 +317,19 @@ class EstudianteDocumentosController(APIView):
         try:
             doc = repo.subir_documento(int(usuario_id), tipo_documento, archivo)
             return Response({'ok': True, 'datos': doc}, status=201)
+        except Exception as e:
+            return Response({'error': str(e)}, status=400)
+
+    def delete(self, request):
+        usuario_id = request.data.get('usuario_id') or request.query_params.get('usuario_id')
+        tipo_documento = request.data.get('tipo_documento') or request.query_params.get('tipo_documento')
+
+        if not usuario_id or not tipo_documento:
+            return Response({'error': 'usuario_id y tipo_documento son requeridos.'}, status=400)
+
+        repo = DjangoEstudianteRepository()
+        try:
+            repo.eliminar_documento(int(usuario_id), tipo_documento)
+            return Response({'ok': True}, status=200)
         except Exception as e:
             return Response({'error': str(e)}, status=400)

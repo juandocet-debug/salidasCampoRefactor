@@ -11,6 +11,7 @@ import TabFlota      from '../../componentes/TabFlota/TabFlota';
 import TabComponentes from '../../componentes/TabComponentes/TabComponentes';
 import TabSalidas from '../../componentes/TabSalidas/TabSalidas';
 import TabDirectorio from '../../componentes/TabDirectorio/TabDirectorio';
+import TabPersonal from '../../componentes/TabPersonal/TabPersonal';
 import CoordinadorLogisticaDashboard from '@/features/coordinadorLogistica/CoordinadorLogisticaDashboard';
 import './PanelHerramientas.css';
 
@@ -36,13 +37,27 @@ const TABS = [
         icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
     },
     {
+        id: 'personal', label: 'Personal', desc: 'Conductores y Admin', statNum: '06', statText: 'Usuarios', actionTxt: 'Gestionar', progreso: '100%', componente: TabPersonal,
+        icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+    },
+    {
         id: 'salidas', label: 'Salidas', desc: 'Gestión de todas las salidas', statNum: '—', statText: 'Registros', actionTxt: 'Gestionar', progreso: '100%', componente: TabSalidas,
         icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M3 12h18M3 6l9-3 9 3M3 18l9 3 9-3" /></svg>,
     }
 ];
 
+const MAIN_TABS = [
+    { id: 'flota', label: 'Flota' },
+    { id: 'gestion_operativa', label: 'Gestión Operativa' },
+    { id: 'academico', label: 'Catál. Acad.' },
+    { id: 'calendario', label: 'Calendario' },
+    { id: 'usuarios_group', label: 'Usuarios', subTabs: ['directorio', 'personal'] },
+    { id: 'salidas', label: 'Salidas' },
+];
+
 export default function PanelHerramientas() {
     const [tabActivo, setTabActivo] = useState('flota');
+    const [dropdownOpen, setDropdownOpen] = useState(false);
     const [toast, setToast]         = useState('');
     const token = useAutenticacion(s => s.token) || '';
 
@@ -58,16 +73,48 @@ export default function PanelHerramientas() {
             {/* ── Menú de Navegación Horizontal ────────────────────── */}
             <div className="herr-top-nav">
                 <div className="herr-nav-links">
-                    {TABS.map(tab => (
-                        <button
-                            key={tab.id}
-                            className={`herr-nav-link ${tabActivo === tab.id ? 'active' : ''}`}
-                            onClick={() => setTabActivo(tab.id)}
-                        >
-                            {tab.label}
-                            <svg className="herr-nav-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6"/></svg>
-                        </button>
-                    ))}
+                    {MAIN_TABS.map(mt => {
+                        if (mt.subTabs) {
+                            const isActive = mt.subTabs.includes(tabActivo);
+                            return (
+                                <div key={mt.id} className="herr-nav-dropdown-container" 
+                                     onMouseEnter={() => setDropdownOpen(true)}
+                                     onMouseLeave={() => setDropdownOpen(false)}>
+                                    <button className={`herr-nav-link ${isActive ? 'active' : ''}`}>
+                                        {mt.label}
+                                        <svg className="herr-nav-arrow" style={{transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0)'}} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                                    </button>
+                                    {dropdownOpen && (
+                                        <div className="herr-nav-dropdown">
+                                            {mt.subTabs.map(subId => {
+                                                const tab = TABS.find(t => t.id === subId);
+                                                return (
+                                                    <button 
+                                                        key={subId} 
+                                                        className={`herr-dropdown-item ${tabActivo === subId ? 'active' : ''}`}
+                                                        onClick={() => { setTabActivo(subId); setDropdownOpen(false); }}
+                                                    >
+                                                        {tab.label}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        } else {
+                            const tab = TABS.find(t => t.id === mt.id);
+                            return (
+                                <button
+                                    key={tab.id}
+                                    className={`herr-nav-link ${tabActivo === tab.id ? 'active' : ''}`}
+                                    onClick={() => setTabActivo(tab.id)}
+                                >
+                                    {tab.label}
+                                </button>
+                            );
+                        }
+                    })}
                 </div>
                 <div className="herr-nav-actions">
                     <button className="herr-btn-icon">

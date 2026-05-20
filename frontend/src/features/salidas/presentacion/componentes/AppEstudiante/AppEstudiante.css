@@ -185,7 +185,7 @@
 .app-est__main-content {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 20px calc(90px + var(--safe-bottom)); /* Espacio para el bottom nav */
+  padding: 20px 20px calc(140px + var(--safe-bottom)); /* Espacio para el bottom nav y boton */
 }
 
 /* â”€â”€ Bottom Navigation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */

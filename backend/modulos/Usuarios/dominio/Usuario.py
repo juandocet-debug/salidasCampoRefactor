@@ -5,6 +5,7 @@ from .UsuarioApellido import UsuarioApellido
 from .UsuarioEmail import UsuarioEmail
 from .UsuarioPassword import UsuarioPassword
 from .UsuarioFoto import UsuarioFoto
+from .UsuarioRol import UsuarioRol
 
 @dataclass
 class Usuario:
@@ -14,3 +15,4 @@ class Usuario:
     email: UsuarioEmail
     password: UsuarioPassword
     foto: UsuarioFoto
+    rol: UsuarioRol

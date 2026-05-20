@@ -87,6 +87,7 @@ class NovedadOperativa(models.Model):
     salida_id = models.IntegerField()
     nivel = models.CharField(max_length=50) # critica, alta, media, baja
     mensaje = models.TextField()
+    foto = models.ImageField(upload_to='novedades/', null=True, blank=True)
     fecha_reporte = models.DateTimeField(auto_now_add=True)
     
     class Meta:
@@ -105,4 +106,21 @@ class CierreOperativo(models.Model):
     class Meta:
         db_table = 'salidas_logistica_cierres'
         verbose_name = 'Cierre Operativo'
+
+
+class CheckpointParada(models.Model):
+    """Registro de cuando el conductor o profesor confirma llegada a una parada del itinerario."""
+    salida_id   = models.IntegerField()
+    parada_id   = models.IntegerField()          # ID del punto en puntos_ruta
+    parada_nombre = models.CharField(max_length=300)
+    reportado_por = models.CharField(max_length=20, default='conductor')  # 'conductor' | 'profesor'
+    usuario_id  = models.IntegerField(null=True, blank=True)
+    notas       = models.TextField(blank=True, null=True)
+    timestamp   = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'salidas_checkpoint_parada'
+        verbose_name = 'Checkpoint de Parada'
+        # Un mismo rol solo puede marcar una parada una vez
+        unique_together = ('salida_id', 'parada_id', 'reportado_por')
 

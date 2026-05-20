@@ -34,6 +34,9 @@ class DirectorioEstudiante(models.Model):
     apellido        = models.CharField(max_length=200)
     facultad        = models.CharField(max_length=200, blank=True)
     programa        = models.CharField(max_length=200, blank=True)
+    cedula          = models.CharField(max_length=20, null=True, blank=True)
+    telefono        = models.CharField(max_length=20, null=True, blank=True)
+    rol             = models.CharField(max_length=50, default='estudiante')
     activo          = models.BooleanField(default=True)
 
     class Meta:

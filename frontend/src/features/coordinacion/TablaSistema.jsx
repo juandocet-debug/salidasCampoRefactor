@@ -41,8 +41,10 @@ export const TablaSistema = ({ salidas = [], cargando = false, titulo = "Sistema
                         const codigo = s.codigo || s.id;
                         const isExpanded = expandidoId === s.id;
 
-                        // Estilos dinámicos para los distintos estados de la salida
                         const getFormatEstado = (estadoRaw) => {
+                            if (s.color === '#ef4444') {
+                                return { texto: 'URGENCIA: SIN ITINERARIO', style: { background: '#fee2e2', color: '#ef4444', border: '1px solid #f87171', animation: 'pulse 2s infinite' } };
+                            }
                             const e = (estadoRaw || '').toLowerCase();
                             if (e === 'ajustada') return { texto: 'CON AJUSTES (CORREGIDA)', style: { background: '#fef3c7', color: '#d97706', border: 'none' } };
                             if (e === 'pendiente_ajuste') return { texto: 'CON AJUSTES', style: { background: '#fef3c7', color: '#d97706', border: 'none' } };
@@ -77,7 +79,15 @@ export const TablaSistema = ({ salidas = [], cargando = false, titulo = "Sistema
                                         <div style={{ fontWeight: '600' }}>{s.asignatura || 'Sin asignatura'}</div>
                                         <div style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', marginTop: '2px' }}>{s.nombre}</div>
                                         {s.nota_cambio && (
-                                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginTop: '6px', padding: '4px 10px', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '6px', fontSize: '10px', fontWeight: '600', color: '#1d4ed8' }}>
+                                            <div style={{ 
+                                                display: 'inline-flex', alignItems: 'center', gap: '6px', 
+                                                marginTop: '6px', padding: '4px 10px', 
+                                                background: (s.color === '#ef4444' || s.nota_cambio.includes('URGENTE')) ? '#fef2f2' : '#eff6ff', 
+                                                border: `1px solid ${(s.color === '#ef4444' || s.nota_cambio.includes('URGENTE')) ? '#fca5a5' : '#bfdbfe'}`, 
+                                                borderRadius: '6px', 
+                                                fontSize: '10px', fontWeight: '600', 
+                                                color: (s.color === '#ef4444' || s.nota_cambio.includes('URGENTE')) ? '#b91c1c' : '#1d4ed8' 
+                                            }}>
                                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                                                 {s.nota_cambio}
                                             </div>

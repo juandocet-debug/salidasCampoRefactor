@@ -10,4 +10,6 @@ class ConductorExterno:
     cedula: str
     telefono: Optional[str]
     licencia: Optional[str]
-    activo: bool
+    email: Optional[str] = None
+    foto: Optional[str] = None
+    activo: bool = True

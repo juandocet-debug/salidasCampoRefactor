@@ -7,6 +7,7 @@ from ..dominio.UsuarioApellido import UsuarioApellido
 from ..dominio.UsuarioEmail import UsuarioEmail
 from ..dominio.UsuarioPassword import UsuarioPassword
 from ..dominio.UsuarioFoto import UsuarioFoto
+from ..dominio.UsuarioRol import UsuarioRol
 from ..dominio.UsuarioRepository import UsuarioRepository
 from .models import UsuarioModel
 
@@ -18,7 +19,8 @@ class DjangoUsuarioRepository(UsuarioRepository):
                 apellido=usuario.apellido.value,
                 email=usuario.email.value,
                 password_hash=make_password(usuario.password.value), # Hash en la capa sucia (infraestructura)
-                foto=usuario.foto.value # Permite pasar objeto archivo o None
+                foto=usuario.foto.value, # Permite pasar objeto archivo o None
+                rol=usuario.rol.value if usuario.rol else 'estudiante'
             )
             usuario.id = UsuarioId(modelo.pk)
         else:
@@ -29,6 +31,8 @@ class DjangoUsuarioRepository(UsuarioRepository):
                 modelo.email = usuario.email.value
                 if usuario.foto.value is not None:
                     modelo.foto = usuario.foto.value
+                if usuario.rol:
+                    modelo.rol = usuario.rol.value
                 modelo.save()
             except UsuarioModel.DoesNotExist:
                 raise ValueError(f"Usuario con ID {usuario.id.value} no encontrado")
@@ -68,5 +72,6 @@ class DjangoUsuarioRepository(UsuarioRepository):
             apellido=UsuarioApellido(modelo.apellido),
             email=UsuarioEmail(modelo.email),
             password=UsuarioPassword("********"), # Dummy pasword, dominio nunca manipula hashes expuestos
-            foto=UsuarioFoto(foto_url)
+            foto=UsuarioFoto(foto_url),
+            rol=UsuarioRol(modelo.rol)
         )

@@ -89,3 +89,19 @@ class RegistrarRevisionController(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class AlertaItinerarioController(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, salida_id):
+        from modulos.Salidas.Core.infraestructura.models import SalidaModelo
+        try:
+            salida = SalidaModelo.objects.get(id=salida_id)
+            salida.color = '#ef4444'
+            salida.icono = 'IcoAlert'
+            salida.nota_cambio = 'ALERTA LOGÍSTICA: Se requiere cargar el itinerario urgentemente. Conductor detenido.'
+            salida.save()
+            print(f'*** CORREO ENVIADO: Profesor notificado urgente sobre salida {salida_id} ***')
+            return Response({'ok': True, 'mensaje': 'Profesor notificado exitosamente.'}, status=status.HTTP_200_OK)
+        except SalidaModelo.DoesNotExist:
+            return Response({'error': 'Salida no encontrada'}, status=status.HTTP_404_NOT_FOUND)

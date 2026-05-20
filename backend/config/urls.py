@@ -15,8 +15,13 @@ from modulos.Logistica.Parametro.infraestructura.ParametroController import Para
 from modulos.Logistica.Parametro.infraestructura.ParametroConfiguracionController import ParametroConfiguracionController
 from modulos.Logistica.EmpresaTransporte.infraestructura.EmpresaTransporteController import EmpresaTransporteController
 from modulos.Logistica.ConductorExterno.infraestructura.ConductorExternoController import ConductorExternoController
+from modulos.Logistica.ConductorInstitucional.infraestructura.ConductorInstitucionalController import ConductorInstitucionalController
+from modulos.Logistica.ConductorInstitucional.infraestructura.ConductorAppController import ConductorLoginController, ConductorMisViajesController, ConductorComentarParadaController, ConductorReportarNovedadController, ConductorNotificarLlegadaController, ConductorFinalizarViajeController
+from modulos.Salidas.Core.infraestructura.ConductorCheckpointController import ConductorCheckpointController
 from modulos.Salidas.Core.infraestructura.AdminSalidasController import AdminSalidasController, CleanupHuerfanosController
 from modulos.Salidas.Core.infraestructura.OsrmProxyController import OsrmProxyController
+from modulos.Usuarios.infraestructura.PersonalAdministrativoController import PersonalAdministrativoController, PersonalAdministrativoDetailController
+from modulos.Usuarios.infraestructura.CambiarPasswordController import CambiarPasswordController
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -44,6 +49,17 @@ urlpatterns = [
     
     # Alias de Autenticación para compatibilidad con el Frontend
     path('api/auth/login/', UsuarioLoginController.as_view()),
+    path('api/auth/mobile/cambiar-password/', CambiarPasswordController.as_view()),
+    
+    # Rutas para la App del Conductor (Modo PWA)
+    path('api/conductor/login/', ConductorLoginController.as_view()),
+    path('api/conductor/mis-viajes/', ConductorMisViajesController.as_view()),
+    path('api/conductor/comentar-parada/', ConductorComentarParadaController.as_view()),
+    path('api/conductor/reportar-novedad/', ConductorReportarNovedadController.as_view()),
+    path('api/conductor/llegada/', ConductorNotificarLlegadaController.as_view()),
+    path('api/conductor/finalizar/', ConductorFinalizarViajeController.as_view()),
+    path('api/conductor/checkpoint/', ConductorCheckpointController.as_view(), name='conductor-checkpoint'),
+    path('api/profesor/checkpoint/', ConductorCheckpointController.as_view(), name='profesor-checkpoint'),
     
     # Endpoint masivo para el Tablero Académico
     path('api/admin/catalogos/', CatalogoController.as_view()),
@@ -52,6 +68,9 @@ urlpatterns = [
     path('api/admin/parametros/configuracion/', ParametroConfiguracionController.as_view()),
     path('api/admin/parametros/', ParametroController.as_view()),
     path('api/admin/parametros/<str:pk>/', ParametroController.as_view()),
+    # Rutas para Administrador del Sistema — Gestión de Personal Administrativo
+    path('api/admin/personal/', PersonalAdministrativoController.as_view(), name='admin-personal-list'),
+    path('api/admin/personal/<int:pk>/', PersonalAdministrativoDetailController.as_view(), name='admin-personal-detail'),
 
     # Rutas para Transporte / Vehiculos
     path('api/transporte/vehiculos/', VehiculoController.as_view()),
@@ -65,6 +84,10 @@ urlpatterns = [
     # Rutas para Conductores Externos
     path('api/transporte/conductores/', ConductorExternoController.as_view(), name='conductores-list'),
     path('api/transporte/conductores/<int:pk>/', ConductorExternoController.as_view(), name='conductores-detail'),
+
+    # Rutas para Conductores Institucionales
+    path('api/transporte/conductores-institucionales/', ConductorInstitucionalController.as_view(), name='conductores-institucionales-list'),
+    path('api/transporte/conductores-institucionales/<int:pk>/', ConductorInstitucionalController.as_view(), name='conductores-institucionales-detail'),
 
     # Rutas para Salidas Core
     path('api/salidas/core/', include('modulos.Salidas.Core.infraestructura.urls')),

@@ -15,7 +15,10 @@ class EditarEstudianteDirectorioCasoUso:
             "correo": estudiante.correo,
             "nombre": estudiante.nombre,
             "apellido": estudiante.apellido,
+            "cedula": getattr(estudiante, 'cedula', None),
+            "telefono": getattr(estudiante, 'telefono', None),
             "facultad": estudiante.facultad,
             "programa": estudiante.programa,
+            "rol": getattr(estudiante, 'rol', 'estudiante'),
             "activo": estudiante.activo
         }

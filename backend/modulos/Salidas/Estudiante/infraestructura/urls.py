@@ -5,11 +5,11 @@ from .CargaDirectorioController import CargaDirectorioController, CargaDirectori
 from .DirectorioActivoController import DirectorioActivoController, DirectorioEstudianteEditController
 
 urlpatterns = [
-    # ── Autenticación del Estudiante (público) ─────────────────────────────
-    path('auth/estudiante/login/', EstudianteLoginController.as_view(), name='estudiante-login'),
+    # ── Autenticación Unificada (público) ─────────────────────────────
+    path('auth/mobile/login/', EstudianteLoginController.as_view(), name='mobile-login'),
 
     # ── Inscripción del Estudiante ─────────────────────────────────────────
-    path('estudiante/salidas/<int:salida_id>/inscribirse/',
+    path('estudiante/salidas/<str:salida_id>/inscribirse/',
          EstudianteInscripcionController.as_view(), name='estudiante-inscribirse'),
     path('estudiante/salidas/pin/<str:pin>/', EstudianteCodigoController.as_view(), name='estudiante-salida-pin'),
 

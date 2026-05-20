@@ -5,6 +5,7 @@ from ...dominio.UsuarioApellido import UsuarioApellido
 from ...dominio.UsuarioEmail import UsuarioEmail
 from ...dominio.UsuarioPassword import UsuarioPassword
 from ...dominio.UsuarioFoto import UsuarioFoto
+from ...dominio.UsuarioRol import UsuarioRol
 from ...dominio.UsuarioRepository import UsuarioRepository
 
 class UsuarioCreate:
@@ -17,7 +18,8 @@ class UsuarioCreate:
         apellido: str,
         email: str,
         password: str,
-        foto = None
+        foto = None,
+        rol: str = "estudiante"
     ) -> None:
         usuario = Usuario(
             id=UsuarioId(None),
@@ -25,6 +27,7 @@ class UsuarioCreate:
             apellido=UsuarioApellido(apellido),
             email=UsuarioEmail(email),
             password=UsuarioPassword(password),
-            foto=UsuarioFoto(foto)
+            foto=UsuarioFoto(foto),
+            rol=UsuarioRol(rol)
         )
         self.repository.save(usuario)

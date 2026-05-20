@@ -31,6 +31,8 @@ class DjangoEstudianteRepository(IEstudianteRepository):
                 id=obj.id, correo=obj.correo, password_hash=obj.password_hash,
                 nombre=obj.nombre, apellido=obj.apellido,
                 facultad=obj.facultad, programa=obj.programa,
+                cedula=obj.cedula, telefono=obj.telefono,
+                rol=getattr(obj, 'rol', 'estudiante'),
                 activo=obj.activo, carga_id=obj.carga_id,
             )
         except DirectorioEstudiante.DoesNotExist:
@@ -71,8 +73,11 @@ class DjangoEstudianteRepository(IEstudianteRepository):
                         'password_hash': make_password(password),
                         'nombre':   fila.get('nombre', '').strip(),
                         'apellido': fila.get('apellido', '').strip(),
+                        'cedula':   fila.get('cedula', '').strip() or None,
+                        'telefono': fila.get('telefono', '').strip() or None,
                         'facultad': fila.get('facultad', '').strip(),
                         'programa': fila.get('programa', '').strip(),
+                        'rol':      fila.get('rol', 'estudiante').strip().lower() or 'estudiante',
                     }
                 )
                 if created:
@@ -103,7 +108,7 @@ class DjangoEstudianteRepository(IEstudianteRepository):
         try:
             carga_activa = CargaDirectorio.objects.filter(activa=True).latest('fecha_carga')
             estudiantes = DirectorioEstudiante.objects.filter(carga=carga_activa)
-            return list(estudiantes.values('id', 'correo', 'nombre', 'apellido', 'facultad', 'programa', 'activo'))
+            return list(estudiantes.values('id', 'correo', 'nombre', 'apellido', 'cedula', 'telefono', 'facultad', 'programa', 'rol', 'activo'))
         except CargaDirectorio.DoesNotExist:
             return []
 
@@ -115,6 +120,9 @@ class DjangoEstudianteRepository(IEstudianteRepository):
             if 'apellido' in datos: obj.apellido = datos['apellido']
             if 'facultad' in datos: obj.facultad = datos['facultad']
             if 'programa' in datos: obj.programa = datos['programa']
+            if 'cedula' in datos: obj.cedula = datos['cedula']
+            if 'telefono' in datos: obj.telefono = datos['telefono']
+            if 'rol' in datos: obj.rol = datos['rol']
             if 'activo' in datos: obj.activo = datos['activo']
             if 'password_hash' in datos: obj.password_hash = datos['password_hash']
             obj.save()
@@ -123,6 +131,8 @@ class DjangoEstudianteRepository(IEstudianteRepository):
                 id=obj.id, correo=obj.correo, password_hash=obj.password_hash,
                 nombre=obj.nombre, apellido=obj.apellido,
                 facultad=obj.facultad, programa=obj.programa,
+                cedula=obj.cedula, telefono=obj.telefono,
+                rol=getattr(obj, 'rol', 'estudiante'),
                 activo=obj.activo, carga_id=obj.carga_id
             )
         except DirectorioEstudiante.DoesNotExist:
@@ -330,3 +340,23 @@ class DjangoEstudianteRepository(IEstudianteRepository):
             'url': d.archivo.url if d.archivo else None,
             'fecha_subida': str(d.fecha_subida)
         } for d in docs]
+
+    def tiene_documentos_obligatorios(self, usuario_id: int) -> bool:
+        from .models import DocumentoEstudiante
+        # Buscar si existen documentos de tipo 'eps' y 'documento_identidad'
+        tipos_subidos = DocumentoEstudiante.objects.filter(
+            usuario_id=usuario_id, 
+            tipo_documento__in=['eps', 'documento_identidad']
+        ).values_list('tipo_documento', flat=True)
+        
+        return 'eps' in tipos_subidos and 'documento_identidad' in tipos_subidos
+
+    def eliminar_documento(self, usuario_id: int, tipo_documento: str) -> None:
+        from .models import DocumentoEstudiante
+        try:
+            doc = DocumentoEstudiante.objects.get(usuario_id=usuario_id, tipo_documento=tipo_documento)
+            if doc.archivo:
+                doc.archivo.delete()
+            doc.delete()
+        except DocumentoEstudiante.DoesNotExist:
+            pass

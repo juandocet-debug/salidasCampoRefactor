@@ -20,5 +20,6 @@ class UsuarioLogin:
             "nombre": usuario.nombre.value,
             "apellido": usuario.apellido.value,
             "email": usuario.email.value,
-            "foto": usuario.foto.value
+            "foto": usuario.foto.value,
+            "rol": usuario.rol.value
         }

@@ -43,11 +43,6 @@ const MENUS = {
                 { etiqueta: 'Historial', ruta: '/historial', icono: Ico.historial },
             ]
         },
-        {
-            titulo: 'Cuenta', items: [
-                { etiqueta: 'Usuarios', ruta: '/usuarios', icono: Ico.perfil },
-            ]
-        },
     ],
     coordinador_salidas: [
         {
@@ -55,11 +50,6 @@ const MENUS = {
                 { etiqueta: 'Gestión Operativa', ruta: '/logistica', icono: Ico.transporte },
                 { etiqueta: 'Presupuesto', ruta: '/presupuesto', icono: Ico.presupuesto },
                 { etiqueta: 'Parámetros', ruta: '/parametros', icono: Ico.parametros },
-            ]
-        },
-        {
-            titulo: 'Cuenta', items: [
-                { etiqueta: 'Usuarios', ruta: '/usuarios', icono: Ico.perfil },
             ]
         },
     ],
@@ -71,11 +61,6 @@ const MENUS = {
                 { etiqueta: 'Novedades', ruta: '/novedades', icono: Ico.novedades },
             ]
         },
-        {
-            titulo: 'Cuenta', items: [
-                { etiqueta: 'Usuarios', ruta: '/usuarios', icono: Ico.perfil },
-            ]
-        },
     ],
     estudiante: [
         {
@@ -85,22 +70,12 @@ const MENUS = {
                 { etiqueta: 'Documentos', ruta: '/documentos', icono: Ico.documentos },
             ]
         },
-        {
-            titulo: 'Cuenta', items: [
-                { etiqueta: 'Usuarios', ruta: '/usuarios', icono: Ico.perfil },
-            ]
-        },
     ],
     admin_sistema: [
         {
             titulo: 'Administración', items: [
                 { etiqueta: 'Tablero', ruta: '/tablero', icono: Ico.tablero },
                 { etiqueta: 'Herramientas', ruta: '/herramientas', icono: Ico.herramientas },
-            ]
-        },
-        {
-            titulo: 'Cuenta', items: [
-                { etiqueta: 'Usuarios', ruta: '/usuarios', icono: Ico.perfil },
             ]
         },
     ],

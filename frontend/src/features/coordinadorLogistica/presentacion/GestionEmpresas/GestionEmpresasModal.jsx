@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import './GestionEmpresasModal.css';
 import {
     obtenerEmpresasContratadas,
@@ -38,6 +39,12 @@ const IcoEdit = () => (
 const IcoDriver = () => (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+    </svg>
+);
+const IcoCamera = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+        <circle cx="12" cy="13" r="4"/>
     </svg>
 );
 const IcoBuilding = () => (
@@ -92,10 +99,12 @@ const TablaConductores = ({ conductores, onEditar, onEliminar }) => (
         <table className="ge-table">
             <thead>
                 <tr>
+                    <th style={{ width: '50px', textAlign: 'center' }}>Foto</th>
                     <th>Nombre</th>
                     <th>Cédula</th>
                     <th>Teléfono</th>
                     <th>Licencia</th>
+                    <th>Estado</th>
                     <th style={{ textAlign: 'right' }}>Acciones</th>
                 </tr>
             </thead>
@@ -104,10 +113,24 @@ const TablaConductores = ({ conductores, onEditar, onEliminar }) => (
                     <tr><td colSpan={5} className="ge-empty">Esta empresa no tiene conductores registrados.</td></tr>
                 ) : conductores.map(c => (
                     <tr key={c.id}>
+                        <td style={{ textAlign: 'center', width: '50px' }}>
+                            {c.foto ? (
+                                <img src={c.foto} alt="Foto" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
+                            ) : (
+                                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '12px' }}>
+                                    <IcoDriver />
+                                </div>
+                            )}
+                        </td>
                         <td style={{ fontWeight: '600', color: '#0f172a' }}>{c.nombre}</td>
                         <td style={{ fontFamily: 'monospace', fontSize: '13px' }}>{c.cedula}</td>
                         <td>{c.telefono || '—'}</td>
                         <td>{c.licencia || '—'}</td>
+                        <td>
+                            <span className={`ge-badge ge-badge--${c.activo ? 'select' : 'danger'}`}>
+                                {c.activo ? 'Activo' : 'Inactivo'}
+                            </span>
+                        </td>
                         <td style={{ textAlign: 'right' }}>
                             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                                 <button className="ge-btn-edit" onClick={() => onEditar(c)}>
@@ -125,7 +148,7 @@ const TablaConductores = ({ conductores, onEditar, onEliminar }) => (
 
 // ─── Modal Principal ──────────────────────────────────────────────────────────
 const FORM_EMPRESA_VACIO = { nit: '', razon_social: '', telefono: '', correo: '', contacto: '' };
-const FORM_CONDUCTOR_VACIO = { nombre: '', cedula: '', telefono: '', licencia: '' };
+const FORM_CONDUCTOR_VACIO = { nombres: '', apellidos: '', cedula: '', email: '', telefono: '', licencia: '', activo: true };
 
 export default function GestionEmpresasModal({ onCerrar }) {
     const { agregarAlerta } = useAlertas();
@@ -147,6 +170,10 @@ export default function GestionEmpresasModal({ onCerrar }) {
     const [conductorAEliminar, setConductorAEliminar] = useState(null);
     const [conductorEditando, setConductorEditando] = useState(null); // null = modo crear
     const [formConductor, setFormConductor] = useState(FORM_CONDUCTOR_VACIO);
+    const [fotoArchivo, setFotoArchivo] = useState(null);
+    const [fotoPreview, setFotoPreview] = useState(null);
+    const fileInputRef = useRef(null);
+    const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
     useEffect(() => { cargarEmpresas(); }, []);
 
@@ -238,20 +265,38 @@ export default function GestionEmpresasModal({ onCerrar }) {
     };
 
     // ── Crear / Actualizar conductor ──────────────────────────────────────────
+    const handleFotoChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setFotoArchivo(file);
+            setFotoPreview(URL.createObjectURL(file));
+        }
+    };
+    const triggerFileInput = () => fileInputRef.current?.click();
+
     const handleSubmitConductor = async (e) => {
         e.preventDefault();
-        if (!formConductor.nombre || !formConductor.cedula || !empresaSeleccionada) return;
+        if (!formConductor.nombres || !formConductor.apellidos || !formConductor.cedula || !empresaSeleccionada) return;
         setGuardandoConductor(true);
         try {
+            const formData = new FormData();
+            formData.append('empresa_id', empresaSeleccionada.id);
+            formData.append('nombre', `${formConductor.nombres.trim()} ${formConductor.apellidos.trim()}`);
+            formData.append('cedula', formConductor.cedula);
+            if(formConductor.email) formData.append('email', formConductor.email);
+            if(formConductor.telefono) formData.append('telefono', formConductor.telefono);
+            if(formConductor.licencia) formData.append('licencia', formConductor.licencia);
+            formData.append('activo', formConductor.activo ? 'true' : 'false');
+            if(fotoArchivo) formData.append('foto', fotoArchivo);
+
             if (conductorEditando) {
-                await actualizarConductorExterno(conductorEditando.id, formConductor);
-                agregarAlerta(`Conductor "${formConductor.nombre}" actualizado.`, 'exito');
-                setConductorEditando(null);
+                await actualizarConductorExterno(conductorEditando.id, formData);
+                agregarAlerta(`Conductor "${formConductor.nombres}" actualizado.`, 'exito');
             } else {
-                await crearConductorExterno({ ...formConductor, empresa_id: empresaSeleccionada.id });
-                agregarAlerta(`Conductor "${formConductor.nombre}" registrado.`, 'exito');
+                await crearConductorExterno(formData);
+                agregarAlerta(`Conductor "${formConductor.nombres}" registrado.`, 'exito');
             }
-            setFormConductor(FORM_CONDUCTOR_VACIO);
+            cancelarEditarConductor();
             const data = await obtenerConductoresPorEmpresa(empresaSeleccionada.id);
             setConductores(data);
         } catch {
@@ -263,18 +308,32 @@ export default function GestionEmpresasModal({ onCerrar }) {
 
     const iniciarEditarConductor = (conductor) => {
         setConductorEditando(conductor);
+        const parts = (conductor.nombre || '').trim().split(' ');
+        let half = Math.ceil(parts.length / 2);
+        if (parts.length === 3) half = 1;
+        const n = parts.slice(0, half).join(' ');
+        const a = parts.slice(half).join(' ');
+
         setFormConductor({
-            nombre: conductor.nombre || '',
+            nombres: n || '',
+            apellidos: a || '',
             cedula: conductor.cedula || '',
+            email: conductor.email || '',
             telefono: conductor.telefono || '',
             licencia: conductor.licencia || '',
+            activo: conductor.activo !== undefined ? conductor.activo : true,
         });
+        setFotoArchivo(null);
+        setFotoPreview(conductor.foto ? conductor.foto.replace('http://127.0.0.1:8000', API_URL) : null);
         setTimeout(() => document.getElementById('form-conductor')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
     };
 
     const cancelarEditarConductor = () => {
         setConductorEditando(null);
         setFormConductor(FORM_CONDUCTOR_VACIO);
+        setFotoArchivo(null);
+        setFotoPreview(null);
+        if(fileInputRef.current) fileInputRef.current.value = "";
     };
 
     // ── Eliminar conductor ────────────────────────────────────────────────────
@@ -291,9 +350,9 @@ export default function GestionEmpresasModal({ onCerrar }) {
         }
     };
 
-    return (
+    return createPortal(
         <>
-            <div className="ge-overlay" onClick={onCerrar}>
+            <div className="ge-overlay" onClick={onCerrar} style={{ zIndex: 10000 }}>
                 <div className="ge-modal" onClick={e => e.stopPropagation()}>
 
                     {/* ── Header ── */}
@@ -432,48 +491,132 @@ export default function GestionEmpresasModal({ onCerrar }) {
                                             : <><IcoPlus /> Registrar Conductor</>
                                         }
                                     </h4>
-                                    <form onSubmit={handleSubmitConductor}>
-                                        <div className="ge-grid">
-                                            <div className="ge-field">
-                                                <label>Nombre Completo <span style={{ color: 'red' }}>*</span></label>
-                                                <input type="text" placeholder="Ej: Carlos Rodríguez"
-                                                    value={formConductor.nombre}
-                                                    onChange={e => setFormConductor({ ...formConductor, nombre: e.target.value })}
-                                                    required />
+                                    <form onSubmit={handleSubmitConductor} style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+                                        
+                                        {/* Columna Izquierda: Foto */}
+                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', width: '120px' }}>
+                                            <div 
+                                                onClick={triggerFileInput}
+                                                style={{ 
+                                                    width: '100px', height: '100px', borderRadius: '50%', background: '#f1f5f9',
+                                                    border: '2px dashed #cbd5e1', display: 'flex', flexDirection: 'column', alignItems: 'center',
+                                                    justifyContent: 'center', cursor: 'pointer', overflow: 'hidden', position: 'relative'
+                                                }}
+                                                onMouseOver={e => e.currentTarget.style.border = '2px solid #3b82f6'}
+                                                onMouseOut={e => e.currentTarget.style.border = '2px dashed #cbd5e1'}
+                                            >
+                                                {fotoPreview ? (
+                                                    <img src={fotoPreview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                ) : (
+                                                    <>
+                                                        <IcoCamera />
+                                                        <span style={{ fontSize: '10px', color: '#64748b', marginTop: '4px' }}>Añadir Foto</span>
+                                                    </>
+                                                )}
+                                                <div style={{ position: 'absolute', bottom: 0, width: '100%', background: 'rgba(0,0,0,0.5)', color: '#fff', fontSize: '10px', textAlign: 'center', padding: '2px 0', opacity: fotoPreview ? 1 : 0 }}>
+                                                    Cambiar
+                                                </div>
                                             </div>
-                                            <div className="ge-field">
-                                                <label>Cédula <span style={{ color: 'red' }}>*</span></label>
-                                                <input type="text" placeholder="Ej: 12345678"
-                                                    value={formConductor.cedula}
-                                                    onChange={e => setFormConductor({ ...formConductor, cedula: e.target.value })}
-                                                    required />
-                                            </div>
-                                            <div className="ge-field">
-                                                <label>Teléfono</label>
-                                                <input type="tel" placeholder="Ej: 311 234 5678"
-                                                    value={formConductor.telefono}
-                                                    onChange={e => setFormConductor({ ...formConductor, telefono: e.target.value })} />
-                                            </div>
-                                            <div className="ge-field">
-                                                <label>No. Licencia de Conducción</label>
-                                                <input type="text" placeholder="Ej: C2E-123456"
-                                                    value={formConductor.licencia}
-                                                    onChange={e => setFormConductor({ ...formConductor, licencia: e.target.value })} />
-                                            </div>
+                                            <input 
+                                                type="file" 
+                                                accept="image/*" 
+                                                ref={fileInputRef} 
+                                                style={{ display: 'none' }} 
+                                                onChange={handleFotoChange}
+                                            />
                                         </div>
-                                        <div className="ge-form-actions">
-                                            {conductorEditando && (
-                                                <button type="button" className="ge-btn-secondary" onClick={cancelarEditarConductor}>
-                                                    Cancelar
+
+                                        {/* Columna Derecha: Datos */}
+                                        <div style={{ flex: 1, minWidth: '300px' }}>
+                                            <div className="ge-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                                                <div className="ge-field">
+                                                    <label>Nombres <span style={{ color: 'red' }}>*</span></label>
+                                                    <input type="text" placeholder="Ej: Carlos"
+                                                        value={formConductor.nombres}
+                                                        onChange={e => setFormConductor({ ...formConductor, nombres: e.target.value })}
+                                                        required />
+                                                </div>
+                                                <div className="ge-field">
+                                                    <label>Apellidos <span style={{ color: 'red' }}>*</span></label>
+                                                    <input type="text" placeholder="Ej: Rodríguez"
+                                                        value={formConductor.apellidos}
+                                                        onChange={e => setFormConductor({ ...formConductor, apellidos: e.target.value })}
+                                                        required />
+                                                </div>
+                                                <div className="ge-field">
+                                                    <label>Cédula <span style={{ color: 'red' }}>*</span></label>
+                                                    <input type="text" placeholder="Ej: 12345678"
+                                                        value={formConductor.cedula}
+                                                        onChange={e => setFormConductor({ ...formConductor, cedula: e.target.value })}
+                                                        required />
+                                                </div>
+                                                <div className="ge-field">
+                                                    <label>Correo Electrónico</label>
+                                                    <input type="email" placeholder="usuario@empresa.com"
+                                                        value={formConductor.email}
+                                                        onChange={e => setFormConductor({ ...formConductor, email: e.target.value })} />
+                                                </div>
+                                                <div className="ge-field">
+                                                    <label>Teléfono</label>
+                                                    <input type="tel" placeholder="Ej: 311 234 5678"
+                                                        value={formConductor.telefono}
+                                                        onChange={e => setFormConductor({ ...formConductor, telefono: e.target.value })} />
+                                                </div>
+                                                <div className="ge-field">
+                                                    <label>Licencia</label>
+                                                    <input type="text" placeholder="Ej: C2E-123456"
+                                                        value={formConductor.licencia}
+                                                        onChange={e => setFormConductor({ ...formConductor, licencia: e.target.value })} />
+                                                </div>
+                                                <div className="ge-field" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                                                    <label>Estado del Conductor</label>
+                                                    <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', marginTop: '4px' }}>
+                                                        <div style={{
+                                                            position: 'relative', width: '42px', height: '24px', 
+                                                            background: formConductor.activo ? '#10b981' : '#cbd5e1', 
+                                                            borderRadius: '24px', transition: 'background 0.3s ease',
+                                                            boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.1)'
+                                                        }}>
+                                                            <div style={{
+                                                                position: 'absolute', top: '2px', left: formConductor.activo ? '20px' : '2px',
+                                                                width: '20px', height: '20px', background: '#fff', borderRadius: '50%',
+                                                                transition: 'left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)', 
+                                                                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                                            }} />
+                                                        </div>
+                                                        <span style={{ fontSize: '14px', color: formConductor.activo ? '#166534' : '#64748b', fontWeight: '500' }}>
+                                                            {formConductor.activo ? 'Activo (Disponible)' : 'Inactivo (No Disponible)'}
+                                                        </span>
+                                                        <input 
+                                                            type="checkbox" 
+                                                            checked={formConductor.activo}
+                                                            onChange={e => setFormConductor({ ...formConductor, activo: e.target.checked })}
+                                                            style={{ display: 'none' }}
+                                                        />
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div className="ge-form-actions" style={{ marginTop: '16px' }}>
+                                                {conductorEditando && (
+                                                    <button type="button" className="ge-btn-secondary" onClick={cancelarEditarConductor}>
+                                                        Cancelar
+                                                    </button>
+                                                )}
+                                                <button type="submit" className="ge-btn-primary" disabled={guardandoConductor} style={{
+                                                    background: 'linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%)',
+                                                    boxShadow: '0 4px 12px rgba(124, 58, 237, 0.25)',
+                                                    padding: '10px 24px',
+                                                    borderRadius: '8px',
+                                                    transition: 'all 0.2s ease',
+                                                    border: '1px solid rgba(255,255,255,0.1)'
+                                                }}>
+                                                    {conductorEditando ? <IcoEdit /> : <IcoPlus />}
+                                                    {guardandoConductor
+                                                        ? 'Guardando...'
+                                                        : conductorEditando ? 'Guardar Cambios' : 'Registrar Conductor'
+                                                    }
                                                 </button>
-                                            )}
-                                            <button type="submit" className="ge-btn-primary" disabled={guardandoConductor}>
-                                                {conductorEditando ? <IcoEdit /> : <IcoPlus />}
-                                                {guardandoConductor
-                                                    ? 'Guardando...'
-                                                    : conductorEditando ? 'Guardar Cambios' : 'Registrar Conductor'
-                                                }
-                                            </button>
+                                            </div>
                                         </div>
                                     </form>
                                 </div>
@@ -495,24 +638,27 @@ export default function GestionEmpresasModal({ onCerrar }) {
             </div>
 
             {/* Modales de confirmación */}
-            {empresaAEliminar && (
+            {empresaAEliminar && createPortal(
                 <ModalConfirmar
                     titulo="Eliminar Empresa"
                     descripcion={<span>¿Confirmas eliminar <strong>{empresaAEliminar.razon_social}</strong>? Sus conductores también quedarán desactivados.</span>}
                     labelConfirmar="Sí, eliminar"
                     onConfirmar={confirmarEliminarEmpresa}
                     onCancelar={() => setEmpresaAEliminar(null)}
-                />
+                />,
+                document.body
             )}
-            {conductorAEliminar && (
+            {conductorAEliminar && createPortal(
                 <ModalConfirmar
                     titulo="Eliminar Conductor"
                     descripcion={<span>¿Confirmas eliminar a <strong>{conductorAEliminar.nombre}</strong>?</span>}
                     labelConfirmar="Sí, eliminar"
                     onConfirmar={confirmarEliminarConductor}
                     onCancelar={() => setConductorAEliminar(null)}
-                />
+                />,
+                document.body
             )}
-        </>
+        </>,
+        document.body
     );
 }

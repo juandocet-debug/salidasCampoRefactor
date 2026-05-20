@@ -11,6 +11,16 @@ export async function obtenerSalidasPendientesLogistica() {
 }
 
 /**
+ * Obtiene salidas actualmente en ejecución (en_ejecucion, preembarque) para monitoreo.
+ */
+export async function obtenerSalidasEnEjecucion() {
+    const res = await clienteHttp.get('/api/admin/salidas/');
+    const lista = Array.isArray(res.data) ? res.data : (res.data?.datos ?? []);
+    const estadosActivos = ['en_ejecucion', 'preembarque', 'lista_ejecucion', 'en_preparacion'];
+    return lista.filter(s => estadosActivos.includes((s.estado || '').toLowerCase()));
+}
+
+/**
  * Obtener vehículos catalogados (flota propia y externa configurada)
  * @param {Object} opciones - Filtros opcionales: { fecha_inicio, fecha_fin, salida_id }
  */
@@ -91,8 +101,10 @@ export async function obtenerConductoresPorEmpresa(empresa_id) {
     return res.data;
 }
 
-export async function crearConductorExterno(payload) {
-    const res = await clienteHttp.post('/api/transporte/conductores/', payload);
+export async function crearConductorExterno(formData) {
+    const res = await clienteHttp.post('/api/transporte/conductores/', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
     return res.data;
 }
 
@@ -101,8 +113,36 @@ export async function eliminarConductorExterno(id) {
     return res.data;
 }
 
-export async function actualizarConductorExterno(id, payload) {
-    const res = await clienteHttp.patch(`/api/transporte/conductores/${id}/`, payload);
+export async function actualizarConductorExterno(id, formData) {
+    const res = await clienteHttp.patch(`/api/transporte/conductores/${id}/`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return res.data;
+}
+
+// ─── Conductores Institucionales ─────────────────────────────────────────────
+
+export async function obtenerConductoresInstitucionales(incluirInactivos = false) {
+    const res = await clienteHttp.get(`/api/transporte/conductores-institucionales/?incluir_inactivos=${incluirInactivos}`);
+    return res.data;
+}
+
+export async function crearConductorInstitucional(formData) {
+    const res = await clienteHttp.post('/api/transporte/conductores-institucionales/', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return res.data;
+}
+
+export async function actualizarConductorInstitucional(id, formData) {
+    const res = await clienteHttp.patch(`/api/transporte/conductores-institucionales/${id}/`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return res.data;
+}
+
+export async function eliminarConductorInstitucional(id) {
+    const res = await clienteHttp.delete(`/api/transporte/conductores-institucionales/${id}/`);
     return res.data;
 }
 

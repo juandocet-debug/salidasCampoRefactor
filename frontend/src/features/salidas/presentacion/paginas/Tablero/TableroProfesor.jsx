@@ -53,6 +53,22 @@ const TableroProfesor = () => {
         <>
             <div className="tablero-prof">
                 <div className="tablero-prof__principal">
+                    {error && (
+                        <div style={{
+                            margin: '16px 0', padding: '12px 16px',
+                            background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
+                            borderRadius: '10px', color: '#fca5a5', fontSize: '0.875rem',
+                            display: 'flex', alignItems: 'center', gap: '12px'
+                        }}>
+                            <span>⚠️ No se pudieron cargar las salidas: {error}</span>
+                            <button
+                                onClick={cargar}
+                                style={{ marginLeft: 'auto', padding: '4px 12px', background: 'var(--cyan-500)', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem' }}
+                            >
+                                Reintentar
+                            </button>
+                        </div>
+                    )}
                     <KpisProfesor salidas={salidas} cargando={cargando} />
                     <BarraAccionesProfesor />
                     <ListaTarjetasProfesor

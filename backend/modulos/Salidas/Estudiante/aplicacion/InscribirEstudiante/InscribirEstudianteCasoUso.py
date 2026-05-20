@@ -16,6 +16,11 @@ class InscribirEstudianteCasoUso:
         self.repo = repo
 
     def ejecutar(self, salida_id: int, usuario_id: int, foto_path: str, firma_path: str) -> dict:
+        # Regla: verificar documentos obligatorios
+        if hasattr(self.repo, 'tiene_documentos_obligatorios'):
+            if not self.repo.tiene_documentos_obligatorios(usuario_id):
+                raise ValueError("Debes subir tu Certificado EPS y Documento de Identidad en la pestaña 'Mis Documentos' antes de inscribirte.")
+
         # Regla: no puede inscribirse dos veces (primero para dar mensaje claro)
         existente = self.repo.buscar_inscripcion(salida_id, usuario_id)
         if existente:

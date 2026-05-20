@@ -25,7 +25,24 @@ class DjangoLogisticaRepository(ILogisticaRepository):
             EstadoOperativoSalida.PREEMBARQUE.value,        # 'preembarque'
         ]
         # Solo salidas que han pasado por el proceso completo (aprobadas por consejo o ya en ejecución)
-        salidas_orm = SalidaModelo.objects.filter(estado__in=estados_visibles).order_by('-id')
+        salidas_orm_raw = SalidaModelo.objects.filter(estado__in=estados_visibles).order_by('-id')
+
+        # Regla de Negocio: No mostrar en logística (estado APROBADA_CONSEJO) si no tiene al menos el 70% del cupo
+        from modulos.Salidas.Estudiante.infraestructura.models import EstudianteSalida
+        salidas_orm = []
+        mapa_ocupacion = {}
+        for s in salidas_orm_raw:
+            cupo_total = s.num_estudiantes or 0
+            inscritos = 0
+            porcentaje = 0.0
+            if cupo_total > 0:
+                inscritos = EstudianteSalida.objects.filter(salida_id=s.id).exclude(estado='rechazado').count()
+                porcentaje = (inscritos / cupo_total) * 100
+            
+            mapa_ocupacion[s.id] = {"inscritos": inscritos, "porcentaje": porcentaje}
+            
+            # La UI controlará si se puede asignar basado en el porcentaje
+            salidas_orm.append(s)
 
         # Obtener nombres de facultades
         facultad_ids = [s.facultad_id for s in salidas_orm if s.facultad_id]
@@ -104,6 +121,8 @@ class DjangoLogisticaRepository(ILogisticaRepository):
                 hora_fin=s_orm.hora_fin.strftime('%H:%M') if s_orm.hora_fin else '18:00',
                 destino_principal=s_orm.parada_max or s_orm.punto_partida or "No especificado",
                 num_estudiantes=s_orm.num_estudiantes or 0,
+                estudiantes_inscritos=mapa_ocupacion.get(s_orm.id, {}).get("inscritos", 0),
+                porcentaje_ocupacion=mapa_ocupacion.get(s_orm.id, {}).get("porcentaje", 0.0),
                 num_docentes=1,
                 costo_estimado=float(asig.costo_proyectado) if (asig and float(asig.costo_proyectado) > 0) else float(s_orm.costo_estimado or 0),
                 viaticos_estimados=max(0.5, float(s_orm.duracion_dias or 1) - 0.5) * 80000.0,

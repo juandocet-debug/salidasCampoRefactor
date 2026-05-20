@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { CardMatcha } from '../../../shared/componentes/generales/Tarjetas/Tarjetas';
 import { EtiquetaPill, BotonAccion } from '../../../shared/componentes/generales/ElementosUX/ElementosUX';
 import ModalConfirmar from '../../../shared/componentes/generales/ModalConfirmar/ModalConfirmar';
-import { obtenerVehiculosDisponibles, asignarTransporteLogistica, limpiarAsignacionLogistica, obtenerEmpresasContratadas, obtenerConductoresPorEmpresa, cambiarEstadoPreembarque } from '../aplicacion/servicios';
+import { obtenerVehiculosDisponibles, asignarTransporteLogistica, limpiarAsignacionLogistica, obtenerEmpresasContratadas, obtenerConductoresPorEmpresa, cambiarEstadoPreembarque, obtenerConductoresInstitucionales } from '../aplicacion/servicios';
 import useAlertas from '../../../shared/estado/useAlertas';
 import GestionEmpresasModal from './GestionEmpresas/GestionEmpresasModal';
+import GestionConductoresModal from './GestionConductores/GestionConductoresModal';
 
 const CustomCombobox = ({ value, onChange, options, placeholder, placeholderBusqueda, disabled }) => {
     const [open, setOpen] = useState(false);
@@ -99,6 +100,7 @@ const AsignarTransportePanel = ({ salida, onVolver }) => {
     const [vehiculosSeleccionados, setVehiculosSeleccionados] = useState([]);
     const [vehiculoARemover, setVehiculoARemover] = useState(null);
     const [modalGestion, setModalGestion] = useState(false);
+    const [modalConductoresInst, setModalConductoresInst] = useState(false);
     const [confirmarBorrar, setConfirmarBorrar] = useState(false);
     const [limpiando, setLimpiando] = useState(false);
     const [confirmarPreembarque, setConfirmarPreembarque] = useState(false);
@@ -108,6 +110,10 @@ const AsignarTransportePanel = ({ salida, onVolver }) => {
     const [modoEdicion, setModoEdicion] = useState(!tieneAsignacionPrevia);
 
     // Estados para formulario contratado
+    
+    const [conductoresInstitucionales, setConductoresInstitucionales] = useState([]);
+    const [asignacionesPropias, setAsignacionesPropias] = useState({}); // { vehiculoId: conductorId }
+
     const [empresasExternas, setEmpresasExternas] = useState([]);
     const [conductoresExternos, setConductoresExternos] = useState([]);
     const [busquedaEmpresa, setBusquedaEmpresa] = useState('');
@@ -216,17 +222,10 @@ const AsignarTransportePanel = ({ salida, onVolver }) => {
         }
     };
 
-    const asignarVehiculoInmediato = async (v) => {
-        try {
-            const nuevos = [...vehiculosSeleccionados, v];
-            const placas = nuevos.map(x => x.placa).join(' / ');
-            const costoReal = parseFloat(salida?.costo_estimado) || 0;
-            const capTotal = nuevos.reduce((sum, x) => sum + (parseInt(x.capacidad) || 0), 0);
-            await handleAsignar('flota_propia', placas, 'Conductor Institucional', costoReal, false, capTotal);
-            setVehiculosSeleccionados(nuevos);
-            agregarAlerta(`¡El vehículo ${v.placa} ha sido asignado a la salida!`, 'exito');
-        } catch (e) {
-            // Error ya manejado en handleAsignar
+    
+    const seleccionarVehiculoInmediato = (v) => {
+        if (!vehiculosSeleccionados.some(x => x.id === v.id)) {
+            setVehiculosSeleccionados([...vehiculosSeleccionados, v]);
         }
     };
 
@@ -296,6 +295,13 @@ const AsignarTransportePanel = ({ salida, onVolver }) => {
             obtenerEmpresasContratadas().then(data => setEmpresasExternas(data)).catch(console.error);
         }
     }, [tipoTransporte, modalGestion]); // Refrescar si se cierra el modal de gestión
+
+
+    useEffect(() => {
+        if (tipoTransporte === 'propio') {
+            obtenerConductoresInstitucionales().then(data => setConductoresInstitucionales(data)).catch(console.error);
+        }
+    }, [tipoTransporte]);
 
     // Auto-matching: cuando cargan las empresas y hay asignación previa, matchear por nombre
     useEffect(() => {
@@ -587,7 +593,7 @@ const AsignarTransportePanel = ({ salida, onVolver }) => {
                                     key={v.id}
                                     onClick={() => {
                                         if (v.estado_tecnico === 'disponible' && !asignando && !isSelected) {
-                                            asignarVehiculoInmediato(v);
+                                            seleccionarVehiculoInmediato(v);
                                         }
                                     }}
                                     style={{ 
@@ -629,10 +635,12 @@ const AsignarTransportePanel = ({ salida, onVolver }) => {
                     {vehiculosSeleccionados.length > 0 && (
                         <div style={{ marginTop: '30px', padding: '20px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #cbd5e1', animation: 'fadeIn 0.3s ease' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px', flexWrap: 'wrap', gap: '20px' }}>
-                                <h4 style={{ margin: '0', color: '#16a34a', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px', alignSelf: 'center' }}>
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                                    Asignación Activa Confirmada
-                                </h4>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', alignSelf: 'center' }}>
+                                    <h4 style={{ margin: '0', color: '#16a34a', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                        Asignación Activa Confirmada
+                                    </h4>
+                                </div>
                                 
                                 {/* Medidor de Capacidad */}
                                 <div style={{ background: '#fff', padding: '16px 20px', borderRadius: '8px', border: '1px solid #e2e8f0', minWidth: '320px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
@@ -672,12 +680,32 @@ const AsignarTransportePanel = ({ salida, onVolver }) => {
                                     )}
                                 </div>
                             </div>
+
+                            {/* Fila de controles superior a la tabla */}
+                            {tipoTransporte === 'propio' && (
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
+                                    <button
+                                        onClick={() => setModalConductoresInst(true)}
+                                        style={{
+                                            background: '#7c3aed', color: '#fff', border: 'none', borderRadius: '6px',
+                                            padding: '8px 14px', fontSize: '13px', cursor: 'pointer', fontWeight: 'bold',
+                                            display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 2px 4px rgba(124, 58, 237, 0.25)',
+                                            transition: 'background 0.2s ease'
+                                        }}
+                                        onMouseOver={(e) => e.currentTarget.style.background = '#6d28d9'}
+                                        onMouseOut={(e) => e.currentTarget.style.background = '#7c3aed'}
+                                    >
+                                        + Registrar Conductor
+                                    </button>
+                                </div>
+                            )}
+
                             <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: '#fff', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
                                 <thead style={{ backgroundColor: '#f1f5f9', borderBottom: '2px solid #e2e8f0' }}>
                                     <tr>
                                         <th style={{ padding: '12px 16px', textAlign: 'left', color: '#475569', fontSize: '13px', fontWeight: '600' }}>Placa</th>
                                         <th style={{ padding: '12px 16px', textAlign: 'left', color: '#475569', fontSize: '13px', fontWeight: '600' }}>Tipo</th>
-                                        <th style={{ padding: '12px 16px', textAlign: 'left', color: '#475569', fontSize: '13px', fontWeight: '600' }}>Capacidad</th>
+                                        <th style={{ padding: '12px 16px', textAlign: 'left', color: '#475569', fontSize: '13px', fontWeight: '600' }}>{tipoTransporte === 'propio' ? 'Conductor Asignado' : 'Capacidad'}</th>
                                         <th style={{ padding: '12px 16px', textAlign: 'right', color: '#475569', fontSize: '13px', fontWeight: '600' }}>Acción</th>
                                     </tr>
                                 </thead>
@@ -686,7 +714,22 @@ const AsignarTransportePanel = ({ salida, onVolver }) => {
                                         <tr key={vehiculo.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
                                             <td style={{ padding: '16px', fontWeight: '600', color: '#0f172a' }}>{vehiculo.placa}</td>
                                             <td style={{ padding: '16px', color: '#475569', textTransform: 'capitalize' }}>{vehiculo.tipo}</td>
-                                            <td style={{ padding: '16px', color: '#475569' }}>{vehiculo.capacidad} Pasajeros</td>
+                                            <td style={{ padding: '16px', color: '#475569' }}>
+                                                {tipoTransporte === 'propio' ? (
+                                                    <select 
+                                                        value={asignacionesPropias[vehiculo.id] || ''}
+                                                        onChange={(e) => setAsignacionesPropias({...asignacionesPropias, [vehiculo.id]: e.target.value})}
+                                                        style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none', background: '#fff', fontSize: '13px' }}
+                                                    >
+                                                        <option value="">Seleccione Conductor...</option>
+                                                        {conductoresInstitucionales.map(c => (
+                                                            <option key={c.id} value={c.nombre}>{c.nombre} - CC {c.cedula}</option>
+                                                        ))}
+                                                    </select>
+                                                ) : (
+                                                    <span>{vehiculo.capacidad} Pasajeros</span>
+                                                )}
+                                            </td>
                                             <td style={{ padding: '16px', textAlign: 'right' }}>
                                                 <button 
                                                     onClick={() => setVehiculoARemover(vehiculo)}
@@ -703,6 +746,26 @@ const AsignarTransportePanel = ({ salida, onVolver }) => {
                             <div style={{ marginTop: '16px', fontSize: '13px', color: '#64748b' }}>
                                 * Puedes seleccionar múltiples vehículos si la salida lo requiere. Para quitar uno, haz clic en "Eliminar".
                             </div>
+                            {tipoTransporte === 'propio' && (
+                                <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid #e2e8f0', paddingTop: '16px' }}>
+                                    <button 
+                                        className="herr-btn"
+                                        disabled={asignando || vehiculosSeleccionados.some(v => !asignacionesPropias[v.id])}
+                                        onClick={async () => {
+                                            const placas = vehiculosSeleccionados.map(x => x.placa).join(' / ');
+                                            const conductores = vehiculosSeleccionados.map(x => asignacionesPropias[x.id]).join(' + ');
+                                            const costoReal = parseFloat(salida?.costo_estimado) || 0;
+                                            const capTotal = vehiculosSeleccionados.reduce((sum, x) => sum + (parseInt(x.capacidad) || 0), 0);
+                                            try {
+                                                await handleAsignar('flota_propia', placas, conductores, costoReal, false, capTotal);
+                                                agregarAlerta(`¡Los vehículos han sido asignados correctamente!`, 'exito');
+                                            } catch (e) {}
+                                        }}
+                                    >
+                                        {asignando ? 'Asignando...' : 'Confirmar Asignación Institucional'}
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -861,6 +924,13 @@ const AsignarTransportePanel = ({ salida, onVolver }) => {
                         agregarAlerta("¡Transporte asignado correctamente!", 'exito');
                         if(onVolver) onVolver();
                     }}
+                />
+            )}
+            
+            {modalConductoresInst && (
+                <GestionConductoresModal 
+                    onCerrar={() => setModalConductoresInst(false)} 
+                    onConductoresActualizados={(data) => setConductoresInstitucionales(data.filter(c => c.activo !== false))} 
                 />
             )}
         </div>

@@ -4,6 +4,74 @@ import { obtenerSalidasPendientesLogistica, limpiarAsignacionLogistica, asignarT
 import useAlertas from '../../../shared/estado/useAlertas';
 import ModalConfirmar from '../../../shared/componentes/generales/ModalConfirmar/ModalConfirmar';
 
+// Componente para Filtros en Cabecera (Estilo Excel/PowerBI)
+const FiltroColumnaUX = ({ titulo, opciones, valorActual, onChange }) => {
+    const [abierto, setAbierto] = useState(false);
+    const ref = React.useRef(null);
+
+    useEffect(() => {
+        const handleClickFuera = (e) => {
+            if (ref.current && !ref.current.contains(e.target)) setAbierto(false);
+        };
+        document.addEventListener('mousedown', handleClickFuera);
+        return () => document.removeEventListener('mousedown', handleClickFuera);
+    }, []);
+
+    return (
+        <div ref={ref} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', position: 'relative' }}>
+            <span>{titulo}</span>
+            <button 
+                onClick={(e) => { e.stopPropagation(); setAbierto(!abierto); }}
+                style={{
+                    background: valorActual ? '#eff6ff' : 'transparent',
+                    border: valorActual ? '1px solid #bfdbfe' : '1px solid transparent',
+                    color: valorActual ? '#3b82f6' : '#94a3b8',
+                    padding: '4px', borderRadius: '4px', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s',
+                    outline: 'none'
+                }}
+                title={`Filtrar por ${titulo}`}
+            >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+            </button>
+
+            {abierto && (
+                <div style={{
+                    position: 'absolute', top: '100%', left: '0', marginTop: '4px',
+                    background: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px',
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)', padding: '6px',
+                    zIndex: 1000, minWidth: '200px', display: 'flex', flexDirection: 'column', gap: '2px'
+                }}>
+                    <div 
+                        onClick={() => { onChange(''); setAbierto(false); }}
+                        style={{ padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', color: !valorActual ? '#0f172a' : '#475569', background: !valorActual ? '#f8fafc' : 'transparent', fontWeight: !valorActual ? '600' : '400', transition: 'background 0.15s' }}
+                        onMouseOver={e => e.currentTarget.style.background = '#f1f5f9'}
+                        onMouseOut={e => e.currentTarget.style.background = !valorActual ? '#f8fafc' : 'transparent'}
+                    >
+                        Todos
+                    </div>
+                    {opciones.map(opc => {
+                        const activo = valorActual === opc.valor;
+                        return (
+                            <div 
+                                key={opc.valor}
+                                onClick={() => { onChange(opc.valor); setAbierto(false); }}
+                                style={{ padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', color: activo ? '#3b82f6' : '#475569', background: activo ? '#eff6ff' : 'transparent', fontWeight: activo ? '600' : '400', transition: 'background 0.15s' }}
+                                onMouseOver={e => e.currentTarget.style.background = activo ? '#eff6ff' : '#f8fafc'}
+                                onMouseOut={e => e.currentTarget.style.background = activo ? '#eff6ff' : 'transparent'}
+                            >
+                                {opc.etiqueta}
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
+    );
+};
+
 const ListaAprobadas = ({ onAsignar }) => {
     const { agregarAlerta } = useAlertas();
     const [salidas, setSalidas] = useState([]);
@@ -13,6 +81,8 @@ const ListaAprobadas = ({ onAsignar }) => {
     const [filtroFacultad, setFiltroFacultad] = useState('');
     const [filtroPrograma, setFiltroPrograma] = useState('');
     const [filtroEstado, setFiltroEstado] = useState('');
+    const [filtroOcupacion, setFiltroOcupacion] = useState('');
+    const [filtroNovedades, setFiltroNovedades] = useState('');
     const [expandidoId, setExpandidoId] = useState(null);
     const [recursoABorrar, setRecursoABorrar] = useState(null);
 
@@ -140,7 +210,22 @@ const ListaAprobadas = ({ onAsignar }) => {
             (s.nombre || '').toLowerCase().includes(busqueda.toLowerCase()) ||
             (s.asignatura || '').toLowerCase().includes(busqueda.toLowerCase())
         );
-        return matchFacultad && matchPrograma && matchEstado && matchBusqueda;
+
+        let matchOcupacion = true;
+        if (filtroOcupacion) {
+            const poc = s.porcentaje_ocupacion || 0;
+            if (filtroOcupacion === 'completo' && poc < 80) matchOcupacion = false;
+            if (filtroOcupacion === 'medio' && (poc < 60 || poc >= 80)) matchOcupacion = false;
+            if (filtroOcupacion === 'bajo' && poc >= 60) matchOcupacion = false;
+        }
+
+        let matchNovedades = true;
+        if (filtroNovedades) {
+            if (filtroNovedades === 'con_novedad') matchNovedades = !!s.nota_cambio;
+            if (filtroNovedades === 'sin_novedad') matchNovedades = !s.nota_cambio;
+        }
+
+        return matchFacultad && matchPrograma && matchEstado && matchBusqueda && matchOcupacion && matchNovedades;
     });
 
     return (
@@ -187,17 +272,7 @@ const ListaAprobadas = ({ onAsignar }) => {
                     />
                 </div>
 
-                {/* Dropdown Estado */}
-                <select 
-                    value={filtroEstado}
-                    onChange={(e) => setFiltroEstado(e.target.value)}
-                    style={{ padding: '0 12px', border: '1px solid #e2e8f0', borderRadius: '8px', height: '40px', fontSize: '13px', color: filtroEstado ? '#0f172a' : '#94a3b8', outline: 'none', background: 'white', cursor: 'pointer' }}
-                >
-                    <option value="">Todos los Estados</option>
-                    <option value="en_preparacion">Pendientes / Incompletas</option>
-                    <option value="lista_ejecucion">Agendadas Logística</option>
-                    <option value="preembarque">Pre-embarque</option>
-                </select>
+
 
                 {/* Dropdown Facultad */}
                 <select 
@@ -225,9 +300,9 @@ const ListaAprobadas = ({ onAsignar }) => {
                 </select>
 
                 {/* Botón limpiar filtros */}
-                {(filtroFacultad || filtroPrograma || filtroEstado || busqueda) && (
+                {(filtroFacultad || filtroPrograma || filtroEstado || busqueda || filtroOcupacion) && (
                     <button
-                        onClick={() => { setFiltroFacultad(''); setFiltroPrograma(''); setFiltroEstado(''); setBusqueda(''); }}
+                        onClick={() => { setFiltroFacultad(''); setFiltroPrograma(''); setFiltroEstado(''); setBusqueda(''); setFiltroOcupacion(''); }}
                         title="Limpiar filtros"
                         style={{ 
                             height: '40px', 
@@ -256,24 +331,56 @@ const ListaAprobadas = ({ onAsignar }) => {
 
             {/* Tabla */}
             <div className="herr-tabla-wrapper">
-                {cargando ? (
-                    <div className="herr-vacio">Cargando datos logísticos...</div>
-                ) : salidasFiltradas.length === 0 ? (
-                    <div className="herr-vacio">No hay salidas pendientes de asignación.</div>
-                ) : (
-                    <table className="herr-tabla">
+                <table className="herr-tabla">
                         <thead>
                             <tr>
                                 <th>Código</th>
-                                <th>Nombre</th>
+                                <th style={{ paddingRight: '16px', overflow: 'visible' }}>
+                                    <FiltroColumnaUX 
+                                        titulo="Nombre" 
+                                        valorActual={filtroNovedades} 
+                                        onChange={setFiltroNovedades}
+                                        opciones={[
+                                            { valor: 'con_novedad', etiqueta: '⚠️ Con Novedades' },
+                                            { valor: 'sin_novedad', etiqueta: '✅ Sin Novedades' },
+                                        ]}
+                                    />
+                                </th>
                                 <th>Facultad</th>
                                 <th>Categoría</th>
-                                <th>Estado</th>
+                                <th style={{ paddingRight: '16px', overflow: 'visible' }}>
+                                    <FiltroColumnaUX 
+                                        titulo="Ocupación" 
+                                        valorActual={filtroOcupacion} 
+                                        onChange={setFiltroOcupacion}
+                                        opciones={[
+                                            { valor: 'completo', etiqueta: '🟢 Óptima (≥ 80%)' },
+                                            { valor: 'medio', etiqueta: '🟡 Media (60% - 79%)' },
+                                            { valor: 'bajo', etiqueta: '🔴 Baja (< 60%)' },
+                                        ]}
+                                    />
+                                </th>
+                                <th style={{ paddingRight: '16px', overflow: 'visible' }}>
+                                    <FiltroColumnaUX 
+                                        titulo="Estado" 
+                                        valorActual={filtroEstado} 
+                                        onChange={setFiltroEstado}
+                                        opciones={[
+                                            { valor: 'en_preparacion', etiqueta: 'Pendiente / Incompleta' },
+                                            { valor: 'lista_ejecucion', etiqueta: 'Agendada Logística' },
+                                            { valor: 'preembarque', etiqueta: 'Pre-embarque' },
+                                        ]}
+                                    />
+                                </th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {salidasFiltradas.map(s => {
+                            {cargando ? (
+                                <tr><td colSpan="7"><div className="herr-vacio">Cargando datos logísticos...</div></td></tr>
+                            ) : salidasFiltradas.length === 0 ? (
+                                <tr><td colSpan="7"><div className="herr-vacio">No hay salidas que coincidan con los filtros.</div></td></tr>
+                            ) : salidasFiltradas.map(s => {
                                 const isExpanded = expandidoId === s.id;
                                 const yaAsignada = s.estado === 'lista_ejecucion' || !!s.empresa_asignada;
                                 const totalPax = (s.num_estudiantes || 0) + (s.num_docentes || 0);
@@ -281,6 +388,19 @@ const ListaAprobadas = ({ onAsignar }) => {
                                 const capAsignada = (s.capacidad_asignada != null) ? Number(s.capacidad_asignada) : 0;
                                 const esIncompleta = yaAsignada && (capAsignada === 0 || capAsignada < totalPax);
                                 const costoFormateado = s.costo_estimado ? new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(s.costo_estimado) : '$ 0';
+                                
+                                const poc = s.porcentaje_ocupacion || 0;
+                                let colorBarra = '#ef4444'; // Rojo (< 60%)
+                                let colorTexto = '#b91c1c';
+                                if (poc >= 80) {
+                                    colorBarra = '#10b981'; // Verde
+                                    colorTexto = '#15803d';
+                                } else if (poc >= 60) {
+                                    colorBarra = '#f59e0b'; // Amarillo
+                                    colorTexto = '#b45309';
+                                }
+                                
+                                const disableAsignar = !yaAsignada && poc < 80;
                                 
                                 return (
                                     <React.Fragment key={s.id}>
@@ -301,7 +421,15 @@ const ListaAprobadas = ({ onAsignar }) => {
                                             <td>
                                                 <div style={{ fontWeight: 600 }}>{s.nombre}</div>
                                                 {s.nota_cambio && (
-                                                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginTop: '6px', padding: '4px 10px', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '6px', fontSize: '10px', fontWeight: '600', color: '#1d4ed8' }}>
+                                                    <div style={{ 
+                                                        display: 'inline-flex', alignItems: 'center', gap: '6px', 
+                                                        marginTop: '6px', padding: '4px 10px', 
+                                                        background: (s.color === '#ef4444' || s.nota_cambio.includes('URGENTE')) ? '#fef2f2' : '#eff6ff', 
+                                                        border: `1px solid ${(s.color === '#ef4444' || s.nota_cambio.includes('URGENTE')) ? '#fca5a5' : '#bfdbfe'}`, 
+                                                        borderRadius: '6px', 
+                                                        fontSize: '10px', fontWeight: '600', 
+                                                        color: (s.color === '#ef4444' || s.nota_cambio.includes('URGENTE')) ? '#b91c1c' : '#1d4ed8' 
+                                                    }}>
                                                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                                                         {s.nota_cambio}
                                                     </div>
@@ -312,6 +440,19 @@ const ListaAprobadas = ({ onAsignar }) => {
                                                 <span style={{ background: '#e0e7ff', color: '#4338ca', padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
                                                     {s.categoria ? s.categoria.toUpperCase() : 'N/A'}
                                                 </span>
+                                            </td>
+                                            <td>
+                                                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '4px 10px' }}>
+                                                    <span style={{ fontSize: '12px', fontWeight: 600, color: '#334155', lineHeight: 1 }}>
+                                                        {s.estudiantes_inscritos || 0}/{s.num_estudiantes || 0}
+                                                    </span>
+                                                    <div style={{ width: '40px', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden', display: 'flex' }}>
+                                                        <div style={{ width: `${Math.min(poc, 100)}%`, height: '100%', background: colorBarra }}></div>
+                                                    </div>
+                                                    <span style={{ fontSize: '11px', color: colorTexto, fontWeight: 700, minWidth: '32px', textAlign: 'right', lineHeight: 1 }}>
+                                                        {Math.round(poc)}%
+                                                    </span>
+                                                </div>
                                             </td>
                                             <td>
                                                 {s.estado === 'preembarque' ? (
@@ -338,12 +479,18 @@ const ListaAprobadas = ({ onAsignar }) => {
                                                 <div className="herr-acciones">
                                                     <button 
                                                         className="herr-action-circle" 
-                                                        title={s.estado === 'preembarque' ? 'Ver Pre-embarque' : yaAsignada ? 'Ver / Reasignar' : 'Asignar Recursos'}
-                                                        onClick={(e) => { e.stopPropagation(); onAsignar?.(s); }}
+                                                        title={s.estado === 'preembarque' ? 'Ver Pre-embarque' : yaAsignada ? 'Ver / Reasignar' : disableAsignar ? 'Requiere 80% de cupo para asignar' : 'Asignar Recursos'}
+                                                        disabled={disableAsignar}
+                                                        onClick={(e) => { 
+                                                            e.stopPropagation(); 
+                                                            if (!disableAsignar) onAsignar?.(s); 
+                                                        }}
                                                         style={{ 
-                                                            color: esIncompleta ? '#d97706' : yaAsignada ? '#10b981' : '#0ea5e9', 
-                                                            borderColor: esIncompleta ? '#fde68a' : yaAsignada ? '#d1fae5' : '#e0f2fe', 
-                                                            background: esIncompleta ? '#fffbeb' : yaAsignada ? '#f0fdf4' : '#f0f9ff' 
+                                                            color: disableAsignar ? '#94a3b8' : (esIncompleta ? '#d97706' : yaAsignada ? '#10b981' : '#0ea5e9'), 
+                                                            borderColor: disableAsignar ? '#cbd5e1' : (esIncompleta ? '#fde68a' : yaAsignada ? '#d1fae5' : '#e0f2fe'), 
+                                                            background: disableAsignar ? '#f1f5f9' : (esIncompleta ? '#fffbeb' : yaAsignada ? '#f0fdf4' : '#f0f9ff'),
+                                                            cursor: disableAsignar ? 'not-allowed' : 'pointer',
+                                                            opacity: disableAsignar ? 0.6 : 1
                                                         }}
                                                     >
                                                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -352,13 +499,38 @@ const ListaAprobadas = ({ onAsignar }) => {
                                                                 : <><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></>}
                                                         </svg>
                                                     </button>
-                                                    <button 
-                                                        className="herr-btn herr-btn--ghost herr-btn--sm"
-                                                        onClick={(e) => { e.stopPropagation(); onAsignar?.(s); }}
-                                                        style={yaAsignada ? { color: '#15803d', borderColor: '#86efac' } : {}}
-                                                    >
-                                                        {yaAsignada ? 'Reasignar' : 'Asignar'}
-                                                    </button>
+                                                    {!yaAsignada && (
+                                                        <button 
+                                                            className="herr-action-btn herr-btn-primary"
+                                                            disabled={disableAsignar}
+                                                            onClick={(e) => { 
+                                                                e.stopPropagation(); 
+                                                                if (!disableAsignar) onAsignar?.(s); 
+                                                            }}
+                                                            style={{
+                                                                cursor: disableAsignar ? 'not-allowed' : 'pointer',
+                                                                opacity: disableAsignar ? 0.6 : 1,
+                                                                background: disableAsignar ? '#94a3b8' : '#3b82f6',
+                                                                color: 'white',
+                                                                padding: '6px 12px',
+                                                                borderRadius: '6px',
+                                                                border: 'none',
+                                                                fontSize: '12px',
+                                                                fontWeight: '600'
+                                                            }}
+                                                        >
+                                                            Asignar
+                                                        </button>
+                                                    )}
+                                                    {yaAsignada && (
+                                                        <button 
+                                                            className="herr-btn herr-btn--ghost herr-btn--sm"
+                                                            onClick={(e) => { e.stopPropagation(); onAsignar?.(s); }}
+                                                            style={{ color: '#15803d', borderColor: '#86efac' }}
+                                                        >
+                                                            Reasignar
+                                                        </button>
+                                                    )}
                                                     <button style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8', display: 'flex', alignItems: 'center', padding: '0 5px' }}>
                                                         <svg style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                             <polyline points="6 9 12 15 18 9"></polyline>
@@ -369,7 +541,7 @@ const ListaAprobadas = ({ onAsignar }) => {
                                         </tr>
                                         {isExpanded && (
                                             <tr style={{ background: '#fafaf9', borderBottom: '1px solid #e2e8f0' }}>
-                                                <td colSpan="6" style={{ padding: '0 16px 16px 16px' }}>
+                                                <td colSpan="7" style={{ padding: '0 16px 16px 16px' }}>
                                                     <div style={{ padding: '16px 20px', background: '#fff', borderRadius: '8px', border: '1px solid #f1f5f9', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', display: 'grid', gridTemplateColumns: 'minmax(0, 0.8fr) minmax(0, 0.9fr) minmax(0, 0.7fr) minmax(0, 1.8fr)', gap: '16px', whiteSpace: 'normal', boxSizing: 'border-box' }}>
                                                         {/* Columna 1: Itinerario */}
                                                         <div style={{ overflow: 'hidden', minWidth: 0 }}>
@@ -560,7 +732,6 @@ const ListaAprobadas = ({ onAsignar }) => {
                             })}
                         </tbody>
                     </table>
-                )}
             </div>
             {/* Modal de Confirmación */}
             {recursoABorrar && (

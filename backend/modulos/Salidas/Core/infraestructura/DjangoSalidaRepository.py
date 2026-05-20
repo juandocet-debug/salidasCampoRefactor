@@ -29,6 +29,41 @@ except ImportError:
     SalidaModelo = None
     SalidaVehiculoAsignado = None
 
+
+# Mapa de estados legados / alternativos que puedan existir en la BD
+# hacia los estados canónicos del dominio.
+# Esta normalización pertenece a la infraestructura — NO al dominio.
+_ESTADO_LEGACY_MAP = {
+    'ejecutandose':     'en_ejecucion',
+    'en_ejecución':     'en_ejecucion',
+    'BORRADOR':         'borrador',
+    'ENVIADA':          'enviada',
+    'EN_REVISION':      'en_revision',
+    'FAVORABLE':        'favorable',
+    'PENDIENTE_AJUSTE': 'pendiente_ajuste',
+    'AJUSTADA':         'ajustada',
+    'APROBADA':         'aprobada',
+    'RECHAZADA':        'rechazada',
+    'EN_PREPARACION':   'en_preparacion',
+    'LISTA_EJECUCION':  'lista_ejecucion',
+    'PREEMBARQUE':      'preembarque',
+    'EN_EJECUCION':     'en_ejecucion',
+    'FINALIZADA':       'finalizada',
+    'CERRADA':          'cerrada',
+    'CANCELADA':        'cancelada',
+}
+
+def _parse_estado(raw: str) -> EstadoSalida:
+    """Convierte un valor de estado raw de la BD a EstadoSalida, tolerando valores legacy."""
+    normalizado = _ESTADO_LEGACY_MAP.get(raw, raw)
+    try:
+        return EstadoSalida(normalizado)
+    except ValueError:
+        # Fallback seguro: si el estado es completamente desconocido, usar EN_EJECUCION
+        print(f"[DjangoSalidaRepository] Estado desconocido en BD: '{raw}' → usando EN_EJECUCION como fallback")
+        return EstadoSalida.EN_EJECUCION
+
+
 class DjangoSalidaRepository(SalidaRepository):
 
     def _to_domain(self, model_obj) -> Salida:
@@ -47,7 +82,7 @@ class DjangoSalidaRepository(SalidaRepository):
             programa_id=ProgramaId(model_obj.programa_id),
             num_estudiantes=SalidaNumEstudiantes(model_obj.num_estudiantes),
             justificacion=SalidaJustificacion(model_obj.justificacion),
-            estado=EstadoSalida(model_obj.estado),
+            estado=_parse_estado(model_obj.estado),
             profesor_id=ProfesorId(model_obj.profesor_id),
             fecha_inicio=SalidaFechaInicio(model_obj.fecha_inicio),
             fecha_fin=SalidaFechaFin(model_obj.fecha_fin),

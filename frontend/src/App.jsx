@@ -20,7 +20,7 @@ import PanelHerramientas from '@/features/admin_sistema/presentacion/paginas/Pan
 import PaginaVerificacionAbordaje from '@/features/abordaje/presentacion/paginas/PaginaVerificacionAbordaje/PaginaVerificacionAbordaje';
 import PaginaCodigoEstudiante from '@/features/abordaje/presentacion/paginas/PaginaCodigoEstudiante/PaginaCodigoEstudiante';
 import PaginaConstruccion from '@/shared/componentes/PaginaConstruccion/PaginaConstruccion';
-import AppEstudiante from '@/features/salidas/presentacion/componentes/AppEstudiante/AppEstudiante';
+import AppMobile from '@/features/mobile/presentacion/componentes/AppMobile/AppMobile';
 import CoordinadorDashboard from '@/features/coordinacion/CoordinadorDashboard';
 import ConsejoDashboard from '@/features/consejo/ConsejoDashboard';
 import CoordinadorLogisticaDashboard from '@/features/coordinadorLogistica/CoordinadorLogisticaDashboard';
@@ -67,8 +67,8 @@ export default function App() {
       <GlobalAlerts />
       <Routes>
 
-        {/* ── Ruta pública de la App del Estudiante (sin auth) ──────── */}
-        <Route path="/estudiante/unirse" element={<AppEstudiante />} />
+        {/* ── App Móvil Unificada (Estudiantes, Conductores) ── */}
+        <Route path="/app" element={<AppMobile />} />
 
         {/* ── Rutas públicas ──────────────────────────────────────── */}
         <Route path="/login" element={<PaginaLogin />} />

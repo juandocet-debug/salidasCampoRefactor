@@ -79,7 +79,7 @@ export default function PaginaNuevaSalida() {
     const handleAnterior = () => setPasoActivo(p => Math.max(p - 1, 1));
 
     // ── Envío del formulario ─────────────────────────────────────────────
-    const ESTADOS_AVANZADOS = ['enviada', 'en_revision', 'favorable', 'ajustada', 'favorable_con_ajustes', 'aprobada'];
+    const ESTADOS_AVANZADOS = ['enviada', 'en_revision', 'favorable', 'ajustada', 'favorable_con_ajustes', 'aprobada', 'en_preparacion', 'lista_ejecucion', 'preembarque'];
 
     const handleSubmit = async (e) => {
         e?.preventDefault?.();

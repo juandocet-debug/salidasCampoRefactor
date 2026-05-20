@@ -52,11 +52,14 @@ clienteHttp.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            if (enCierreSesion) {
-                enCierreSesion();
-            }
+            // Solo cerrar sesión si no estamos ya en /login para evitar bucle infinito
             if (!window.location.pathname.startsWith('/login')) {
-                window.location.href = '/login';
+                if (enCierreSesion) {
+                    enCierreSesion();
+                }
+                // NO usar window.location.href — eso causa reload completo y bucle.
+                // React Router detectará el cambio de estado de Zustand y
+                // RutasProtegidas redirigirá a /login automáticamente.
             }
         }
         return Promise.reject(error);

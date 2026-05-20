@@ -90,3 +90,13 @@ class IEstudianteRepository(ABC):
     def obtener_documentos(self, usuario_id: int) -> List[dict]:
         """Retorna los documentos actuales subidos por el estudiante."""
         pass
+
+    @abstractmethod
+    def tiene_documentos_obligatorios(self, usuario_id: int) -> bool:
+        """Verifica si el estudiante ha subido el Certificado EPS y Documento de Identidad."""
+        pass
+
+    @abstractmethod
+    def eliminar_documento(self, usuario_id: int, tipo_documento: str) -> None:
+        """Elimina un documento específico del estudiante."""
+        pass
